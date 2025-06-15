@@ -1,0 +1,111 @@
+<svg width="340" height="340" viewBox="0 0 340 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="340" height="340" fill="transparent"/>
+  <g opacity="0.13" stroke="#7a8a9a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Palm Tree 1 -->
+    <g>
+      <path d="M40 60 Q45 50 55 60 Q50 55 60 60 Q55 50 65 60" />
+      <line x1="52" y1="60" x2="52" y2="80" />
+    </g>
+    <!-- Palm Tree 2 -->
+    <g>
+      <path d="M300 100 Q305 90 315 100 Q310 95 320 100 Q315 90 325 100" />
+      <line x1="312" y1="100" x2="312" y2="120" />
+    </g>
+    <!-- Palm Tree 3 -->
+    <g>
+      <path d="M120 200 Q125 190 135 200 Q130 195 140 200 Q135 190 145 200" />
+      <line x1="132" y1="200" x2="132" y2="220" />
+    </g>
+    <!-- Sun with more rays -->
+    <g>
+      <circle cx="280" cy="60" r="12" />
+      <line x1="280" y1="40" x2="280" y2="30" />
+      <line x1="280" y1="80" x2="280" y2="90" />
+      <line x1="268" y1="60" x2="258" y2="60" />
+      <line x1="292" y1="60" x2="302" y2="60" />
+      <line x1="271" y1="49" x2="263" y2="41" />
+      <line x1="289" y1="49" x2="297" y2="41" />
+      <line x1="271" y1="71" x2="263" y2="79" />
+      <line x1="289" y1="71" x2="297" y2="79" />
+      <line x1="273" y1="46" x2="267" y2="36" />
+      <line x1="287" y1="46" x2="293" y2="36" />
+      <line x1="273" y1="74" x2="267" y2="84" />
+      <line x1="287" y1="74" x2="293" y2="84" />
+    </g>
+    <!-- Suitcase -->
+    <g>
+      <rect x="60" y="260" width="32" height="22" rx="4" />
+      <rect x="70" y="255" width="12" height="7" rx="2" />
+    </g>
+    <!-- Waves -->
+    <g>
+      <path d="M200 320 Q205 315 210 320 T220 320 T230 320" />
+      <path d="M210 330 Q215 325 220 330 T230 330 T240 330" />
+    </g>
+    <!-- Island -->
+    <g>
+      <ellipse cx="170" cy="80" rx="18" ry="6" />
+      <rect x="165" y="65" width="10" height="15" rx="3" />
+      <path d="M170 65 Q172 60 175 65" />
+    </g>
+    <!-- Boat -->
+    <g>
+      <rect x="250" y="250" width="30" height="8" rx="2" />
+      <polygon points="265,242 270,250 260,250" />
+      <rect x="263" y="235" width="4" height="10" rx="1" />
+    </g>
+    <!-- Airplane 1 -->
+    <g>
+      <path d="M60 40 l20 8 l-8 4 l8 4 l-20 8 l4 -8 l-8 -4 l8 -4 z" />
+    </g>
+    <!-- Airplane 2 -->
+    <g>
+      <path d="M200 40 l18 7 l-7 4 l7 4 l-18 7 l4 -7 l-7 -4 l7 -4 z" />
+    </g>
+    <!-- Airplane 3 -->
+    <g>
+      <path d="M80 300 l16 6 l-6 3 l6 3 l-16 6 l3 -6 l-6 -3 l6 -3 z" />
+    </g>
+    <!-- Car -->
+    <g>
+      <rect x="120" y="260" width="28" height="12" rx="4" />
+      <rect x="125" y="255" width="18" height="7" rx="2" />
+      <circle cx="126" cy="273" r="2" />
+      <circle cx="144" cy="273" r="2" />
+    </g>
+    <!-- Scooter -->
+    <g>
+      <circle cx="300" cy="300" r="4" />
+      <circle cx="320" cy="300" r="4" />
+      <rect x="304" y="296" width="12" height="4" rx="2" />
+      <line x1="316" y1="296" x2="320" y2="292" />
+      <line x1="320" y1="292" x2="324" y2="292" />
+    </g>
+    <!-- Beach Umbrella -->
+    <g>
+      <path d="M90 120 Q100 100 110 120" />
+      <line x1="100" y1="120" x2="100" y2="135" />
+      <path d="M95 135 Q100 140 105 135" />
+    </g>
+    <!-- Location Pin -->
+    <g>
+      <ellipse cx="220" cy="120" rx="7" ry="10" />
+      <circle cx="220" cy="120" r="2" />
+      <line x1="220" y1="130" x2="220" y2="135" />
+    </g>
+    <!-- Extra Waves -->
+    <g>
+      <path d="M60 200 Q65 195 70 200 T80 200 T90 200" />
+      <path d="M80 210 Q85 205 90 210 T100 210 T110 210" />
+    </g>
+    <!-- More Dots for subtlety -->
+    <circle cx="100" cy="120" r="2" />
+    <circle cx="300" cy="200" r="2" />
+    <circle cx="60" cy="180" r="2" />
+    <circle cx="200" cy="100" r="2" />
+    <circle cx="180" cy="300" r="2" />
+    <circle cx="240" cy="40" r="2" />
+    <circle cx="320" cy="120" r="2" />
+    <circle cx="40" cy="320" r="2" />
+  </g>
+</svg> 

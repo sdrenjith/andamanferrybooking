@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Ferry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity=""
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
+        integrity="" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+        integrity="" crossorigin="anonymous">
+    <link href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css'
+        rel='stylesheet'>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <div class="ad text-center py-2 text-white">
+        <p class="m-0">FLAT 10% OFF ON ALL BOOKINGS</p>
+    </div>
+    <header>
+        <nav class="navbar navbar-expand-lg py-0">
+            <div class="container-fluid justify-content-between">
+                <a class="navbar-brand" href=""><img src="images/logo.svg" alt=""></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="bi bi-view-list" id="menu"></i>
+                    <i class="bi bi-x-lg" id="menuclose"></i>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Blogs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">FAQs</a>
+                        </li>
+                        <li class="nav-item ms-md-3">
+                            <a class="nav-link d-flex align-items-center" href="#">
+                                <img src="images/profile-demo.svg" alt="" class="me-2">
+                                Sayan Debnath
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <div class="ferryBanner">
+                <div class="bookingConsole ">
+                    <div class="tabBtns  d-flex align-items-center">
+                        <div class="d-flex align-items-start tabBtn tabBtn1 active" data-list="1">
+                            <img src="images/one-way-inactive.png" class="icon-inactive" alt="">
+                            <img src="images/one-way-active.png" class="icon-active" alt="">
+                            <p class="mb-0 ms-2">One Way</p>
+                        </div>
+                        <div class="d-flex align-items-center tabBtn tabBtn2" data-list="2">
+                            <img src="images/return-inactive.png" class="icon-inactive" alt="">
+                            <img src="images/return-active.png" class="icon-active" alt="">
+                            <p class="mb-0 ms-2">Return</p>
+                        </div>
+
+                    </div>
+                    <div class="position-relative tabContainer">
+                        <div class="tabs tabs1 row mx-0">
+                            <div class="col-12 col-md-6 col-lg-3 mb-2 mb-lg-0 border-end">
+                                <label for="location">From</label>
+                                <select name="" class="form-select border-0 p-0" id="">
+                                    <option value="select">Select</option>
+                                    <option value="">Port Blair</option>
+                                    <option value="">Havelock</option>
+                                    <option value="">Neil Island</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-3 mb-2 mb-lg-0 border-end">
+                                <label for="location">To</label>
+                                <select name="" class="form-select border-0 p-0" id="">
+                                    <option value="select">Select</option>
+                                    <option value="">Port Blair</option>
+                                    <option value="">Havelock</option>
+                                    <option value="">Neil Island</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0 border-end">
+                                <label for="date">Date</label>
+                                <input type="text" id="" class="my_date_picker" placeholder="Select Date">
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0 ">
+                                <label for="location">Passengers</label>
+                                <input type="tel" name="" maxlength="1" inputmode="numeric" id="days"
+                                    placeholder="No. of Pax">
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
+                                <a href="search-result-ferry.html" target="_blank"  class="btn button w-100"><i class="bi bi-search"></i>
+                                    Search</a>
+                            </div>
+                        </div>
+                        <div class="tabs tabs2 row mx-0">
+                            <div class="col-12 col-md-6 col-lg-3 mb-2 mb-lg-0 border-end">
+                                <label for="location">From</label>
+                                <select name="" class="form-select border-0 p-0" id="">
+                                    <option value="select">Select</option>
+                                    <option value="">Port Blair</option>
+                                    <option value="">Havelock</option>
+                                    <option value="">Neil Island</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-3 mb-2 mb-lg-0 border-end">
+                                <label for="location">To</label>
+                                <select name="" class="form-select border-0 p-0" id="">
+                                    <option value="select">Select</option>
+                                    <option value="">Port Blair</option>
+                                    <option value="">Havelock</option>
+                                    <option value="">Neil Island</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0 border-end">
+                                <label for="date">Date</label>
+                                <input type="text" id="" class="my_date_picker" placeholder="Select Date">
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0 ">
+                                <label for="location">Passengers</label>
+                                <input type="tel" name="" maxlength="1" inputmode="numeric" id="days"
+                                    placeholder="No. of Pax">
+                            </div>
+                            <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
+                                <a href="search-result-ferry.html" target="_blank"  class="btn button w-100"><i class="bi bi-search"></i>
+                                    Search</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="mt-5 pt-3">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-sm-6 mb-3 mb-lg-0  col-md-3 col-12">
+                        <div class="processCard card">
+                            <div class="card-body">
+                                <img src="images/search.png" alt="">
+                            </div>
+                            <div class="card-footer bg-transparent p-0 border-0">
+                                <p>Search</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6 mb-3 mb-lg-0 col-md-3 col-12">
+                        <div class="processCard card">
+                            <div class="card-body">
+                                <img src="images/fill-info.png" alt="">
+                            </div>
+                            <div class="card-footer bg-transparent p-0 border-0">
+                                <p>Fill Info</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6 mb-3 mb-lg-0  col-md-3 col-12">
+                        <div class="processCard card">
+                            <div class="card-body">
+                                <img src="images/payment.png" alt="">
+                            </div>
+                            <div class="card-footer bg-transparent p-0 border-0">
+                                <p>Payment</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6 mb-3 mb-lg-0  col-md-3 col-12">
+                        <div class="processCard card">
+                            <div class="card-body">
+                                <img src="images/get-ticket.png" alt="">
+                            </div>
+                            <div class="card-footer bg-transparent p-0 border-0">
+                                <p>Get Ticket</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="mt-5 pt-3">
+            <div class="container">
+
+                <div class="row align-items-center">
+                    <div class="col-12 col-md-12 col-lg-8">
+                        <div class="row secHead mb-4">
+                            <div class="col-12 text-center">
+                                <h2>Ferries in Andaman</h2>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 searchResults">
+                                <div class="ferryCard ferrySearch mb-3">
+                                    <div class="ferryImg">
+                                        <img src="images/ferry2.png" alt="">
+                                    </div>
+                                    <div class="ferryDetails ms-3 ">
+                                        <div>
+                                            <h4 class="mb-3">Makruzz Gold</h4>
+                                            <p class="mb-3">4.5 - 5 hour NaPali Tour</p>
+                                            <p class="mb-3">55 Seats Availabel</p>
+                                            <p class="">₹ 169.00</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <a href="" class="btn">Book Now</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ferryCard ferrySearch mb-3">
+                                    <div class="ferryImg">
+                                        <img src="images/ferry1.png" alt="">
+                                    </div>
+                                    <div class="ferryDetails ms-3 ">
+                                        <div>
+                                            <h4 class="mb-3">Makruzz Gold</h4>
+                                            <p class="mb-3">4.5 - 5 hour NaPali Tour</p>
+                                            <p class="mb-3">55 Seats Availabel</p>
+                                            <p class="">₹ 169.00</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <a href="" class="btn">Book Now</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ferryCard ferrySearch mb-3">
+                                    <div class="ferryImg">
+                                        <img src="images/ferry2.png" alt="">
+                                    </div>
+                                    <div class="ferryDetails ms-3 ">
+                                        <div>
+                                            <h4 class="mb-3">Makruzz Gold</h4>
+                                            <p class="mb-3">4.5 - 5 hour NaPali Tour</p>
+                                            <p class="mb-3">55 Seats Availabel</p>
+                                            <p class="">₹ 169.00</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <a href="" class="btn">Book Now</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="ferryCard ferrySearch mb-3">
+                                    <div class="ferryImg">
+                                        <img src="images/ferry1.png" alt="">
+                                    </div>
+                                    <div class="ferryDetails ms-3 ">
+                                        <div>
+                                            <h4 class="mb-3">Makruzz Gold</h4>
+                                            <p class="mb-3">4.5 - 5 hour NaPali Tour</p>
+                                            <p class="mb-3">55 Seats Availabel</p>
+                                            <p class="">₹ 169.00</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <a href="" class="btn">Book Now</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 d-none d-md-none d-lg-block">
+                        <div class="mapImg"><img src="images/map.png" width="100%" alt=""></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class=" mt-5 pt-3">
+            <div class="container">
+                <div class="row secHead">
+                    <div class="col-12 text-center">
+                        <h2>We are collaborated with</h2>
+                    </div>
+                </div>
+                <div class="cardSlider mt-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="col-12 owl-carousel owl-theme" id="collabFerry">
+                                <div class="item">
+                                    <a href="" class="destinationCard">
+                                        <img src="images/port-blair.png" alt="">
+
+                                    </a>
+                                </div>
+                                <div class="item">
+                                    <a href="" class="destinationCard">
+                                        <img src="images/havelock.png" alt="">
+
+                                    </a>
+                                </div>
+                                <div class="item">
+                                    <a href="" class="destinationCard">
+                                        <img src="images/neil-island.png" alt="">
+
+                                    </a>
+                                </div>
+                                <div class="item">
+                                    <a href="" class="destinationCard">
+                                        <img src="images/baratang.png" alt="">
+
+                                    </a>
+                                </div>
+                                <div class="item">
+                                    <a href="" class="destinationCard">
+                                        <img src="images/diglipur.png" alt="">
+
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </section>
+        <section class=" mt-5 pt-3">
+            <div class="container">
+                <div class="row secHead">
+                    <div class="col-12 text-center">
+                        <h2>Top Destination In Andaman </h2>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12 owl-carousel owl-theme" id="topDestinations">
+                        <div class="item">
+                            <a href="" class="destinationCard">
+                                <img src="images/port-blair.png" alt="">
+                                <h3>Port Blair</h3>
+                            </a>
+                        </div>
+                        <div class="item">
+                            <a href="" class="destinationCard">
+                                <img src="images/havelock.png" alt="">
+                                <h3>Havelock</h3>
+                            </a>
+                        </div>
+                        <div class="item">
+                            <a href="" class="destinationCard">
+                                <img src="images/neil-island.png" alt="">
+                                <h3>Neil Island</h3>
+                            </a>
+                        </div>
+                        <div class="item">
+                            <a href="" class="destinationCard">
+                                <img src="images/baratang.png" alt="">
+                                <h3>Baratang</h3>
+                            </a>
+                        </div>
+                        <div class="item">
+                            <a href="" class="destinationCard">
+                                <img src="images/diglipur.png" alt="">
+                                <h3>Diglipur</h3>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-5 pt-3">
+
+            <div class="row justify-content-end secHead w-100 m-0">
+                <div class="col-12 col-lg-6 text-center">
+                    <h2>What They Say About Us</h2>
+                </div>
+            </div>
+            <div class="testimonials">
+                <div class="container">
+
+                    <div id="carouselExample" class="carousel slide">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="row align-items-center">
+                                    <div class="col-12 col-sm-12 col-md-7">
+                                        <div class="comment">
+                                            <!-- <video controls autoplay muted>
+                                                        <source src="https://youtu.be/ytyw2oufE4U?si=DRx8uZ58PdqdjD7m"
+                                                            type="">
+                                                    </video> -->
+                                            <p class="text-white ps-5">Lorem ipsum dolor sit, amet consectetur
+                                                adipisicing elit. Animi laudantium reiciendis eos tempora cum expedita
+                                                qui dolore, quo ipsam repudiandae optio accusamus distinctio sit
+                                                voluptatibus perspiciatis omnis. Excepturi, possimus ipsa!</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-5">
+                                        <div class="profileInfo">
+                                            <div class="profilePic"><img src="images/profile-demo.png" alt="">
+                                            </div>
+                                            <div>
+                                                <h3>Elsa Weimann</h3>
+                                                <p>Central Accounts Strategist</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="carousel-item ">
+                                <div class="row align-items-center">
+                                    <div class="col-12 col-sm-12 col-md-7">
+                                        <div class="comment">
+                                            <!-- <video controls autoplay muted>
+                                                        <source src="https://youtu.be/ytyw2oufE4U?si=DRx8uZ58PdqdjD7m"
+                                                            type="">
+                                                    </video> -->
+                                            <p class="text-white ps-5">Lorem ipsum dolor sit, amet consectetur
+                                                adipisicing elit. Animi laudantium reiciendis eos tempora cum expedita
+                                                qui dolore, quo ipsam repudiandae optio accusamus distinctio sit
+                                                voluptatibus perspiciatis omnis. Excepturi, possimus ipsa!</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-5">
+                                        <div class="profileInfo">
+                                            <div class="profilePic"><img src="images/profile-demo.png" alt="">
+                                            </div>
+                                            <div>
+                                                <h3>Elsa Weimann</h3>
+                                                <p>Central Accounts Strategist</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
+                            data-bs-slide="prev">
+                            <img src="images/left_arrow_white.svg" alt="">
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
+                            data-bs-slide="next">
+                            <img src="images/right_arrow_white.svg" alt="">
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+        <section class="faqSec">
+            <div class="row secHead w-100 m-0">
+                <div class="col-12 text-center">
+                    <h2>FAQs</h2>
+                </div>
+            </div>
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="accordion bg-transparent" id="accordionExample">
+                            <div class="accordion-item bg-transparent">
+                                <h2 class="accordion-header bg-transparent">
+                                    <button class="accordion-button bg-transparent collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true"
+                                        aria-controls="collapseOne">
+                                        What is Fronted Mentor, and how will it help me?
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse "
+                                    data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        Frontend Mentor offers realistc coding challenges to help developers improve
+                                        their fronted coding skills with projects in HTML, CSS, and JavaScript. It’s
+                                        suitable for all levels and ideal for porfolio building.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item bg-transparent">
+                                <h2 class="accordion-header bg-transparent">
+                                    <button class="accordion-button bg-transparent collapsed" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="true"
+                                        aria-controls="collapse2">
+                                        What is Fronted Mentor, and how will it help me?
+                                    </button>
+                                </h2>
+                                <div id="collapse2" class="accordion-collapse collapse "
+                                    data-bs-parent="#accordionExample">
+                                    <div class="accordion-body">
+                                        Frontend Mentor offers realistc coding challenges to help developers improve
+                                        their fronted coding skills with projects in HTML, CSS, and JavaScript. It’s
+                                        suitable for all levels and ideal for porfolio building.
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class=" mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <a href=""><img src="images/logo.svg" width="180px" alt=""></a>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <h2>About US</h2>
+                    <ul class="p-0">
+                        <li class="list-unstyled">Address:</li>
+                        <li class="list-unstyled">sayan@xgenmedia.com</li>
+                        <li class="list-unstyled">Hours: 8:00a.m. - 8:00p.m. Daily</li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <h2>Recent Posts</h2>
+                    <ul class="p-0">
+                        <li class="list-unstyled">7 Reasons to Choose Makana Charters for your Na Pali Coast Cruise
+                        </li>
+                        <li class="list-unstyled">The Honu (Sea Turtle) and Its Importance to Hawaii</li>
+                        <li class="list-unstyled">6 Tips for Photographing the Na Pali Coast</li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <h2>Quick Links</h2>
+                    <ul class="p-0">
+                        <li class="list-unstyled">About Us</li>
+                        <li class="list-unstyled">Terms and Conditions</li>
+                        <li class="list-unstyled">Privacy and Policies</li>
+                    </ul>
+                </div>
+                <div class="col-12 d-flex align-items-center justify-content-end mt-4">
+                    <a href="" class="me-2"><img src="images/instagram.svg" width="24px" alt=""></a>
+                    <a href="" class="me-2"><img src="images/facebook.svg" width="24px" alt=""></a>
+                    <a href=""><img src="images/youtube.svg" width="24px" alt=""></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity=""
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" integrity=""
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js">
+    </script>
+    <script src="js/script.js"></script>
+</body>
+
+</html>

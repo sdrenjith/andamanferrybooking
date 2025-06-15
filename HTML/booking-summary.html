@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Summary</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity=""
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css"
+        integrity="" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+        integrity="" crossorigin="anonymous">
+    <link href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/ui-lightness/jquery-ui.css'
+        rel='stylesheet'>
+</head>
+
+<body>
+    <style>
+        .form-group {
+            margin-bottom: 10px;
+        }
+    </style>
+    <div class="overlay"></div>
+    <div class="ad text-center py-2 text-white">
+        <p class="m-0">FLAT 10% OFF ON ALL BOOKINGS</p>
+    </div>
+    <header>
+        <nav class="navbar navbar-expand-lg py-0">
+            <div class="container-fluid justify-content-between">
+                <a class="navbar-brand" href=""><img src="images/logo.svg" alt=""></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="bi bi-view-list" id="menu"></i>
+                    <i class="bi bi-x-lg" id="menuclose"></i>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Blogs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">FAQs</a>
+                        </li>
+                        <li class="nav-item ms-md-3">
+                            <a class="nav-link d-flex align-items-center" href="#">
+                                <img src="images/profile-demo.svg" alt="" class="me-2">
+                                Sayan Debnath
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="mt-5 pt-3">
+            <div class="row secHead mb-5 w-100">
+                <div class="col-12 text-center">
+                    <h2>Booking Details</h2>
+                </div>
+            </div>
+            <div class="container">
+                <div class="row ">
+                    <div class="col-12 col-lg-8">
+                        <div class="travel-insurance-main-bg">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="add-insurance-heading">PASSENGER 1 (Adult)</div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12 booking-journey-prevnext-btn ">
+                                    <label class="mb-0">Enater Name</label>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <div class="order-input">
+                                        <select id="p_title1" class="form-control" name="passenger[1][p1_title]">
+                                            <option value="Mr">MR</option>
+                                            <option value="Mrs">MRS</option>
+                                            <option value="Miss">MISS</option>
+                                            <option value="Master">MASTER</option>
+                                            <option value="Dr">DR</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-8 form-group">
+                                    <div class="order-input">
+                                        <input type="text" name="passenger[1][p1_name]" class="form-control"
+                                            id="passenger[1][p1_name]" placeholder="Full Name">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 form-group">
+                                    <div class=" booking-journey-prevnext-btn ">
+                                        <label class="mb-0">Date Of Birth</label>
+                                    </div>
+                                    <div class="order-input">
+
+                                        <input type="date" name="" class="form-control " id="" placeholder="DOB">
+                                        <label class="error p1_age"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <div class=" booking-journey-prevnext-btn ">
+                                        <label class="mb-0">Gender</label>
+                                    </div>
+                                    <div class="order-input">
+                                        <select id="p_sex1" class="form-control" name="passenger[1][p1_sex]">
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <div class=" booking-journey-prevnext-btn ">
+                                        <label class="mb-0">Resident</label>
+                                    </div>
+                                    <div class="order-input">
+                                        <select id="" class="form-control" name="passenger[1][p1_nationality]"
+                                            onchange="loadForeignFields(this.value, 1)">
+                                            <option value="indian">INDIAN</option>
+                                            <option value="foreigner">FOREIGNER</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="foreign_fields1">
+                            </div>
+                        </div>
+                        <div class="">
+                            <div class="">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3 class="home-heading-top">Contact Details</span></h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="">
+                                <div class="travel-insurance-main-bg">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="add-insurance-heading ">CONTACT PERSON</div>
+                                        </div>
+                                        <div class="booking-journey-prevnext-btn row">
+                                            <p class="col-12 mb-0"> <span class="text-danger">*</span>Booking
+                                                details
+                                                will be shared to
+                                                this ID</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-10 form-group">
+                                            <div class="order-input">
+                                                <input type="text" name="c_name" class="form-control" id="c_name"
+                                                    placeholder="Name">
+                                                <label class="error c_name"></label>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 form-group">
+                                            <div class="order-input">
+                                                <input type="text" name="c_email" class="form-control" id="c_email"
+                                                    placeholder="Email address" style="text-transform: none;">
+                                                <label class="error c_email"></label>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-md-6 form-group">
+                                            <div class="order-input">
+                                                <input type="text" name="c_mobile" class="form-control" id="c_mobile"
+                                                    placeholder="Mobile No">
+                                                <label class="error c_mobile"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-8 form-group">
+                                            <div class="order-input">
+                                                <input type="text" name="p_contact" class="form-control" id="p_contact"
+                                                    placeholder="Contact numbers(Optional)">
+                                                <label class="error p_contact"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="booking-summary-main-bg" id="payment">
+                            <div class="row py-2 p-0 m-0 w-100">
+                                <div class="col-md-12">
+                                    <div class="booking-summary-heading">BOOKING SUMMARY</div>
+                                </div>
+                            </div>
+                            <div class="bookingSummary">
+                                <div class="row w-100 p-0 m-0 bg-white">
+                                    <div class="px-2 col-12 py-1 tripDirection">
+                                        <p class=" m-0 ">Onwards : <span class="departing-txt-date d-inline-block">FRI,
+                                                30 SEP,
+                                                2022</span></p>
+                                    </div>
+                                    <div class="col-md-12 mt-2">
+                                        <div class="departing-box-main">
+
+                                            <div class="departing-txt">
+                                                <span class="departing-txt-date"></span>
+                                            </div>
+                                            <div class="row w-100 p-0 m-0 departing-destination">
+                                                <div class="col-sm-6 destination-time px-0">0800 Port Blair
+                                                </div>
+                                                <div class="col-sm-6 destination-time px-0">0930
+                                                    Swaraj Dweep (Havelock)
+                                                </div>
+                                            </div>
+                                            <div class="row w-100 p-0 m-0 mt-2">
+                                                <div class="departing-txt m-0 col-6 p-0">
+                                                    <p class="departing-txt-date m-0">Total Duration</p>
+                                                </div>
+                                                <div class="col-6 p-0 departing-txt">
+                                                    <p class="departing-txt-date d-inline-block m-0"> 1 Hr 30 m
+                                                        Non-stop</p>
+                                                </div>
+                                            </div>
+                                            <div class="row w-100 p-0 m-0 mt-2">
+                                                <div class="departing-txt m-0 col-6 p-0">
+                                                    <p class="departing-txt-date m-0">Fare Type</p>
+                                                </div>
+                                                <div class="col-6 p-0 departing-txt">
+                                                    <p class="departing-txt-date d-inline-block m-0">Delux Class
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row w-100 p-0 m-0 w-100 p-0 m-0  pt-3 bg-white">
+                                    <div class="tripDirection px-2 col-12">
+                                        <p class=" m-0 py-1">Return : <span
+                                                class="departing-txt-date d-inline-block">FRI, 30
+                                                SEP,
+                                                2022</span></p>
+                                    </div>
+                                    <div class="col-md-12 mt-2">
+                                        <div class="departing-box-main">
+
+                                            <div class="departing-txt">
+                                                <span class="departing-txt-date"></span>
+                                            </div>
+                                            <div class="row w-100 p-0 m-0 departing-destination">
+                                                <div class="col-sm-6 destination-time px-0">0800 Port Blair
+                                                </div>
+                                                <div class="col-sm-6 destination-time px-0">0930
+                                                    Swaraj Dweep (Havelock)
+                                                </div>
+                                            </div>
+                                            <div class="row w-100 p-0 m-0 mt-2">
+                                                <div class="departing-txt m-0 col-6 p-0">
+                                                    <p class="departing-txt-date m-0">Total Duration</p>
+                                                </div>
+                                                <div class="col-6 p-0 departing-txt">
+                                                    <p class="departing-txt-date d-inline-block m-0"> 1 Hr 30 m
+                                                        Non-stop</p>
+                                                </div>
+                                            </div>
+                                            <div class="row w-100 p-0 m-0 mt-2">
+                                                <div class="departing-txt m-0 col-6 p-0">
+                                                    <p class="departing-txt-date m-0">Fare Type</p>
+                                                </div>
+                                                <div class="col-6 p-0 departing-txt">
+                                                    <p class="departing-txt-date d-inline-block m-0">Delux Class
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <div class="departing-box-main totalFare">
+                                            <div class="row w-100 p-0 m-0 py-2 px-3 align-items-center">
+                                                <div class="col-6 p-0">
+                                                    <div class="departing-txt">
+                                                        <p class="departing-txt-date m-0 text-white">Total fare
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6 destination-time p-0 text-white">INR 1475
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row w-100 p-0 m-0 mt-2 px-3">
+                                        <div class="departing-txt m-0 col-6 p-0">
+                                            <p class="departing-txt-date m-0">Makruzz Fare</p>
+                                        </div>
+                                        <div class="col-6 p-0 departing-txt">
+                                            <p class="departing-txt-date d-inline-block m-0">INR
+                                                <span>2600</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="row w-100 p-0 m-0 mt-2 px-3 pb-2">
+                                        <div class="departing-txt m-0 col-6 p-0">
+                                            <p class="departing-txt-date m-0">PSF</p>
+                                        </div>
+                                        <div class="col-6 p-0 departing-txt">
+                                            <p class="departing-txt-date d-inline-block m-0">INR
+                                                <span>100</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class=" mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <a href=""><img src="images/logo.svg" width="180px" alt=""></a>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <h2>About US</h2>
+                    <ul class="p-0">
+                        <li class="list-unstyled">Address:</li>
+                        <li class="list-unstyled">sayan@xgenmedia.com</li>
+                        <li class="list-unstyled">Hours: 8:00a.m. - 8:00p.m. Daily</li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <h2>Recent Posts</h2>
+                    <ul class="p-0">
+                        <li class="list-unstyled">7 Reasons to Choose Makana Charters for your Na Pali Coast Cruise
+                        </li>
+                        <li class="list-unstyled">The Honu (Sea Turtle) and Its Importance to Hawaii</li>
+                        <li class="list-unstyled">6 Tips for Photographing the Na Pali Coast</li>
+                    </ul>
+                </div>
+                <div class="col-12 col-md-6 col-lg-3 mb-4 mb-lg-0">
+                    <h2>Quick Links</h2>
+                    <ul class="p-0">
+                        <li class="list-unstyled">About Us</li>
+                        <li class="list-unstyled">Terms and Conditions</li>
+                        <li class="list-unstyled">Privacy and Policies</li>
+                    </ul>
+                </div>
+                <div class="col-12 d-flex align-items-center justify-content-end mt-4">
+                    <a href="" class="me-2"><img src="images/instagram.svg" width="24px" alt=""></a>
+                    <a href="" class="me-2"><img src="images/facebook.svg" width="24px" alt=""></a>
+                    <a href=""><img src="images/youtube.svg" width="24px" alt=""></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+   
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity=""
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" integrity=""
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js">
+    </script>
+    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('scroll', function (e) {
+            if (window.scrollY > 200) {
+                $("#payment").addClass("stick");
+
+            } else {
+                $("#payment").removeClass("stick");
+
+            }
+        });
+
+    </script>
+</body>
+
+</html>

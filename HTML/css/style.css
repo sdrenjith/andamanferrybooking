@@ -1,0 +1,1507 @@
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&family=Saira+Stencil+One&family=Sniglet:wght@400;800&family=Water+Brush&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    background: #FAFAFA;
+    font-family: 'League Spartan';
+}
+
+.ad {
+    background: linear-gradient(45deg, #008da7, #2be7dc, #2487bd);
+}
+
+.ad p {
+    letter-spacing: 1px;
+}
+
+.navbar {
+    background: linear-gradient(180deg, rgba(3, 13, 37, 0.59) 57.2%, rgba(41, 78, 173, 0) 100%);
+    z-index: 99;
+
+}
+
+.navbar-toggler {
+    border: none;
+    outline: none !important;
+    box-shadow: none !important;
+    font-size: 25px;
+    color: #fff;
+    z-index: 99999;
+    background: transparent;
+}
+
+.navbar-toggler #menu {
+    display: block;
+}
+
+.navbar-toggler #menuclose {
+    display: none;
+}
+
+.navbar-toggler.show #menu {
+    display: none;
+}
+
+.navbar-toggler.show #menuclose {
+    display: block;
+}
+
+.nav-link {
+    color: #fff;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-link.active {
+    color: #fff !important;
+    font-weight: 600;
+    border-bottom: 2px solid #fff;
+}
+
+.nav-link:hover {
+    border-bottom: 2px solid #fff;
+    color: #fff !important;
+}
+
+.banner {
+    margin-top: -76px;
+}
+
+.carousel-item img {
+    height: auto;
+    width: 100%;
+}
+
+.carousel-item {
+    position: relative;
+    height: 400px;
+}
+
+.bannerDetails {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.bannerDetails h1 span {
+    font-family: 'Sniglet';
+    font-size: 34px;
+    font-weight: 400;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 1px #fff;
+
+}
+
+.bannerDetails h1 label {
+    font-family: 'Water Brush';
+    font-size: 55px;
+    font-weight: 400;
+    color: #fff;
+}
+
+.bannerDetails h1 {
+    font-family: 'Saira Stencil One';
+    font-size: 55px;
+    font-weight: 400;
+    color: #fff;
+}
+
+.bannerDetails p {
+    inline-size: 480px;
+    box-sizing: border-box;
+    padding: 15px;
+    background: rgb(0 0 0 / 50%);
+    color: #fff;
+    border-radius: 5px;
+    position: relative;
+}
+
+.bannerDetails p::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    background: #fff;
+    border-radius: 10px;
+}
+
+.bannerBtns {
+    display: flex;
+    align-items: center;
+
+}
+
+.bannerBtns button {
+    color: #fff;
+    border: 1px solid #8f8f8f;
+    background: linear-gradient(45deg, #01272c, #586f76);
+    font-size: 20px;
+    border-radius: 5px;
+    width: 195px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 55px;
+}
+
+.bannerBtns button:hover {
+    border-color: #fff;
+    color: #fff;
+}
+
+.socialIcon {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    align-items: center;
+
+}
+
+.socialIcon a img {
+    width: 24px;
+    height: auto;
+    transition: all 0.3s ease 0s;
+}
+
+.socialIcon a:hover img {
+    transform: scale(1.2);
+}
+
+
+@keyframes scroll {
+    0% {
+        transform: translateY(0%);
+    }
+
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+.ourStats {
+    box-shadow: 0px 0px 18px 0px #00000014;
+    color: #fff;
+    background: #172652;
+}
+
+.bookingCard {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0px 7px 14px 0px #00000040;
+    background: #fff;
+    box-shadow: 0px 7px 14px 0px #00000040;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.bookingCard p {
+    font-size: 20px;
+    font-weight: 500;
+    color: #172652;
+    padding-left: 20px;
+}
+
+.bookingCard p span {
+    font-size: 30px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-family: 'Sniglet';
+}
+
+.bookingCard img {
+    width: 185px;
+}
+
+.secHead h2 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #172652;
+    position: relative;
+}
+
+.secHead h3 {
+    font-size: 28px;
+    font-weight: 500;
+    color: #172652;
+}
+
+.secHead h2::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 75px;
+    height: 75px;
+    background: url("../images/wave.svg") no-repeat center center / 100% 100%;
+}
+
+.packages .secHead h2 {
+    inline-size: 205px;
+}
+
+.secHead p {
+    color: rgb(12 17 31 / 60%);
+    font-size: 18px;
+}
+
+.packageCard {
+    border-radius: 30px;
+    overflow: hidden;
+    position: relative;
+    background: #eee;
+}
+
+.whiteShade {
+    position: absolute;
+    left: 0px;
+    width: 200px !important;
+    top: 0px;
+    height: 200px;
+    z-index: 9;
+}
+
+.cardImg {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    box-shadow: 0px 4px 15px 0px #00000040;
+
+}
+
+.cardImg img {
+    height: 100%;
+
+}
+
+.cardImg .badge {
+    position: absolute;
+    border-radius: 30px;
+    background: #0C111F57;
+    color: #fff;
+    padding: 5px;
+    padding-right: 10px;
+    font-size: 12px;
+    font-weight: 400;
+    display: flex;
+    top: 20px;
+    left: 20px;
+    align-items: center;
+    z-index: 10;
+    box-shadow: 7px 0px 20px 0px #FFFFFF26 inset;
+    backdrop-filter: blur(5px);
+}
+
+.cardImg .badge img {
+    width: 20px !important;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.packageName {
+    padding: 15px 20px 20px 20px;
+    background: #fff;
+    border-radius: 0px 0px 30px 30px;
+}
+
+.packageName h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #172652;
+}
+
+.packageName p {
+    color: #0C111F99;
+    margin: 0;
+    display: none;
+}
+
+.price {
+    padding: 15px 20px 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.price p {
+    margin-bottom: 0;
+    color: #172652;
+    display: flex;
+    align-items: baseline;
+}
+
+.price p span {
+    color: #0C111F99;
+}
+
+.price p b {
+    font-size: 24px;
+    margin-left: 5px;
+}
+
+.price img {
+    width: 20px !important;
+}
+
+.price .btn {
+    box-shadow: 8px 0px 12px 0px #17265259;
+    padding: 5px 15px;
+    border-radius: 10px;
+    background: #172652;
+    color: #fff;
+    transition: all 0.3s ease 0s;
+}
+
+.price .btn:hover {
+    box-shadow: 8px 7px 12px 0px #17265259;
+}
+
+.owl-nav {
+    position: absolute;
+    width: 105%;
+    height: 40px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: block !important;
+
+}
+
+.owl-prev {
+
+    position: absolute;
+    z-index: 99999;
+    background: url("../images/left-arrow.svg") no-repeat center center / 100% 100% !important;
+    width: 40px;
+    height: 40px;
+    cursor: pointer !important;
+    display: block;
+}
+
+.owl-next {
+
+    position: absolute;
+    z-index: 99999;
+    background: url("../images/right-arrow.svg") no-repeat center center / 100% 100% !important;
+    width: 40px;
+    height: 40px;
+    cursor: pointer !important;
+    display: block;
+}
+
+.owl-dots {
+    display: none !important;
+}
+
+
+
+.ferryCard {
+    display: flex;
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0px 4.43px 17.71px 0px #9E9E9E40;
+}
+
+.ferryDetails h4 {
+    color: #172652;
+    font-weight: 500;
+    margin: 0;
+    font-size: 25px;
+}
+
+.ferryDetails p {
+    color: #172652;
+    margin-bottom: 0;
+
+}
+
+.ferryDetails .btn {
+    padding: 5px 15px;
+    border-radius: 10px;
+    background: #172652;
+    color: #fff;
+    transition: all 0.3s ease 0s;
+}
+
+.ferryDetails .btn:hover {
+    box-shadow: 8px 7px 12px 0px #17265259;
+    background: #172652;
+}
+
+.ferryCardSlider .owl-nav {
+    top: 45%;
+}
+
+.destinationCard {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 180px;
+
+}
+
+.destinationCard img {
+    height: 100%;
+    width: auto !important;
+    transition: all 0.3s ease 0s;
+}
+
+.destinationCard:hover img {
+    transform: scale(1.2);
+}
+
+.destinationCard::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    opacity: 45%;
+}
+
+.destinationCard h3 {
+    font-weight: 700;
+    font-size: 30px;
+    position: absolute;
+    z-index: 9;
+    text-align: center;
+    bottom: 20px;
+}
+
+.owl-next,
+.owl-next {
+    right: 0px;
+}
+
+.weOffer {
+    background: url("../images/blue-paper-bg.png") no-repeat center center / 100% 100%;
+    padding-top: 30px;
+}
+
+.weOffer .secHead h2,
+.weOffer .secHead p {
+    color: #fff;
+}
+
+.weOffer .secHead h2::after {
+    background: url("../images/white-wave.svg") no-repeat center center / 100% 100%;
+}
+
+.weOfferPoints img {
+    width: 50px;
+    margin: 0px auto;
+    margin-bottom: 10px;
+}
+
+.weOfferPoints h3 {
+    font-size: 20px;
+    font-weight: 500;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.whyUsCard {
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.whyUsCard.one {
+    background: #5feb5f73;
+    border: 2px solid #5feb5ff7;
+}
+
+.whyUsCard.one h3 {
+    color: #5feb5ff7;
+}
+
+.whyUsCard.two {
+    background: #90063975;
+    border: 2px solid #900639;
+}
+
+.whyUsCard.two h3 {
+    color: #ff2d7b;
+}
+
+.whyUsCard.three {
+    background: #ffc44471;
+    border: 2px solid #FFC444;
+}
+
+.whyUsCard.three h3 {
+    color: #FFC444;
+}
+
+.whyUsCard.four {
+    background: #51ffee99;
+    border: 2px solid #51ffee;
+}
+
+.whyUsCard.four h3 {
+    color: #51ffee;
+}
+
+.blogCards {
+    background: url("../images/blog-bg.png") no-repeat center center / 100% 100%;
+    padding: 50px 0px;
+    margin-top: 25px;
+}
+
+.blogcard {
+    background: #eee;
+    padding-top: 20px;
+    border-radius: 20px;
+}
+
+.blogcard .blogImg {
+    width: 85%;
+    height: 150px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0px 16px 26px 0px #00000066;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0px auto;
+    position: relative;
+    z-index: 9;
+}
+
+.blogCardInfo {
+    background: #fff;
+    box-shadow: 0px 4px 4px 0px #00000040;
+    border-radius: 20px;
+    overflow: hidden;
+    padding: 20px 20px 15px 20px;
+    margin-top: 20px;
+}
+
+.blogCardInfo span {
+    color: #697488;
+    font-size: 12px;
+}
+
+.blogCardInfo h3 {
+    color: #172652;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.blogCardInfo p {
+    color: #172652;
+
+}
+
+.blogCardInfo a {
+    color: #172652;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+
+}
+
+.blogCardInfo a img {
+    width: 25px !important;
+    margin-left: 5px;
+    transition: all 0.3s ease 0s;
+}
+
+.blogCardInfo a:hover img {
+    margin-left: 10px;
+}
+
+.testimonials .carousel-control-next,
+.testimonials .carousel-control-prev {
+    width: 35px;
+    height: 35px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.testimonials .carousel-control-next img,
+.testimonials .carousel-control-prev img {
+    width: 100%;
+}
+
+.testimonials {
+    margin-top: 40px;
+    padding: 50px 0px 150px 0px;
+    background: url(../images/ocean.jpg) no-repeat bottom 0px center / 100% 100%;
+    position: relative;
+}
+
+.testimonials::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #172652;
+    opacity: 70%;
+    left: 0;
+    top: 0;
+    z-index: 3;
+}
+
+.testimonials::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 150px;
+    background: url("../images/paper.png") no-repeat center center / 100% 100%;
+    left: 0;
+    bottom: -15px;
+    z-index: 3;
+}
+
+#carouselExample {
+    z-index: 9;
+}
+
+.profilePic {
+    width: 150px;
+    height: 150px;
+    margin: 0px auto;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.profilePic::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #EAEAEA;
+}
+
+.profilePic img {
+    height: auto;
+}
+
+.profileInfo {
+    text-align: center;
+}
+
+.profileInfo h3 {
+    font-size: 36px;
+    color: #fff;
+}
+
+.profileInfo p {
+    font-size: 18px;
+    color: #fff;
+}
+
+.faqSec {
+    position: relative;
+    z-index: 99;
+}
+
+.accordion-button {
+    font-size: 20px;
+    font-weight: 600;
+    color: #172652;
+}
+
+.accordion-item {
+    border: none !important;
+    border-bottom: 1px solid #ccc !important;
+    border-radius: 0 !important;
+}
+
+
+.accordion-body {
+    font-size: 18px;
+    font-weight: 500;
+    color: #6B6B6B;
+    background: #eee;
+}
+
+.accordion-button::after {
+    background-image: url("../images/expand-icon.svg") !important;
+}
+
+.accordion-button:not(.collapsed)::after {
+    background-image: url("../images/collapse-icon.svg") !important;
+}
+
+/* .comment {
+
+    margin: 0px auto;
+    width: 550px;
+    height: 550px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    margin-bottom: 10px;
+    padding: 10px;
+
+}
+
+.comment::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #EAEAEA;
+} */
+
+.comment video {
+    width: 550px;
+    height: 550px;
+    border-radius: 50%;
+    overflow: hidden;
+    padding: 50px;
+}
+
+footer {
+    color: #fff;
+    background: url("../images/footerBg.png") no-repeat top 0px center / 100% auto;
+    padding: 155px 0px 40px 0px;
+}
+
+footer h2 {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+
+footer ul li {
+    margin-bottom: 15px;
+}
+
+
+/* FERRY PAGE */
+.tabNav .nav-link {
+    font-weight: 500;
+    color: #060a1a;
+    font-size: 16px;
+    border-radius: 0;
+    text-align: center;
+    border-bottom: 1px solid #060a1a !important;
+}
+
+.tabNav .nav-link:hover {
+    color: #919191 !important;
+}
+
+.tabNav .nav-link.active {
+    background: #060a1a;
+    color: #fff;
+}
+
+.ferryBanner {
+    height: 400px;
+    margin-top: -75px;
+    background: url("../images/ocean.jpg") no-repeat center center / 100% auto;
+    position: relative;
+}
+
+.boatBook {
+    height: 350px;
+}
+
+.ferryBanner::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #060a1a71;
+}
+
+.ui-datepicker {
+    z-index: 99999999999 !important;
+}
+
+.bookingConsole {
+    position: absolute;
+    bottom: 10%;
+    width: 85%;
+    left: 50%;
+    top: 55%;
+    transform: translate(-50%, -50%);
+    min-height: 150px;
+    z-index: 9;
+}
+
+.boatBook .bookingConsole {
+    top: 60%;
+}
+
+.tabs {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 5px;
+    margin-top: -5px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    opacity: 0;
+    z-index: 5;
+}
+
+.tabs.tabs1 {
+    z-index: 9;
+}
+
+.tabs label {
+    font-size: 15px;
+    font-weight: 500;
+    display: block;
+}
+
+.tabs input {
+    border: none;
+    outline: none;
+    width: 100%;
+}
+
+.tabBtn {
+    padding: 15px 30px;
+    border-radius: 5px 5px 0px 0px;
+    cursor: pointer;
+    background: #ffffff9e;
+}
+
+.tabBtn p {
+    color: #172652;
+}
+
+.tabBtn img {
+    width: 20px;
+}
+
+.tabBtn .icon-active {
+    display: none;
+}
+
+.tabBtn .icon-inactive {
+    display: block;
+}
+
+.tabBtn.active {
+    background: #172652;
+}
+
+.tabBtn.active p {
+    color: #fff;
+    font-weight: 600;
+}
+
+.tabBtn.active .icon-active {
+    display: block;
+}
+
+.tabBtn.active .icon-inactive {
+    display: none;
+}
+
+.bookingConsole .button {
+    background: #172652;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+}
+
+.bookingConsole .button i {
+    margin-right: 5px;
+}
+
+.processCard {
+    box-shadow: 0 10px 30px 0px #0000004f;
+    border-radius: 10px;
+    text-align: center;
+    padding: 20px;
+    height: 100%;
+}
+
+.processCard .card-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.processCard p {
+    color: #172652;
+    font-weight: 700;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 0;
+    margin-top: 20px;
+
+}
+
+.ferryCard.ferrySearch {
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.ferryCard.ferrySearch .ferryImg {
+    height: 150px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    box-shadow: 0px 16px 26px 0px #00000066;
+}
+
+.ferryCard.ferrySearch .ferryDetails {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.ferryCard.ferrySearch .ferryDetails button {
+
+    margin-left: 25px;
+    margin-top: 0;
+
+}
+
+.selectClass .btn.primeum {
+    background: #187a00;
+}
+
+.selectClass .btn.delux {
+    background: #ff4800;
+}
+
+.selectClass .btn.royal {
+    background: #aa0000;
+}
+
+.selectClass .btn:hover,
+.proceedBtn:hover {
+    box-shadow: 8px 7px 12px 0px #0076ae59;
+    background: #0076ae;
+    color: #fff;
+}
+
+.selectClass a {
+    margin-bottom: 10px;
+ display: block;
+}
+
+.searchResults {
+    height: 550px;
+    overflow-y: scroll;
+}
+
+.searchResults::-webkit-scrollbar {
+    width: 5px;
+}
+
+/* Track */
+.searchResults::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    border-radius: 10px;
+}
+
+/* Handle */
+.searchResults::-webkit-scrollbar-thumb {
+    background: #172652;
+    border-radius: 10px;
+}
+
+/* BOOKING SUMMARR */
+
+.travel-insurance-main-bg {
+    width: 100%;
+    height: auto;
+    margin: 0px 0 25px;
+    padding: 30px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #172652;
+}
+
+.order-input select,
+.order-input .dobCalender,
+.order-input input {
+    border: 0;
+    border-bottom: 1px solid #172652;
+    border-radius: 0;
+    background: transparent;
+    text-transform: uppercase;
+    padding-left: 0;
+}
+
+
+.booking-journey-prevnext-btn label {
+    color: #191f29;
+    font-weight: 600;
+}
+
+.add-insurance-heading {
+    width: 100%;
+    height: auto;
+    float: left;
+    font-size: 18px;
+    color: #000;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+footer.mobile {
+    display: none;
+}
+
+
+
+
+.booking-summary-main-bg {
+    width: 100%;
+    height: auto;
+
+    background: #fff;
+    border: 1px solid #172652;
+    /* padding: 15px 0px; */
+    margin-bottom: 50px;
+    background: #172652;
+}
+
+.booking-summary-heading {
+    width: 100%;
+    height: auto;
+    float: left;
+    font-size: 18px;
+    color: #fff;
+    font-weight: bold;
+}
+
+.tripDirection {
+    background: #D0E2F3;
+}
+
+.tripDirection p {
+    color: #172652;
+    font-weight: bold;
+}
+
+.departing-txt {
+    font-weight: 500;
+    height: auto;
+    font-size: 14px;
+    color: #172652;
+    margin: 0px 0;
+}
+
+.destination-time {
+    font-weight: 600;
+    height: auto;
+    font-size: 18px;
+    color: #172652;
+}
+
+.totalFare {
+    background: #0F55CC;
+}
+
+.bookingSummary {
+    max-height: 300px;
+    overflow-y: scroll;
+    cursor: pointer;
+}
+
+.bookingSummary::-webkit-scrollbar {
+    width: 3px;
+}
+
+/* Track */
+.bookingSummary::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    border-radius: 10px;
+}
+
+/* Handle */
+.bookingSummary::-webkit-scrollbar-thumb {
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+.stick {
+    position: fixed;
+    top: 10px;
+    width: 342px;
+}
+
+.billMobile {
+    display: none;
+}
+
+.searchResultsPage .ferryBanner {
+    height: auto;
+    background: #0000007c;
+    margin-top: -75px;
+    padding: 120px 0px 40px 0px;
+}
+
+.searchResultsPage .bookingConsole {
+    position: relative;
+    transform: none;
+    left: auto;
+    top: auto;
+    width: 100%;
+}
+
+.searchResultsPage .searchResults {
+    height: auto;
+}
+
+.searchResultsPage .searchResults::-webkit-scrollbar {
+    display: none;
+}
+
+.searchResultsPage.boatBook {
+    height: auto;
+}
+
+.searchResultsPage.boatBook .ferryBanner {
+    padding-bottom: 0;
+}
+
+.searchResultsPage .ferryBanner::after {
+    display: none;
+}
+
+@media only screen and (max-width:1399px) {
+    .bookingCard p {
+        font-size: 16px;
+    }
+
+    .bookingCard p span {
+        font-size: 20px;
+    }
+
+    footer {
+        background: url("../images/footerBg.png") no-repeat top 0px center / 100% 100%;
+    }
+}
+
+@media only screen and (max-width:1200px) {
+    .bookingCard img {
+        width: 140px;
+    }
+
+    .weOfferPoints h3 {
+        font-size: 22px;
+    }
+}
+
+@media only screen and (max-width:1100px) {
+    .testimonials {
+        background: url(../images/ocean.jpg) no-repeat bottom 0px center / auto 100%;
+    }
+}
+
+@media only screen and (max-width:991px) {
+    .ferryCardSlider .owl-item {
+        width: 500px !important;
+    }
+
+    .overlay {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: #00000083;
+        display: none;
+        z-index: 9;
+    }
+
+    #navbarNav {
+        position: absolute;
+        top: 55px;
+        right: -1000px;
+        background: transparent;
+        width: 100%;
+        padding: 20px;
+        z-index: 9999;
+        transition: all 0.4s ease 0s;
+        min-height: 325px !important;
+    }
+
+    .nav-link {
+        color: #172652;
+    }
+
+    .nav-link.active {
+        color: #172652 !important;
+        border-bottom: 2px solid #172652;
+    }
+
+    .navbar-nav {
+        padding: 20px;
+        background: #fff;
+        box-shadow: 0px 0px 10px 0px #acacac;
+    }
+
+    .banner .carousel-item .bannerImg {
+        height: 100%;
+        width: 100%;
+    }
+
+    .bannerDetails h1 {
+        font-size: 40px;
+    }
+
+    .bannerDetails h1 span {
+        font-size: 26px;
+    }
+
+    .bannerDetails h1 label {
+        font-size: 40px;
+    }
+
+    .bookingConsole {
+        top: 45%;
+    }
+
+    .ferryBanner {
+        height: 450px;
+        background: url("../images/ocean.jpg") no-repeat center center / auto 100%;
+    }
+
+    .bookingCard img {
+        width: 185px;
+    }
+}
+
+@media only screen and (max-width:767px) {
+    .ferryCardSlider .owl-item {
+        width: 400px !important;
+    }
+
+    .boatBook .bookingConsole {
+        top: 50%;
+    }
+
+    .ferryCard {
+        display: block;
+    }
+
+    .bannerDetails p {
+        display: none;
+    }
+
+    .ferryDetails {
+        margin-top: 15px;
+    }
+
+    .boatBook {
+        height: 400px;
+
+    }
+
+    .ferryBanner {
+        background: url("../images/ocean.jpg") no-repeat center center / auto 100%;
+        height: 500px;
+    }
+
+    .searchResultsPage .ferryBanner {
+        height: 400px;
+    }
+
+    .searchResultsPage .ferryBanner.ferryResults {
+        height: 500px;
+    }
+
+    .ourStats {
+        overflow-x: scroll;
+    }
+
+    .bookingSummary {
+        height: auto;
+        max-height: initial;
+    }
+
+    #payment {
+        display: none;
+    }
+
+    .billMobile {
+        display: block;
+        background: #172652 !important;
+        width: 100%;
+        position: fixed;
+        bottom: 0px;
+        border-radius: 0px;
+        z-index: 99999;
+        padding: 5px 0px;
+        border-top: 1px solid #fff;
+    }
+
+    footer.mobile {
+        display: block;
+    }
+
+    footer.mobile h2 .accordion-button {
+        color: #fff;
+    }
+
+    footer.mobile .accordion-button,
+    footer.mobile .accordion-flush,
+    footer.mobile .accordion-item {
+        background: transparent;
+    }
+
+    footer.mobile .accordion-button::after {
+        background-image: url("../images/expand_white.svg") !important;
+    }
+
+    footer.mobile .accordion-button:not(.collapsed)::after {
+        background-image: url("../images/collapse_white.svg") !important;
+    }
+
+    footer.desktop {
+        display: none;
+    }
+
+    .ourStatsScroll {
+        width: 640px;
+    }
+
+    .cardImg {
+        height: 170px;
+    }
+
+    .weOfferPoints h3 {
+        font-size: 16px;
+    }
+
+    .bannerBtns {
+        display: none;
+    }
+
+
+    footer {
+        background: url("../images/footerBg.png") no-repeat top 0px center / auto 100%;
+    }
+
+    .destinationCard img {
+        width: 100% !important;
+    }
+
+    .ferryCard.ferrySearch {
+        display: block;
+    }
+
+    .ferryCard.ferrySearch .ferryImg {
+        margin-bottom: 25px;
+    }
+
+    .ferryCard.ferrySearch .ferryImg img {
+        width: 100%;
+    }
+
+    .banner .carousel-item .bannerImg {
+        height: 100%;
+        width: auto;
+    }
+
+}
+
+@media only screen and (max-width:567px) {
+    .bannerDetails p {
+        display: none;
+    }
+
+    .carousel {
+        height: 100%;
+    }
+
+    .carousel-inner {
+        height: 100%;
+    }
+
+    .carousel-item {
+        height: 300px;
+    }
+
+    .ferryCardSlider .owl-item {
+        width: 312px !important;
+    }
+
+
+}
+
+@media only screen and (max-width:470px) {
+    .ferryCard {
+        display: block;
+    }
+
+    .ferryDetails {
+        margin-left: 0 !important;
+        margin-top: 20px;
+    }
+
+    .ferryDetails button {
+        margin-top: 15px;
+    }
+
+    .ferryDetails h4,
+    .ferryDetails p {
+        margin-bottom: 10px;
+    }
+
+}
+
+@media only screen and (max-width:360px) {
+    .ferryCard.ferrySearch .ferryDetails {
+        display: block;
+    }
+
+    .ferryCard.ferrySearch .ferryDetails button {
+        margin-top: 10px;
+        margin-left: 0;
+    }
+
+    .ferryCard.ferrySearch .ferryImg img {
+        height: 100%;
+    }
+}
