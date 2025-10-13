@@ -462,7 +462,7 @@
                                     <div class="row w-100 p-0 m-0 mt-2 ">
                                         <div class="departing-txt m-0 col-6 p-0">
                                             <p class="departing-txt-date m-0">
-                                                @if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz')
+                                                @if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz' || str_contains($trip1['ship_name'], 'Green Ocean'))
                                                     Advance Booking Price
                                                 @else
                                                     Per Passenger Price
@@ -472,7 +472,7 @@
                                         <div class="col-6 p-0 departing-txt">
                                             <p class="departing-txt-date d-inline-block m-0">INR
                                                 <?php 
-                                                if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz') {
+                                                if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz' || str_contains($trip1['ship_name'], 'Green Ocean')) {
                                                     $price = 200;
                                                 } else {
                                                     $price = $trip1['fare'];
@@ -486,7 +486,7 @@
                                     $infant = $booking_data['no_of_infant'] ?? 0;
                                     $infant_price = (($trip1['infantFare'] ?? 200) + $trip1['psf']) * $infant;
                                     ?>
-                                    @if ($booking_data['schedule'][1]['ship'] == 'Nautika' || $booking_data['schedule'][1]['ship'] == 'Makruzz')
+                                    @if ($booking_data['schedule'][1]['ship'] == 'Nautika' || $booking_data['schedule'][1]['ship'] == 'Makruzz' || str_contains($booking_data['schedule'][1]['ship'], 'Green Ocean'))
                                     <div class="row w-100 p-0 m-0 mt-2 ">
                                         <div class="departing-txt m-0 col-6 p-0">
                                             <p class="departing-txt-date m-0">No Of Infant</p>
@@ -517,7 +517,7 @@
                                     {{-- if check for single booking total price (for nautike only add rs 100 per infant) --}}
                                     @php
 
-                                    if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz') {
+                                    if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz' || str_contains($trip1['ship_name'], 'Green Ocean')) {
                                         $total_single_price = (200 + $trip1['psf']) * $booking_data['no_of_passenger'] + $infant_price;
                                     } else {
                                         $total_single_price = (($price + $trip1['psf']) * $booking_data['no_of_passenger']) - $discount;
@@ -624,7 +624,7 @@
                                         <div class="row w-100 p-0 m-0 mt-2 ">
                                             <div class="departing-txt m-0 col-6 p-0">
                                                 <p class="departing-txt-date m-0">
-                                                    @if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz')
+                                                    @if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz' || str_contains($trip2['ship_name'], 'Green Ocean'))
                                                         Advance Booking Price
                                                     @else
                                                         Per Passenger Price
@@ -634,7 +634,7 @@
                                             <div class="col-6 p-0 departing-txt">
                                                 <p class="departing-txt-date d-inline-block m-0">INR
                                                     <?php 
-                                                    if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz') {
+                                                    if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz' || str_contains($trip2['ship_name'], 'Green Ocean')) {
                                                         $trip2_price = 200;
                                                     } else {
                                                         $trip2_price = $trip2['fare'];
@@ -659,7 +659,7 @@
                                         
 
                                         @php
-                                        if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz') {
+                                        if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz' || str_contains($trip2['ship_name'], 'Green Ocean')) {
                                             $total_trip2_price = ((200 + $trip2_psf) * $trip2_passenger +
                                             $trip2_infant_price);
 
@@ -767,7 +767,7 @@
                                         <div class="row w-100 p-0 m-0 mt-2 ">
                                             <div class="departing-txt m-0 col-6 p-0">
                                                 <p class="departing-txt-date m-0">
-                                                    @if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz')
+                                                    @if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz' || str_contains($trip3['ship_name'], 'Green Ocean'))
                                                         Advance Booking Price
                                                     @else
                                                         Per Passenger Price
@@ -777,7 +777,7 @@
                                             <div class="col-6 p-0 departing-txt">
                                                 <p class="departing-txt-date d-inline-block m-0">INR
                                                     <?php 
-                                                    if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz') {
+                                                    if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz' || str_contains($trip3['ship_name'], 'Green Ocean')) {
                                                         $trip3_price = 200;
                                                     } else {
                                                         $trip3_price = $trip3['fare'];
@@ -802,7 +802,7 @@
                                         
 
                                         @php
-                                        if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz') {
+                                        if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz' || str_contains($trip3['ship_name'], 'Green Ocean')) {
                                             $total_trip3_price = ((200 + $trip3_psf) * $trip3_passenger +
                                             $trip3_infant_price);
 

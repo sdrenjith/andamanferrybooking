@@ -1170,7 +1170,7 @@
                                             <div class="col-12 searchResults px-0">
                                                 @if (isset($apiScheduleData))
                                                     @foreach ($apiScheduleData as $key => $shipSchedule)
-                                                        @if ($shipSchedule['ship_name'] == 'Nautika')
+                                                        @if ($shipSchedule['ship_name'] == 'Nautika' || str_contains($shipSchedule['ship_name'], 'Green Ocean'))
                                                             <div class="ferryCard ferrySearch mb-3">
                                                                 <div class="ferryImg"
                                                                     data-ferry-id="{{ $shipSchedule['id'] }}">
@@ -1211,9 +1211,9 @@
                                                                             data-class-title="{{ 'Premium' }}"
                                                                             data-class_id="pClass"
                                                                             data-price="200"
-                                                                            data-psf="{{ 50 }}"
+                                                                            data-psf="0"
                                                                             data-avl_seat="999"
-                                                                            data-ship_name="{{ 'Nautika' }}"
+                                                                            data-ship_name="{{ $shipSchedule['ship_name'] }}"
                                                                             class="btn {{ 'Premium' }} ferry-btn  mb-2">
                                                                             <p class="text-white mb-0">
                                                                                 {{ 'Premium' }}
@@ -1239,9 +1239,9 @@
                                                                             data-class-title="{{ 'Business' }}"
                                                                             data-class_id="bClass"
                                                                             data-price="200"
-                                                                            data-psf="{{ 50 }}"
+                                                                            data-psf="0"
                                                                             data-avl_seat="999"
-                                                                            data-ship_name="{{ 'Nautika' }}"
+                                                                            data-ship_name="{{ $shipSchedule['ship_name'] }}"
                                                                             class="btn {{ 'Business' }} ferry-btn  mb-2">
                                                                             <p class="text-white mb-0">
                                                                                 {{ 'Business' }}</p>
@@ -1295,7 +1295,7 @@
                                                                                 data-class-title="{{ $adminFerry['class']['title'] }}"
                                                                                 data-class_id="{{ $adminFerry['class']['id'] }}"
                                                                                 data-price="{{ $adminFerry['price'] }}"
-                                                                                data-psf="{{ 50 }}"
+                                                                                data-psf="0"
                                                                                 data-ship_name="Admin"
                                                                                 class="btn {{ $adminFerry['class']['title'] }} ferry-btn  mb-2">
                                                                                 <p class="text-white mb-0">
@@ -1405,7 +1405,7 @@
                                                                         </p>
                                                                         <p class="mb-3">
                                                                             Arrival Time
-                                                                            {{ date('H:i', strtotime($shipSchedule['arraival_time'])) }}
+                                                                            {{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}
                                                                         </p>
 
                                                                         <p class="mb-3">
@@ -1417,40 +1417,53 @@
                                                                     </div>
 
                                                                     <div class="classBtn">
-                                                                        @foreach ($shipSchedule['ship_class'] as $ferryPrice)
-                                                                            <a href="#"
-                                                                                id="{{ 'ferry_' . $ferryPrice->class_name . '_' . $key + 1 }}"
-                                                                                data-ferryschedule-id="{{ $ferryPrice->route_id }}"
-                                                                                data-class_id="{{ $ferryPrice->class_id }}"
-                                                                                data-from="{{ $route_titles['from_location'] }}"
-                                                                                data-to="{{ $route_titles['to_location'] }}"
-                                                                                data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}"
-                                                                                data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arraival_time'])) }}"
-                                                                                data-class-title="{{ $ferryPrice->class_name }}"
-                                                                                data-price="{{ $ferryPrice->adult_seat_rate }}"
-                                                                                data-psf="{{ $ferryPrice->port_fee }}"
-                                                                                data-avl_seat="{{ $ferryPrice->seat_available }}"
-                                                                                data-ship_name="{{ $ferryPrice->ferry_name }}"
-                                                                                data-ship_id="{{ $ferryPrice->ferry_id }}"
-                                                                                class="btn {{ $ferryPrice->class_name }}  ferry-btn mb-2">
-                                                                                <p class="text-white mb-0">
-                                                                                    {{ $ferryPrice->class_name }}
-                                                                                </p>
-                                                                                <p class="text-white mb-0">
-                                                                                    ₹ {{ $ferryPrice->adult_seat_rate }}
-                                                                                </p>
-                                                                                <!-- <p class="text-white mb-0">
-                                                                                    ₹
-                                                                                    {{ $ferryPrice->adult_seat_rate - 100 }}
-                                                                                </p> -->
-                                                                                <p class="text-white mb-0">
-                                                                                    Seat: {{ $ferryPrice->seat_available }}
-                                                                                </p>
-                                                                                <p class="bg-green-text-white mb-0">
-                                                                                    Book Now
-                                                                                </p>
-                                                                            </a>
-                                                                        @endforeach
+                                                                        <a href="#"
+                                                                            data-ferryschedule-id="{{ $shipSchedule['id'] }}"
+                                                                            data-class_id="pClass"
+                                                                            data-from="{{ $route_titles['from_location'] }}"
+                                                                            data-to="{{ $route_titles['to_location'] }}"
+                                                                            data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}"
+                                                                            data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}"
+                                                                            data-class-title="Premium"
+                                                                            data-price="200"
+                                                                            data-psf="0"
+                                                                            data-avl_seat="999"
+                                                                            data-ship_name="{{ $shipSchedule['ship_name'] }}"
+                                                                            class="btn Premium ferry-btn mb-2">
+                                                                            <p class="text-white mb-0">
+                                                                                Premium
+                                                                            </p>
+                                                                            <p class="text-white mb-0">
+                                                                                ₹200
+                                                                            </p>
+                                                                            <p class="bg-green-text-white mb-0">
+                                                                                Book Now
+                                                                            </p>
+                                                                        </a>
+
+                                                                        <a href="#"
+                                                                            data-ferryschedule-id="{{ $shipSchedule['id'] }}"
+                                                                            data-class_id="bClass"
+                                                                            data-from="{{ $route_titles['from_location'] }}"
+                                                                            data-to="{{ $route_titles['to_location'] }}"
+                                                                            data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}"
+                                                                            data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}"
+                                                                            data-class-title="Business"
+                                                                            data-price="200"
+                                                                            data-psf="0"
+                                                                            data-avl_seat="999"
+                                                                            data-ship_name="{{ $shipSchedule['ship_name'] }}"
+                                                                            class="btn Business ferry-btn mb-2">
+                                                                            <p class="text-white mb-0">
+                                                                                Business
+                                                                            </p>
+                                                                            <p class="text-white mb-0">
+                                                                                ₹200
+                                                                            </p>
+                                                                            <p class="bg-green-text-white mb-0">
+                                                                                Book Now
+                                                                            </p>
+                                                                        </a>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1537,7 +1550,7 @@
                                                 <div class="col-12 searchResults px-0">
                                                     @if (isset($apiScheduleData2))
                                                         @foreach ($apiScheduleData2 as $key => $shipSchedule)
-                                                            @if ($shipSchedule['ship_name'] == 'Nautika')
+                                                            @if ($shipSchedule['ship_name'] == 'Nautika' || str_contains($shipSchedule['ship_name'], 'Green Ocean'))
                                                                 <div class="ferryCard ferrySearch mb-3">
                                                                     <div class="ferryImg"
                                                                         data-ferry-id="{{ $shipSchedule['id'] }}">
@@ -1578,9 +1591,9 @@
                                                                                 data-class-title="{{ 'Premium' }}"
                                                                                 data-class_id="pClass"
                                                                                 data-price="200"
-                                                                                data-psf="{{ 50 }}"
+                                                                                data-psf="0"
                                                                                 data-avl_seat="999"
-                                                                                data-ship_name="{{ 'Nautika' }}"
+                                                                                data-ship_name="{{ $shipSchedule['ship_name'] }}"
                                                                                 class="btn {{ 'Premium' }} ferry-btn2 mb-2">
                                                                                 <p class="text-white mb-0">
                                                                                     {{ 'Premium' }}
@@ -1605,9 +1618,9 @@
                                                                                 data-class-title="{{ 'Business' }}"
                                                                                 data-class_id="bClass"
                                                                                 data-price="200"
-                                                                                data-psf="{{ 50 }}"
+                                                                                data-psf="0"
                                                                                 data-avl_seat="999"
-                                                                                data-ship_name="{{ 'Nautika' }}"
+                                                                                data-ship_name="{{ $shipSchedule['ship_name'] }}"
                                                                                 class="btn {{ 'Business' }} ferry-btn2 mb-2">
                                                                                 <p class="text-white mb-0">
                                                                                     {{ 'Business' }}</p>
@@ -1661,7 +1674,7 @@
                                                                                     data-class-title="{{ $adminFerry['class']['title'] }}"
                                                                                     data-class_id="{{ $adminFerry['class']['id'] }}"
                                                                                     data-price="{{ $adminFerry['price'] }}"
-                                                                                    data-psf="{{ 50 }}"
+                                                                                    data-psf="0"
                                                                                     data-ship_name="Admin"
                                                                                     class="btn {{ $adminFerry['class']['title'] }} ferry-btn2 mb-2">
                                                                                     <p class="text-white mb-0">
@@ -1770,7 +1783,7 @@
                                                                             </p>
                                                                             <p class="mb-3">
                                                                                 Arrival Time
-                                                                                {{ date('H:i', strtotime($shipSchedule['arraival_time'])) }}
+                                                                                {{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}
                                                                             </p>
     
                                                                             <p class="mb-3">
@@ -1782,54 +1795,53 @@
                                                                         </div>
     
                                                                         <div class="classBtn">
-                                                                            @foreach ($shipSchedule['ship_class'] as $ferryPrice)
-                                                                                <!-- <a href="#"
-                                                                                    id="{{ 'ferry_' . $ferryPrice->class_name . '_' . $key + 1 }}"
-                                                                                    data-ferryschedule-id="{{ $ferryPrice->route_id }}"
-                                                                                    data-class_id="{{ $ferryPrice->class_id }}"
-                                                                                    data-from="{{ $route_titles['from_location'] }}"
-                                                                                    data-to="{{ $route_titles['to_location'] }}"
-                                                                                    data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}"
-                                                                                    data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arraival_time'])) }}"
-                                                                                    data-class-title="{{ $ferryPrice->class_name }}"
-                                                                                    data-price="{{ $ferryPrice->adult_seat_rate }}"
-                                                                                    data-psf="{{ $ferryPrice->port_fee }}"
-                                                                                    data-avl_seat="{{ $ferryPrice->seat_available }}"
-                                                                                    data-ship_name="{{ $ferryPrice->ferry_name }}"
-                                                                                    data-ship_id="{{ $ferryPrice->ferry_id }}" -->
-                                                                                <a href="#"
-                                                                                id="{{ 'ferry_' . $ferryPrice->class_name . '_' . $key + 1 }}"
-                                                                                data-ferryschedule-id="{{ $ferryPrice->route_id }}"
-                                                                                data-class_id="{{ $ferryPrice->class_id }}"
-                                                                                data-from="{{ $route_titles['from_location'] }}"
-                                                                                data-to="{{ $route_titles['to_location'] }}"
+                                                                            <a href="#"
+                                                                                data-ferryschedule-id="{{ $shipSchedule['id'] }}"
+                                                                                data-class_id="pClass"
+                                                                                data-from="{{ $round1_route_titles['from_location'] }}"
+                                                                                data-to="{{ $round1_route_titles['to_location'] }}"
                                                                                 data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}"
-                                                                                data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arraival_time'])) }}"
-                                                                                data-class-title="{{ $ferryPrice->class_name }}"
-                                                                                data-price="{{ $ferryPrice->adult_seat_rate }}"
-                                                                                data-psf="{{ $ferryPrice->port_fee }}"
-                                                                                data-avl_seat="{{ $ferryPrice->seat_available }}"
-                                                                                data-ship_name="{{ $ferryPrice->ferry_name }}"
-                                                                                data-ship_id="{{ $ferryPrice->ferry_id }}"
-                                                                                class="btn {{ $ferryPrice->class_name }}  ferry-btn2 mb-2">
-                                                                                    <p class="text-white mb-0">
-                                                                                        {{ $ferryPrice->class_name }}
-                                                                                    </p>
-                                                                                    <p class="text-white mb-0">
-                                                                                        ₹ {{ $ferryPrice->adult_seat_rate }}
-                                                                                    </p>
-                                                                                    <!-- <p class="text-white mb-0">
-                                                                                        ₹
-                                                                                        {{ $ferryPrice->adult_seat_rate - 100 }}
-                                                                                    </p> -->
-                                                                                    <p class="text-white mb-0">
-                                                                                        Seat: {{ $ferryPrice->seat_available }}
-                                                                                    </p>
-                                                                                    <p class="bg-green-text-white mb-0">
-                                                                                        Book Now
-                                                                                    </p>
-                                                                                </a>
-                                                                            @endforeach
+                                                                                data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}"
+                                                                                data-class-title="Premium"
+                                                                                data-price="200"
+                                                                                data-psf="0"
+                                                                                data-avl_seat="999"
+                                                                                data-ship_name="{{ $shipSchedule['ship_name'] }}"
+                                                                                class="btn Premium ferry-btn2 mb-2">
+                                                                                <p class="text-white mb-0">
+                                                                                    Premium
+                                                                                </p>
+                                                                                <p class="text-white mb-0">
+                                                                                    ₹200
+                                                                                </p>
+                                                                                <p class="bg-green-text-white mb-0">
+                                                                                    Book Now
+                                                                                </p>
+                                                                            </a>
+
+                                                                            <a href="#"
+                                                                                data-ferryschedule-id="{{ $shipSchedule['id'] }}"
+                                                                                data-class_id="bClass"
+                                                                                data-from="{{ $round1_route_titles['from_location'] }}"
+                                                                                data-to="{{ $round1_route_titles['to_location'] }}"
+                                                                                data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}"
+                                                                                data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}"
+                                                                                data-class-title="Business"
+                                                                                data-price="200"
+                                                                                data-psf="0"
+                                                                                data-avl_seat="999"
+                                                                                data-ship_name="{{ $shipSchedule['ship_name'] }}"
+                                                                                class="btn Business ferry-btn2 mb-2">
+                                                                                <p class="text-white mb-0">
+                                                                                    Business
+                                                                                </p>
+                                                                                <p class="text-white mb-0">
+                                                                                    ₹200
+                                                                                </p>
+                                                                                <p class="bg-green-text-white mb-0">
+                                                                                    Book Now
+                                                                                </p>
+                                                                            </a>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1918,7 +1930,7 @@
                                             <div class="col-12 searchResults px-0">
                                                 @if (isset($apiScheduleData3))
                                                     @foreach ($apiScheduleData3 as $key => $shipSchedule)
-                                                        @if ($shipSchedule['ship_name'] == 'Nautika')
+                                                        @if ($shipSchedule['ship_name'] == 'Nautika' || str_contains($shipSchedule['ship_name'], 'Green Ocean'))
                                                             <div class="ferryCard ferrySearch mb-3">
                                                                 <div class="ferryImg"
                                                                     data-ferry-id="{{ $shipSchedule['id'] }}">
@@ -1959,9 +1971,9 @@
                                                                             data-class-title="{{ 'Premium' }}"
                                                                             data-class_id="pClass"
                                                                             data-price="200"
-                                                                            data-psf="{{ 50 }}"
+                                                                            data-psf="0"
                                                                             data-avl_seat="999"
-                                                                            data-ship_name="{{ 'Nautika' }}"
+                                                                            data-ship_name="{{ $shipSchedule['ship_name'] }}"
                                                                             class="btn {{ 'Premium' }} ferry-btn3 mb-2">
                                                                             <p class="text-white mb-0">
                                                                                 {{ 'Premium' }}
@@ -1986,9 +1998,9 @@
                                                                             data-class-title="{{ 'Business' }}"
                                                                             data-class_id="bClass"
                                                                             data-price="200"
-                                                                            data-psf="{{ 50 }}"
+                                                                            data-psf="0"
                                                                             data-avl_seat="999"
-                                                                            data-ship_name="{{ 'Nautika' }}"
+                                                                            data-ship_name="{{ $shipSchedule['ship_name'] }}"
                                                                             class="btn {{ 'Business' }} ferry-btn3 mb-2">
                                                                             <p class="text-white mb-0">
                                                                                 {{ 'Business' }}</p>
@@ -2042,7 +2054,7 @@
                                                                                 data-class-title="{{ $adminFerry['class']['title'] }}"
                                                                                 data-class_id="{{ $adminFerry['class']['id'] }}"
                                                                                 data-price="{{ $adminFerry['price'] }}"
-                                                                                data-psf="{{ 50 }}"
+                                                                                data-psf="0"
                                                                                 data-ship_name="Admin"
                                                                                 class="btn {{ $adminFerry['class']['title'] }} ferry-btn3 mb-2">
                                                                                 <p class="text-white mb-0">
@@ -2150,7 +2162,7 @@
                                                                         </p>
                                                                         <p class="mb-3">
                                                                             Arrival Time
-                                                                            {{ date('H:i', strtotime($shipSchedule['arraival_time'])) }}
+                                                                            {{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}
                                                                         </p>
 
                                                                         <p class="mb-3">
@@ -2170,7 +2182,7 @@
                                                                                 data-from="{{ $route_titles['from_location'] }}"
                                                                                 data-to="{{ $route_titles['to_location'] }}"
                                                                                 data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}"
-                                                                                data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arraival_time'])) }}"
+                                                                                data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}"
                                                                                 data-class-title="{{ $ferryPrice->class_name }}"
                                                                                 data-price="{{ $ferryPrice->adult_seat_rate }}"
                                                                                 data-psf="{{ $ferryPrice->port_fee }}"
@@ -2184,7 +2196,7 @@
                                                                             data-from="{{ $route_titles['from_location'] }}"
                                                                             data-to="{{ $route_titles['to_location'] }}"
                                                                             data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}"
-                                                                            data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arraival_time'])) }}"
+                                                                            data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}"
                                                                             data-class-title="{{ $ferryPrice->class_name }}"
                                                                             data-price="{{ $ferryPrice->adult_seat_rate }}"
                                                                             data-psf="{{ $ferryPrice->port_fee }}"
@@ -2437,11 +2449,18 @@
 
             var clickCount = 0;
 
-            $('.ferry-btn').on('click', function(event) {
+            $(document).on('click', '.ferry-btn', function(event) {
+                console.log('Ferry button clicked!');
                 event.preventDefault();
                 
                 var avl_seat = $(this).data('avl_seat');
                 var passenger = $('#passenger').val();
+                
+                // Check if passenger value is valid
+                if (!passenger || passenger <= 0) {
+                    alert('Please enter a valid number of passengers (minimum 1)');
+                    return;
+                }
                 
                 if (avl_seat < passenger) {
                     alert('Not Enough Seat Available');
@@ -2501,17 +2520,14 @@
                         @if (request('trip_type') == 1)
 
                             
-                            if (shipName.indexOf(gShipName) == -1) {
-                                var newUrl = "{{ route('booking-ferry') }}";
-                                window.location.href = newUrl;
-                                // $(document).find("#nav-contact-tab").removeClass('disabled')                                
-                            }
+                            // Redirect for all ferry types
+                            var newUrl = "{{ route('booking-ferry') }}";
+                            window.location.href = newUrl;
                         @else
                             
-                            if (shipName.indexOf(gShipName) == -1) {
-                                $(document).find("#nav-contact-tab").removeClass('disabled').prop('disabled', false)
-                                    .trigger("click");
-                            }
+                            // Enable next tab for all ferry types
+                            $(document).find("#nav-contact-tab").removeClass('disabled').prop('disabled', false)
+                                .trigger("click");
 
                             
                         @endif
@@ -2585,14 +2601,21 @@
 
 
                 // when round 2 booking 
-            $('.ferry-btn2').on('click', function(event) {
+            $(document).on('click', '.ferry-btn2', function(event) {
+                console.log('Ferry button 2 clicked!');
                 event.preventDefault();
 
                 var avl_seat = $(this).data('avl_seat');
                 var passenger = $('#passenger').val();
 
+                // Check if passenger value is valid
+                if (!passenger || passenger <= 0) {
+                    alert('Please enter a valid number of passengers (minimum 1)');
+                    return;
+                }
+
                 if (avl_seat < passenger) {
-                    alert('Not Enough Seat Available');;
+                    alert('Not Enough Seat Available');
                     return;
                 }
 
@@ -2653,19 +2676,15 @@
                         var shipName = element.data('ship_name');
                         @if (request('trip_type') == 2)
                             // if (shipName != 'Nautika') {
-                            if (shipName.indexOf(gShipName) == -1) {
-                                var newUrl = "{{ route('booking-ferry') }}";
-                                window.location.href = newUrl;
-                                // $(document).find("#nav-contact-tab").removeClass('disabled')
-                                //     .trigger("click");
-                            }
+                            // Redirect for all ferry types
+                            var newUrl = "{{ route('booking-ferry') }}";
+                            window.location.href = newUrl;
                         @else
                             
                             // if (shipName != 'Nautika') {
-                            if (shipName.indexOf(gShipName) == -1) {
-                                $(document).find("#nav-extra-tab").removeClass('disabled').prop("disabled", false)
-                                    .trigger("click");
-                            }
+                            // Enable next tab for all ferry types
+                            $(document).find("#nav-extra-tab").removeClass('disabled').prop("disabled", false)
+                                .trigger("click");
                             
                         @endif
                             // var ferryScheduleId = element.data('ferryschedule-id');
@@ -2764,11 +2783,18 @@
 
 
             // when round 3 booking 
-            $('.ferry-btn3').on('click', function(event) {
+            $(document).on('click', '.ferry-btn3', function(event) {
+                console.log('Ferry button 3 clicked!');
                 event.preventDefault();
 
                 var avl_seat = $(this).data('avl_seat');
                 var passenger = $('#passenger').val();
+
+                // Check if passenger value is valid
+                if (!passenger || passenger <= 0) {
+                    alert('Please enter a valid number of passengers (minimum 1)');
+                    return;
+                }
 
                 if (avl_seat < passenger) {
                     alert('Not Enough Seat Available');

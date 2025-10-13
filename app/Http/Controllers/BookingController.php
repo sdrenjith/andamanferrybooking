@@ -310,7 +310,7 @@ class BookingController extends Controller
                 $selectedSche1['arrival_time'] = $scheduleDet1['arrival_time'];
                 $selectedSche1['psf'] = 0;
                 $selectedSche1['route_id'] = NULL;
-            } else if ($scheduleDet1['ship_name'] == 'Nautika' || $scheduleDet1['ship_name'] == 'Makruzz') {
+            } else if ($scheduleDet1['ship_name'] == 'Nautika' || $scheduleDet1['ship_name'] == 'Makruzz' || str_contains($scheduleDet1['ship_name'], 'Green Ocean')) {
                 if ($booking_data['schedule'][1]['shipClass'] == 'bClass') {
                     $selectedSche1['fare'] = 200;
                     $selectedSche1['class_title'] = 'Business';
@@ -329,24 +329,6 @@ class BookingController extends Controller
                 $selectedSche1['psf'] = 0;
                 $selectedSche1['route_id'] = NULL;
                 $selectedSche1['tripSeatNo'] = $booking_data['schedule'][1]['tripSeatNo'] ?? null;
-            } else if (str_contains($scheduleDet1['ship_name'], 'Green Ocean')) {
-                $selectedSche1['class_id'] = $booking_data['schedule'][1]['shipClass'];
-                $selectedSche1['schedule_id'] = $booking_data['schedule'][1]['scheduleId'];
-                $selectedSche1['trip_id'] = NULL;
-                $selectedSche1['ship_id'] = $booking_data['schedule'][1]['ship_id'];
-                $selectedSche1['ship_name'] = $scheduleDet1['ship_name'];
-                $selectedSche1['departure_time'] = $scheduleDet1['departure_time'];
-                $selectedSche1['arrival_time'] = $scheduleDet1['arraival_time'];
-                $selectedSche1['route_id'] = $booking_data['schedule'][1]['route_id'];
-                $selectedSche1['trip_seat_no'] = $booking_data['schedule'][1]['tripSeatNo'];
-
-                foreach ($scheduleDet1['ship_class'] as $sch) {
-                    if ($sch->class_id == $booking_data['schedule'][1]['shipClass']) {
-                        $selectedSche1['fare'] = $sch->adult_seat_rate;
-                        $selectedSche1['psf'] = $sch->port_fee;
-                        $selectedSche1['class_title'] = $sch->class_name;
-                    }
-                }
             }
 
             $data['trip1'] = $selectedSche1;
@@ -382,7 +364,7 @@ class BookingController extends Controller
                     $selectedSche2['psf'] = 0;
                     $selectedSche2['route_id'] = NULL;
 
-                } else if ($scheduleDet2['ship_name'] == 'Nautika' || $scheduleDet2['ship_name'] == 'Makruzz') {
+                } else if ($scheduleDet2['ship_name'] == 'Nautika' || $scheduleDet2['ship_name'] == 'Makruzz' || str_contains($scheduleDet2['ship_name'], 'Green Ocean')) {
                     if ($booking_data['schedule'][2]['shipClass'] == 'bClass') {
                         $selectedSche2['fare'] = 200;
                         $selectedSche2['class_title'] = 'Business';
@@ -470,7 +452,7 @@ class BookingController extends Controller
                     $selectedSche3['psf'] = 0;
                     $selectedSche3['route_id'] = NULL;
 
-                } else if ($scheduleDet3['ship_name'] == 'Nautika' || $scheduleDet3['ship_name'] == 'Makruzz') {
+                } else if ($scheduleDet3['ship_name'] == 'Nautika' || $scheduleDet3['ship_name'] == 'Makruzz' || str_contains($scheduleDet3['ship_name'], 'Green Ocean')) {
                     if ($booking_data['schedule'][3]['shipClass'] == 'bClass') {
                         $selectedSche3['fare'] = 200;
                         $selectedSche3['class_title'] = 'Business';

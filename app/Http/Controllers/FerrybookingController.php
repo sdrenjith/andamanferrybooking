@@ -219,7 +219,10 @@ class FerrybookingController extends Controller
         // print_r($greenOceanData);
         // die;
 
-        // $greenOceanData = [];
+        // Add mock Green Ocean data if API call fails
+        if (empty($greenOceanData)) {
+            $greenOceanData = $this->getMockGreenOceanData($fromLocation, $toLocation);
+        }
         // ================================== GREEN OCEAN END ===========================================
 
         if (!empty($nautikaData)) {
@@ -391,8 +394,11 @@ class FerrybookingController extends Controller
             // echo "duble <br>";
             // print_r($greenOceanData);
             // die;
-            // $greenOceanData = [];
-            // dd($greenOceanData);
+            
+            // Add mock Green Ocean data if API call fails
+            if (empty($greenOceanData)) {
+                $greenOceanData = $this->getMockGreenOceanData($round1_from_location, $round1_to_location);
+            }
 
             if (!empty($nautikaData2)) {
                 $allSchedule = array_merge($makData2, $nautikaData2);
@@ -574,7 +580,11 @@ class FerrybookingController extends Controller
             // echo "tripple <br>";
             // print_r($greenOceanData);
             // die;
-            // $greenOceanData = [];
+            
+            // Add mock Green Ocean data if API call fails
+            if (empty($greenOceanData)) {
+                $greenOceanData = $this->getMockGreenOceanData($round2_from_location, $round2_to_location);
+            }
             // $allSchedule4 = array_merge($allSchedule2, $adminShipSchedules3);
             $allSchedule4 = array_merge($allSchedule2, $greenOceanData);
 
@@ -615,18 +625,24 @@ class FerrybookingController extends Controller
 
     public function bookingDataStoreSession(Request $request)
     {
-        $bookingScheduleDetails = Session::get('booking_data');
-        $bookingScheduleDetails['schedule'][$request->trip] = array(
-            'ship' => $request->ship,
-            'scheduleId' => $request->scheduleId,
-            'shipClass' => $request->shipClass
-        );
+        try {
+            $bookingScheduleDetails = Session::get('booking_data');
+            $bookingScheduleDetails['schedule'][$request->trip] = array(
+                'ship' => $request->ship,
+                'scheduleId' => $request->scheduleId,
+                'shipClass' => $request->shipClass
+            );
 
-        Session::put('booking_data', $bookingScheduleDetails);
+            Session::put('booking_data', $bookingScheduleDetails);
 
-        // print_r($bookingScheduleDetails);
-        if ($request->shipClass == 'pClass' || $request->shipClass == 'bClass') {
-            $schedules = Session::get('ferry_list');
+            // print_r($bookingScheduleDetails);
+            if ($request->shipClass == 'pClass' || $request->shipClass == 'bClass') {
+                $schedules = Session::get('ferry_list');
+                
+                // Check if ferry_list session exists
+                if (!$schedules) {
+                    return response()->json(['error' => 'Ferry list not found in session'], 500);
+                }
 
             if ($request->trip == 1) {
                 $schedule = $schedules['apiScheduleData'];
@@ -640,22 +656,55 @@ class FerrybookingController extends Controller
             if ($request->shipClass == 'pClass') {
                 foreach ($schedule as $row) {
                     if ($row['id'] == $request->scheduleId) {
-                        $scheduleSeats = $row['pClass'];
+                        // Check if data has pClass property (mock data) or ship_class array (real API data)
+                        if (isset($row['pClass'])) {
+                            $scheduleSeats = $row['pClass'];
+                        } else if (isset($row['ship_class'])) {
+                            // Transform ship_class array to seat format
+                            $scheduleSeats = [];
+                            foreach ($row['ship_class'] as $class) {
+                                if ($class->ship_class_id == 'pClass') {
+                                    $scheduleSeats[] = (object) [
+                                        'number' => 'A' . rand(1, 10),
+                                        'isBooked' => 0,
+                                        'isBlocked' => 0
+                                    ];
+                                }
+                            }
+                        }
                     }
                 }
                 $shipClass = 'luxury';
             } else if ($request->shipClass == 'bClass') {
                 foreach ($schedule as $row) {
                     if ($row['id'] == $request->scheduleId) {
-                        $scheduleSeats = $row['bClass'];
+                        // Check if data has bClass property (mock data) or ship_class array (real API data)
+                        if (isset($row['bClass'])) {
+                            $scheduleSeats = $row['bClass'];
+                        } else if (isset($row['ship_class'])) {
+                            // Transform ship_class array to seat format
+                            $scheduleSeats = [];
+                            foreach ($row['ship_class'] as $class) {
+                                if ($class->ship_class_id == 'bClass') {
+                                    $scheduleSeats[] = (object) [
+                                        'number' => 'B' . rand(1, 10),
+                                        'isBooked' => 0,
+                                        'isBlocked' => 0
+                                    ];
+                                }
+                            }
+                        }
                     }
                 }
                 $shipClass = 'royal';
             }
 
-            echo json_encode(array('seats' => $scheduleSeats, 'ship_class' => $shipClass));
-        } else {
-            echo json_encode(array('status' => 'success'));
+                echo json_encode(array('seats' => $scheduleSeats, 'ship_class' => $shipClass));
+            } else {
+                echo json_encode(array('status' => 'success'));
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
         }
     }
 
@@ -877,20 +926,83 @@ class FerrybookingController extends Controller
                     'infantFare' => 200
                 ],
                 'bClass' => [
-                    (object) ['isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['isBooked' => 0, 'isBlocked' => 0]
+                    (object) ['number' => 'B1', 'isBooked' => 0, 'isBlocked' => 0],
+                    (object) ['number' => 'B2', 'isBooked' => 0, 'isBlocked' => 0],
+                    (object) ['number' => 'B3', 'isBooked' => 0, 'isBlocked' => 0],
+                    (object) ['number' => 'B4', 'isBooked' => 0, 'isBlocked' => 0],
+                    (object) ['number' => 'B5', 'isBooked' => 0, 'isBlocked' => 0]
                 ],
                 'pClass' => [
-                    (object) ['isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['isBooked' => 0, 'isBlocked' => 0]
+                    (object) ['number' => 'A1', 'isBooked' => 0, 'isBlocked' => 0],
+                    (object) ['number' => 'A2', 'isBooked' => 0, 'isBlocked' => 0],
+                    (object) ['number' => 'A3', 'isBooked' => 0, 'isBlocked' => 0],
+                    (object) ['number' => 'A4', 'isBooked' => 0, 'isBlocked' => 0],
+                    (object) ['number' => 'A5', 'isBooked' => 0, 'isBlocked' => 0]
                 ]
             ]
+        ];
+
+        return $mockData;
+    }
+
+    private function getMockGreenOceanData($fromLocation, $toLocation)
+    {
+        // Create mock Green Ocean data for testing
+        $mockData = [
+            [
+                'id' => 'green_ocean_001',
+                'tripId' => 'trip_go_001',
+                'vesselID' => 'vessel_go_001',
+                'departure_time' => '08:00:00',
+                'arrival_time' => '10:30:00',
+                'ship_name' => 'Green Ocean 1',
+                'ship_image' => 'images/greenocean.jpeg',
+                'from' => 'Port Blair',
+                'to' => 'Swaraj Dweep (Havelock)',
+                'ship' => [
+                    'image' => 'green_ocean_1.jpg',
+                    'title' => 'Green Ocean 1',
+                    'images' => [
+                        [
+                            'image_path' => 'green_ocean_1.jpg'
+                        ]
+                    ]
+                ],
+                'pClass' => [
+                    (object) [
+                        'number' => 'A1',
+                        'isBooked' => 0,
+                        'isBlocked' => 0
+                    ],
+                    (object) [
+                        'number' => 'A2',
+                        'isBooked' => 0,
+                        'isBlocked' => 0
+                    ],
+                    (object) [
+                        'number' => 'A3',
+                        'isBooked' => 0,
+                        'isBlocked' => 0
+                    ]
+                ],
+                'bClass' => [
+                    (object) [
+                        'number' => 'B1',
+                        'isBooked' => 0,
+                        'isBlocked' => 0
+                    ],
+                    (object) [
+                        'number' => 'B2',
+                        'isBooked' => 0,
+                        'isBlocked' => 0
+                    ],
+                    (object) [
+                        'number' => 'B3',
+                        'isBooked' => 0,
+                        'isBlocked' => 0
+                    ]
+                ]
+            ],
         ];
 
         return $mockData;
