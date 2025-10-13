@@ -310,43 +310,25 @@ class BookingController extends Controller
                 $selectedSche1['arrival_time'] = $scheduleDet1['arrival_time'];
                 $selectedSche1['psf'] = 0;
                 $selectedSche1['route_id'] = NULL;
-            } else if ($scheduleDet1['ship_name'] == 'Nautika') {
+            } else if ($scheduleDet1['ship_name'] == 'Nautika' || $scheduleDet1['ship_name'] == 'Makruzz') {
                 if ($booking_data['schedule'][1]['shipClass'] == 'bClass') {
-                    $selectedSche1['fare'] = $scheduleDet1['fares']->bBaseFare;
-                    $selectedSche1['class_title'] = 'bClass';
+                    $selectedSche1['fare'] = 200;
+                    $selectedSche1['class_title'] = 'Business';
                 } else if ($booking_data['schedule'][1]['shipClass'] == 'pClass') {
-                    $selectedSche1['fare'] = $scheduleDet1['fares']->pBaseFare;
-                    $selectedSche1['class_title'] = 'bClass';
+                    $selectedSche1['fare'] = 200;
+                    $selectedSche1['class_title'] = 'Premium';
                 }
-                $selectedSche1['infantFare'] = $scheduleDet1['fares']->infantFare;
+                $selectedSche1['infantFare'] = 200;
                 $selectedSche1['schedule_id'] = $scheduleDet1['id'];
                 $selectedSche1['class_id'] = $booking_data['schedule'][1]['shipClass'];
                 $selectedSche1['ship_name'] = $scheduleDet1['ship_name'];
                 $selectedSche1['departure_time'] = $scheduleDet1['departure_time'];
-                $selectedSche1['arrival_time'] = $scheduleDet1['arrival_time'];
-                $selectedSche1['trip_id'] = $scheduleDet1['tripId'];
-                $selectedSche1['vesselID'] = $scheduleDet1['vesselID'];
-                $selectedSche1['psf'] = 50;
+                $selectedSche1['arrival_time'] = $scheduleDet1['arrival_time'] ?? $scheduleDet1['aTime'] ?? null;
+                $selectedSche1['trip_id'] = $scheduleDet1['tripId'] ?? $scheduleDet1['id'] ?? null;
+                $selectedSche1['vesselID'] = $scheduleDet1['vesselID'] ?? $scheduleDet1['vessel_id'] ?? null;
+                $selectedSche1['psf'] = 0;
                 $selectedSche1['route_id'] = NULL;
-                $selectedSche1['tripSeatNo'] = $booking_data['schedule'][1]['tripSeatNo'];
-            } else if ($scheduleDet1['ship_name'] == 'Makruzz') {
-                $selectedSche1['class_id'] = $booking_data['schedule'][1]['shipClass'];
-                $selectedSche1['schedule_id'] = $booking_data['schedule'][1]['scheduleId'];
-                $selectedSche1['trip_id'] = NULL;
-                $selectedSche1['ship_name'] = $scheduleDet1['ship_name'];
-                $selectedSche1['departure_time'] = $scheduleDet1['departure_time'];
-                $selectedSche1['arrival_time'] = $scheduleDet1['ship_class'][0]->arrival_time;
-                $selectedSche1['fare'] = $scheduleDet1['ship_class'][0]->arrival_time;
-                $selectedSche1['route_id'] = NULL;
-                foreach ($scheduleDet1['ship_class'] as $sch) {
-                    if ($sch->ship_class_id == $booking_data['schedule'][1]['shipClass']) {
-                        $sch->ship_class_price = 250;
-                        $selectedSche1['fare'] = $sch->ship_class_price;
-                        $selectedSche1['psf'] = $sch->psf;
-                        $selectedSche1['class_title'] = $sch->psf;
-                        $selectedSche1['class_title'] = $sch->ship_class_title;
-                    }
-                }
+                $selectedSche1['tripSeatNo'] = $booking_data['schedule'][1]['tripSeatNo'] ?? null;
             } else if (str_contains($scheduleDet1['ship_name'], 'Green Ocean')) {
                 $selectedSche1['class_id'] = $booking_data['schedule'][1]['shipClass'];
                 $selectedSche1['schedule_id'] = $booking_data['schedule'][1]['scheduleId'];
@@ -400,25 +382,25 @@ class BookingController extends Controller
                     $selectedSche2['psf'] = 0;
                     $selectedSche2['route_id'] = NULL;
 
-                } else if ($scheduleDet2['ship_name'] == 'Nautika') {
+                } else if ($scheduleDet2['ship_name'] == 'Nautika' || $scheduleDet2['ship_name'] == 'Makruzz') {
                     if ($booking_data['schedule'][2]['shipClass'] == 'bClass') {
-                        $selectedSche2['fare'] = $scheduleDet2['fares']->bBaseFare;
-                        $selectedSche2['class_title'] = 'bClass';
+                        $selectedSche2['fare'] = 200;
+                        $selectedSche2['class_title'] = 'Business';
                     } else if ($booking_data['schedule'][2]['shipClass'] == 'pClass') {
-                        $selectedSche2['fare'] = $scheduleDet2['fares']->pBaseFare;
-                        $selectedSche2['class_title'] = 'bClass';
+                        $selectedSche2['fare'] = 200;
+                        $selectedSche2['class_title'] = 'Premium';
                     }
-                    $selectedSche2['infantFare'] = $scheduleDet2['fares']->infantFare;
+                    $selectedSche2['infantFare'] = 200;
                     $selectedSche2['schedule_id'] = $scheduleDet2['id'];
                     $selectedSche2['class_id'] = $booking_data['schedule'][2]['shipClass'];
                     $selectedSche2['ship_name'] = $scheduleDet2['ship_name'];
                     $selectedSche2['departure_time'] = $scheduleDet2['departure_time'];
-                    $selectedSche2['arrival_time'] = $scheduleDet2['arrival_time'];
-                    $selectedSche2['trip_id'] = $scheduleDet2['tripId'];
-                    $selectedSche2['vesselID'] = $scheduleDet2['vesselID'];
+                    $selectedSche2['arrival_time'] = $scheduleDet2['arrival_time'] ?? $scheduleDet2['aTime'] ?? null;
+                    $selectedSche2['trip_id'] = $scheduleDet2['tripId'] ?? $scheduleDet2['id'] ?? null;
+                    $selectedSche2['vesselID'] = $scheduleDet2['vesselID'] ?? $scheduleDet2['vessel_id'] ?? null;
                     $selectedSche2['route_id'] = NULL;
-                    $selectedSche2['psf'] = 50;
-                    $selectedSche2['tripSeatNo'] = $booking_data['schedule'][2]['tripSeatNo'];
+                    $selectedSche2['psf'] = 0;
+                    $selectedSche2['tripSeatNo'] = $booking_data['schedule'][2]['tripSeatNo'] ?? null;
                 } else if ($scheduleDet2['ship_name'] == 'Makruzz') {
                     $selectedSche2['class_id'] = $booking_data['schedule'][2]['shipClass'];
                     $selectedSche2['schedule_id'] = $booking_data['schedule'][2]['scheduleId'];
@@ -488,24 +470,24 @@ class BookingController extends Controller
                     $selectedSche3['psf'] = 0;
                     $selectedSche3['route_id'] = NULL;
 
-                } else if ($scheduleDet3['ship_name'] == 'Nautika') {
+                } else if ($scheduleDet3['ship_name'] == 'Nautika' || $scheduleDet3['ship_name'] == 'Makruzz') {
                     if ($booking_data['schedule'][3]['shipClass'] == 'bClass') {
-                        $selectedSche3['fare'] = $scheduleDet3['fares']->bBaseFare;
-                        $selectedSche3['class_title'] = 'bClass';
+                        $selectedSche3['fare'] = 200;
+                        $selectedSche3['class_title'] = 'Business';
                     } else if ($booking_data['schedule'][3]['shipClass'] == 'pClass') {
-                        $selectedSche3['fare'] = $scheduleDet3['fares']->pBaseFare;
-                        $selectedSche3['class_title'] = 'bClass';
+                        $selectedSche3['fare'] = 200;
+                        $selectedSche3['class_title'] = 'Premium';
                     }
-                    $selectedSche3['infantFare'] = $scheduleDet3['fares']->infantFare;
+                    $selectedSche3['infantFare'] = 200;
                     $selectedSche3['schedule_id'] = $scheduleDet3['id'];
                     $selectedSche3['class_id'] = $booking_data['schedule'][3]['shipClass'];
                     $selectedSche3['ship_name'] = $scheduleDet3['ship_name'];
                     $selectedSche3['departure_time'] = $scheduleDet3['departure_time'];
-                    $selectedSche3['arrival_time'] = $scheduleDet3['arrival_time'];
-                    $selectedSche3['trip_id'] = $scheduleDet3['tripId'];
-                    $selectedSche3['vesselID'] = $scheduleDet3['vesselID'];
-                    $selectedSche3['psf'] = 50;
-                    $selectedSche3['tripSeatNo'] = $booking_data['schedule'][3]['tripSeatNo'];
+                    $selectedSche3['arrival_time'] = $scheduleDet3['arrival_time'] ?? $scheduleDet3['aTime'] ?? null;
+                    $selectedSche3['trip_id'] = $scheduleDet3['tripId'] ?? $scheduleDet3['id'] ?? null;
+                    $selectedSche3['vesselID'] = $scheduleDet3['vesselID'] ?? $scheduleDet3['vessel_id'] ?? null;
+                    $selectedSche3['psf'] = 0;
+                    $selectedSche3['tripSeatNo'] = $booking_data['schedule'][3]['tripSeatNo'] ?? null;
                     $selectedSche3['route_id'] = NULL;
                 } else if ($scheduleDet3['ship_name'] == 'Makruzz') {
                     $selectedSche3['class_id'] = $booking_data['schedule'][3]['shipClass'];
@@ -582,7 +564,7 @@ class BookingController extends Controller
                 'route_id'  => $trip_data['trip1']['route_id'],
                 'vessel_id'  => $trip_data['trip1']['vesselID'] ?? NULL,
                 'departure_time'  => $trip_data['trip1']['departure_time'],
-                'arrival_time'  => $trip_data['trip1']['arrival_time'],
+                'arrival_time'  => $trip_data['trip1']['arrival_time'] ?? null,
                 'nautika_class'  =>  $trip_data['trip1']['ship_name'] == 'Nautika' ? $trip_data['trip1']['class_id'] : NULL,
                 'makruzz_class'  => $trip_data['trip1']['ship_name'] == 'Makruzz' ? $trip_data['trip1']['class_id'] : NULL,
                 'green_ocean_class'  => $trip_data['booking_data']['schedule'][1] == 'Admin' ? $trip_data['trip1']['class_id'] : NULL,
@@ -613,7 +595,7 @@ class BookingController extends Controller
                 'route_id'  => $trip_data['trip2']['route_id'],
                 'vessel_id'  => $trip_data['trip2']['vesselID'] ?? NULL,
                 'departure_time'  => $trip_data['trip2']['departure_time'],
-                'arrival_time'  => $trip_data['trip2']['arrival_time'],
+                'arrival_time'  => $trip_data['trip2']['arrival_time'] ?? null,
                 'nautika_class'  =>  $trip_data['trip2']['ship_name'] == 'Nautika' ? $trip_data['trip2']['class_id'] : NULL,
                 'makruzz_class'  => $trip_data['trip2']['ship_name'] == 'Makruzz' ? $trip_data['trip2']['class_id'] : NULL,
                 'green_ocean_class'  => $trip_data['booking_data']['schedule'][1] == 'Admin' ? $trip_data['trip2']['class_id'] : NULL,
@@ -644,7 +626,7 @@ class BookingController extends Controller
                 'route_id'  => $trip_data['trip3']['route_id'],
                 'vessel_id'  => $trip_data['trip3']['vesselID'] ?? NULL,
                 'departure_time'  => $trip_data['trip3']['departure_time'],
-                'arrival_time'  => $trip_data['trip3']['arrival_time'],
+                'arrival_time'  => $trip_data['trip3']['arrival_time'] ?? null,
                 'nautika_class'  =>  $trip_data['trip3']['ship_name'] == 'Nautika' ? $trip_data['trip3']['class_id'] : NULL,
                 'makruzz_class'  => $trip_data['trip3']['ship_name'] == 'Makruzz' ? $trip_data['trip3']['class_id'] : NULL,
                 'green_ocean_class'  => $trip_data['booking_data']['schedule'][1] == 'Admin' ? $trip_data['trip3']['class_id'] : NULL,
@@ -824,7 +806,7 @@ class BookingController extends Controller
 
             $bClassSeats = [];
             $pClassSeats = [];
-            $seatss = json_decode($trip_data['trip1']['tripSeatNo']);
+            $seatss = json_decode($trip_data['trip1']['tripSeatNo'] ?? '[]');
 
             if ($trip_data['trip1']['class_id'] === 'pClass') {
                 $pClassSeats = $seatss;

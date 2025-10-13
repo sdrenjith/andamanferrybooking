@@ -438,12 +438,12 @@
 
                                         <div class="col-6 p-0 departing-txt">
                                             <p class="departing-txt-date d-inline-block m-0">
-                                                @if($trip1['class_title']=='bClass')
+                                                @if(($trip1['class_title'] ?? '')=='bClass')
                                                     {{'Business'}}
-                                                @elseif ($trip1['class_title']=='pClass')
+                                                @elseif (($trip1['class_title'] ?? '')=='pClass')
                                                     {{'Premium'}}
                                                 @else
-                                                {{ $trip1['class_title'] }}
+                                                {{ $trip1['class_title'] ?? 'Standard' }}
                                                 @endif
                                             </p>
                                         </div>
@@ -461,24 +461,38 @@
 
                                     <div class="row w-100 p-0 m-0 mt-2 ">
                                         <div class="departing-txt m-0 col-6 p-0">
-                                            <p class="departing-txt-date m-0">Per Passenger Price</p>
+                                            <p class="departing-txt-date m-0">
+                                                @if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz')
+                                                    Advance Booking Price
+                                                @else
+                                                    Per Passenger Price
+                                                @endif
+                                            </p>
                                         </div>
                                         <div class="col-6 p-0 departing-txt">
                                             <p class="departing-txt-date d-inline-block m-0">INR
-                                                <?php $price = $trip1['fare']; ?>
+                                                <?php 
+                                                if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz') {
+                                                    $price = 200;
+                                                } else {
+                                                    $price = $trip1['fare'];
+                                                }
+                                                ?>
                                                 <span>{{ number_format($price, 2) }}</span>
                                             </p>
                                         </div>
                                     </div>
-                                    @if ($booking_data['schedule'][1]['ship'] == 'Nautika')
+                                    <?php 
+                                    $infant = $booking_data['no_of_infant'] ?? 0;
+                                    $infant_price = (($trip1['infantFare'] ?? 200) + $trip1['psf']) * $infant;
+                                    ?>
+                                    @if ($booking_data['schedule'][1]['ship'] == 'Nautika' || $booking_data['schedule'][1]['ship'] == 'Makruzz')
                                     <div class="row w-100 p-0 m-0 mt-2 ">
                                         <div class="departing-txt m-0 col-6 p-0">
                                             <p class="departing-txt-date m-0">No Of Infant</p>
                                         </div>
                                         <div class="col-6 p-0 departing-txt">
                                             <p class="departing-txt-date d-inline-block m-0">
-                                                <?php $infant = $booking_data['no_of_infant'];  ?>
-                                                <?php $infant_price = ($trip1['infantFare'] + $trip1['psf']) * $infant; ?>
                                                 <span>{{ $infant }}</span>
                                             </p>
                                         </div>
@@ -500,25 +514,11 @@
                                     <?php $trip2_discount=0; ?>
                                     <?php $trip3_discount=0; ?>
 
-                                    @if (($trip1['ship_name'] == 'Nautika') || ($trip1['ship_name'] == 'Makruzz'))
-                                        <div class="row w-100 p-0 m-0 mt-2 pb-2">
-                                            <div class="departing-txt m-0 col-6 p-0">
-                                                <p class="departing-txt-date m-0">Total Discount</p>
-                                            </div>
-                                            <div class="col-6 p-0 departing-txt">
-                                                <p class="departing-txt-date d-inline-block m-0">INR
-                                                    <?php $no_of_pass = $booking_data['no_of_passenger']; ?>
-                                                    <?php $discount= $no_of_pass * 100; ?>
-                                                    <span>{{$discount }}</span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                    @endif
                                     {{-- if check for single booking total price (for nautike only add rs 100 per infant) --}}
                                     @php
 
-                                    if ($trip1['ship_name'] == 'Nautika') {
-                                        $total_single_price = (($price + $trip1['psf']) * $booking_data['no_of_passenger'] + $infant_price) - $discount;
+                                    if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz') {
+                                        $total_single_price = (200 + $trip1['psf']) * $booking_data['no_of_passenger'] + $infant_price;
                                     } else {
                                         $total_single_price = (($price + $trip1['psf']) * $booking_data['no_of_passenger']) - $discount;
                                     }
@@ -581,14 +581,14 @@
                                             </div>
 
                                             <div class="col-6 p-0 departing-txt">
-                                                <?php $ferry_class_title = $trip2['class_title']; ?>
+                                                <?php $ferry_class_title = $trip2['class_title'] ?? 'Standard'; ?>
                                                 <p class="departing-txt-date d-inline-block m-0">
-                                                    @if($trip2['class_title']=='bClass')
+                                                    @if(($trip2['class_title'] ?? '')=='bClass')
                                                     {{'Business'}}
-                                                    @elseif ($trip2['class_title']=='pClass')
+                                                    @elseif (($trip2['class_title'] ?? '')=='pClass')
                                                         {{'Premium'}}
                                                     @else
-                                                    {{ $trip2['class_title'] }}
+                                                    {{ $trip2['class_title'] ?? 'Standard' }}
                                                     @endif
                                                 </p>
                                             </div>
@@ -612,7 +612,7 @@
                                             </div>
                                             <div class="col-6 p-0 departing-txt">
                                                 <?php $trip2_infants = $booking_data['no_of_infant']; ?>
-                                                <?php $trip2_infant_price = ($trip2['infantFare'] + $trip2['psf']) * $trip2_infants; ?>
+                                                <?php $trip2_infant_price = (($trip2['infantFare'] ?? 200) + $trip2['psf']) * $trip2_infants; ?>
                                                 <p class="departing-txt-date d-inline-block m-0">
                                                     {{ $trip2_infants }}
                                                 </p>
@@ -623,11 +623,23 @@
 
                                         <div class="row w-100 p-0 m-0 mt-2 ">
                                             <div class="departing-txt m-0 col-6 p-0">
-                                                <p class="departing-txt-date m-0">Per Passenger Price</p>
+                                                <p class="departing-txt-date m-0">
+                                                    @if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz')
+                                                        Advance Booking Price
+                                                    @else
+                                                        Per Passenger Price
+                                                    @endif
+                                                </p>
                                             </div>
                                             <div class="col-6 p-0 departing-txt">
                                                 <p class="departing-txt-date d-inline-block m-0">INR
-                                                    <?php $trip2_price = $trip2['fare']; ?>
+                                                    <?php 
+                                                    if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz') {
+                                                        $trip2_price = 200;
+                                                    } else {
+                                                        $trip2_price = $trip2['fare'];
+                                                    }
+                                                    ?>
                                                     <span>{{ number_format($trip2_price, 2) }}</span>
                                                 </p>
                                             </div>
@@ -645,25 +657,11 @@
                                         </div>
 
                                         
-                                        @if (($trip2['ship_name'] == 'Nautika')  || ($trip2['ship_name'] == 'Makruzz'))
-                                            <div class="row w-100 p-0 m-0 mt-2 pb-2">
-                                                <div class="departing-txt m-0 col-6 p-0">
-                                                    <p class="departing-txt-date m-0">Total Discount</p>
-                                                </div>
-                                                <div class="col-6 p-0 departing-txt">
-                                                    <p class="departing-txt-date d-inline-block m-0">INR
-                                                        <?php $trip2_no_of_pass = $booking_data['no_of_passenger']; ?>
-                                                        <?php $trip2_discount= $trip2_no_of_pass * 100; ?>
-                                                        <span>{{ $trip2_discount }}</span>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        @endif
 
                                         @php
-                                        if ($trip2['ship_name'] == 'Nautika') {
-                                            $total_trip2_price = (($trip2_price + $trip2_psf) * $trip2_passenger +
-                                            $trip2_infant_price) - $trip2_discount;
+                                        if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz') {
+                                            $total_trip2_price = ((200 + $trip2_psf) * $trip2_passenger +
+                                            $trip2_infant_price);
 
                                         } else { 
                                             $total_trip2_price = (($trip2_price + $trip2_psf) * $trip2_passenger) - $trip2_discount ;
@@ -726,14 +724,14 @@
                                             </div>
 
                                             <div class="col-6 p-0 departing-txt">
-                                                <?php $ferry_class_title = $trip3['class_title']; ?>
+                                                <?php $ferry_class_title = $trip3['class_title'] ?? 'Standard'; ?>
                                                 <p class="departing-txt-date d-inline-block m-0">
-                                                    @if($trip3['class_title']=='bClass')
+                                                    @if(($trip3['class_title'] ?? '')=='bClass')
                                                     {{'Business'}}
-                                                    @elseif ($trip3['class_title']=='pClass')
+                                                    @elseif (($trip3['class_title'] ?? '')=='pClass')
                                                         {{'Premium'}}
                                                     @else
-                                                    {{ $trip3['class_title'] }}
+                                                    {{ $trip3['class_title'] ?? 'Standard' }}
                                                     @endif
                                                 </p>
                                             </div>
@@ -757,7 +755,7 @@
                                             </div>
                                             <div class="col-6 p-0 departing-txt">
                                                 <?php $trip3_infants = $booking_data['no_of_infant']; ?>
-                                                <?php $trip3_infant_price = ($trip3['infantFare'] + $trip3['psf']) * $trip3_infants; ?>
+                                                <?php $trip3_infant_price = (($trip3['infantFare'] ?? 200) + $trip3['psf']) * $trip3_infants; ?>
                                                 <p class="departing-txt-date d-inline-block m-0">
                                                     {{ $trip3_infants }}
                                                 </p>
@@ -768,11 +766,23 @@
 
                                         <div class="row w-100 p-0 m-0 mt-2 ">
                                             <div class="departing-txt m-0 col-6 p-0">
-                                                <p class="departing-txt-date m-0">Per Passenger Price</p>
+                                                <p class="departing-txt-date m-0">
+                                                    @if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz')
+                                                        Advance Booking Price
+                                                    @else
+                                                        Per Passenger Price
+                                                    @endif
+                                                </p>
                                             </div>
                                             <div class="col-6 p-0 departing-txt">
                                                 <p class="departing-txt-date d-inline-block m-0">INR
-                                                    <?php $trip3_price = $trip3['fare']; ?>
+                                                    <?php 
+                                                    if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz') {
+                                                        $trip3_price = 200;
+                                                    } else {
+                                                        $trip3_price = $trip3['fare'];
+                                                    }
+                                                    ?>
                                                     <span>{{ number_format($trip3_price, 2) }}</span>
                                                 </p>
                                             </div>
@@ -790,25 +800,11 @@
                                         </div>
 
                                         
-                                        @if (($trip3['ship_name'] == 'Nautika')  || ($trip3['ship_name'] == 'Makruzz'))
-                                            <div class="row w-100 p-0 m-0 mt-2 pb-2">
-                                                <div class="departing-txt m-0 col-6 p-0">
-                                                    <p class="departing-txt-date m-0">Total Discount</p>
-                                                </div>
-                                                <div class="col-6 p-0 departing-txt">
-                                                    <p class="departing-txt-date d-inline-block m-0">INR
-                                                        <?php $trip3_no_of_pass = $booking_data['no_of_passenger']; ?>
-                                                        <?php $trip3_discount= $trip3_no_of_pass * 100; ?>
-                                                        <span>{{ $trip3_discount }}</span>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        @endif
 
                                         @php
-                                        if ($trip3['ship_name'] == 'Nautika') {
-                                            $total_trip3_price = (($trip3_price + $trip3_psf) * $trip3_passenger +
-                                            $trip3_infant_price) - $trip3_discount;
+                                        if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz') {
+                                            $total_trip3_price = ((200 + $trip3_psf) * $trip3_passenger +
+                                            $trip3_infant_price);
 
                                         } else { 
                                             $total_trip3_price = (($trip3_price + $trip3_psf) * $trip3_passenger) - $trip3_discount ;

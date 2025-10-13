@@ -1210,26 +1210,16 @@
                                                                             data-arrival_time="{{ $shipSchedule['arrival_time'] }}"
                                                                             data-class-title="{{ 'Premium' }}"
                                                                             data-class_id="pClass"
-                                                                            data-price="{{ $shipSchedule['fares']->pBaseFare }}"
+                                                                            data-price="200"
                                                                             data-psf="{{ 50 }}"
-                                                                            data-avl_seat="{{ $shipSchedule['p_class_seat_availibility'] }}"
+                                                                            data-avl_seat="999"
                                                                             data-ship_name="{{ 'Nautika' }}"
-                                                                            class="btn {{ 'Premium' }} ferry-btn  mb-2"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#exampleModal">
+                                                                            class="btn {{ 'Premium' }} ferry-btn  mb-2">
                                                                             <p class="text-white mb-0">
                                                                                 {{ 'Premium' }}
                                                                             </p>
-                                                                            <p class="text-white mb-0"
-                                                                                style="text-decoration: line-through;">
-                                                                                ₹{{ $shipSchedule['fares']->pBaseFare }}
-                                                                            </p>
                                                                             <p class="text-white mb-0">
-                                                                                ₹{{ $shipSchedule['fares']->pBaseFare - 100 }}
-                                                                            </p>
-                                                                            <p class="text-white mb-0">
-                                                                                Seat:
-                                                                                {{ $shipSchedule['p_class_seat_availibility'] }}
+                                                                                ₹200
                                                                             </p>
                                                                             <p class="bg-green-text-white mb-0">
                                                                                 Book Now
@@ -1248,24 +1238,15 @@
                                                                             data-arrival_time="{{ $shipSchedule['arrival_time'] }}"
                                                                             data-class-title="{{ 'Business' }}"
                                                                             data-class_id="bClass"
-                                                                            data-price="{{ $shipSchedule['fares']->bBaseFare }}"
+                                                                            data-price="200"
                                                                             data-psf="{{ 50 }}"
-                                                                            data-avl_seat="{{ $shipSchedule['b_class_seat_availibility'] }}"
+                                                                            data-avl_seat="999"
                                                                             data-ship_name="{{ 'Nautika' }}"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#exampleModal">
+                                                                            class="btn {{ 'Business' }} ferry-btn  mb-2">
                                                                             <p class="text-white mb-0">
                                                                                 {{ 'Business' }}</p>
-                                                                            <p class="text-white mb-0"
-                                                                                style="text-decoration: line-through;">
-                                                                                ₹{{ $shipSchedule['fares']->bBaseFare }}
-                                                                            </p>
                                                                             <p class="text-white mb-0">
-                                                                                ₹{{ $shipSchedule['fares']->bBaseFare - 100 }}
-                                                                            </p>
-                                                                            <p class="text-white mb-0">
-                                                                                Seat:
-                                                                                {{ $shipSchedule['b_class_seat_availibility'] }}
+                                                                                ₹200
                                                                             </p>
                                                                             <p class="bg-green-text-white mb-0">
                                                                                 Book Now
@@ -1596,26 +1577,16 @@
                                                                                 data-arrival_time="{{ $shipSchedule['arrival_time'] }}"
                                                                                 data-class-title="{{ 'Premium' }}"
                                                                                 data-class_id="pClass"
-                                                                                data-price="{{ $shipSchedule['fares']->pBaseFare }}"
+                                                                                data-price="200"
                                                                                 data-psf="{{ 50 }}"
-                                                                                data-avl_seat="{{ $shipSchedule['p_class_seat_availibility'] }}"
+                                                                                data-avl_seat="999"
                                                                                 data-ship_name="{{ 'Nautika' }}"
-                                                                                class="btn {{ 'Premium' }} ferry-btn2 mb-2"
-                                                                                data-bs-toggle="modal"
-                                                                                data-bs-target="#exampleModal">
+                                                                                class="btn {{ 'Premium' }} ferry-btn2 mb-2">
                                                                                 <p class="text-white mb-0">
                                                                                     {{ 'Premium' }}
                                                                                 </p>
-                                                                                <p class="text-white mb-0"
-                                                                                    style="text-decoration: line-through;">
-                                                                                    ₹{{ $shipSchedule['fares']->pBaseFare }}
-                                                                                </p>
                                                                                 <p class="text-white mb-0">
-                                                                                    ₹{{ $shipSchedule['fares']->pBaseFare - 100 }}
-                                                                                </p>
-                                                                                <p class="text-white mb-0">
-                                                                                    Seat:
-                                                                                    {{ $shipSchedule['p_class_seat_availibility'] }}
+                                                                                    ₹200
                                                                                 </p>
                                                                                 <p class="bg-green-text-white mb-0">
                                                                                     Book Now
@@ -1633,25 +1604,15 @@
                                                                                 data-arrival_time="{{ $shipSchedule['arrival_time'] }}"
                                                                                 data-class-title="{{ 'Business' }}"
                                                                                 data-class_id="bClass"
-                                                                                data-price="{{ $shipSchedule['fares']->bBaseFare }}"
+                                                                                data-price="200"
                                                                                 data-psf="{{ 50 }}"
-                                                                                data-avl_seat="{{ $shipSchedule['b_class_seat_availibility'] }}"
+                                                                                data-avl_seat="999"
                                                                                 data-ship_name="{{ 'Nautika' }}"
-                                                                                class="btn {{ 'Business' }} ferry-btn2 mb-2"
-                                                                                data-bs-toggle="modal"
-                                                                                data-bs-target="#exampleModal">
+                                                                                class="btn {{ 'Business' }} ferry-btn2 mb-2">
                                                                                 <p class="text-white mb-0">
                                                                                     {{ 'Business' }}</p>
-                                                                                <p class="text-white mb-0"
-                                                                                    style="text-decoration: line-through;">
-                                                                                    ₹{{ $shipSchedule['fares']->bBaseFare }}
-                                                                                </p>
                                                                                 <p class="text-white mb-0">
-                                                                                    ₹{{ $shipSchedule['fares']->bBaseFare - 100 }}
-                                                                                </p>
-                                                                                <p class="text-white mb-0">
-                                                                                    Seat:
-                                                                                    {{ $shipSchedule['b_class_seat_availibility'] }}
+                                                                                    ₹200
                                                                                 </p>
                                                                                 <p class="bg-green-text-white mb-0">
                                                                                     Book Now
@@ -1997,26 +1958,16 @@
                                                                             data-arrival_time="{{ $shipSchedule['arrival_time'] }}"
                                                                             data-class-title="{{ 'Premium' }}"
                                                                             data-class_id="pClass"
-                                                                            data-price="{{ $shipSchedule['fares']->pBaseFare }}"
+                                                                            data-price="200"
                                                                             data-psf="{{ 50 }}"
-                                                                            data-avl_seat="{{ $shipSchedule['p_class_seat_availibility'] }}"
+                                                                            data-avl_seat="999"
                                                                             data-ship_name="{{ 'Nautika' }}"
-                                                                            class="btn {{ 'Premium' }} ferry-btn3 mb-2"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#exampleModal">
+                                                                            class="btn {{ 'Premium' }} ferry-btn3 mb-2">
                                                                             <p class="text-white mb-0">
                                                                                 {{ 'Premium' }}
                                                                             </p>
-                                                                            <p class="text-white mb-0"
-                                                                                style="text-decoration: line-through;">
-                                                                                ₹{{ $shipSchedule['fares']->pBaseFare }}
-                                                                            </p>
                                                                             <p class="text-white mb-0">
-                                                                                ₹{{ $shipSchedule['fares']->pBaseFare - 100 }}
-                                                                            </p>
-                                                                            <p class="text-white mb-0">
-                                                                                Seat:
-                                                                                {{ $shipSchedule['p_class_seat_availibility'] }}
+                                                                                ₹200
                                                                             </p>
                                                                             <p class="bg-green-text-white mb-0">
                                                                                 Book Now
@@ -2034,25 +1985,15 @@
                                                                             data-arrival_time="{{ $shipSchedule['arrival_time'] }}"
                                                                             data-class-title="{{ 'Business' }}"
                                                                             data-class_id="bClass"
-                                                                            data-price="{{ $shipSchedule['fares']->bBaseFare }}"
+                                                                            data-price="200"
                                                                             data-psf="{{ 50 }}"
-                                                                            data-avl_seat="{{ $shipSchedule['b_class_seat_availibility'] }}"
+                                                                            data-avl_seat="999"
                                                                             data-ship_name="{{ 'Nautika' }}"
-                                                                            class="btn {{ 'Business' }} ferry-btn3 mb-2"
-                                                                            data-bs-toggle="modal"
-                                                                            data-bs-target="#exampleModal">
+                                                                            class="btn {{ 'Business' }} ferry-btn3 mb-2">
                                                                             <p class="text-white mb-0">
                                                                                 {{ 'Business' }}</p>
-                                                                            <p class="text-white mb-0"
-                                                                                style="text-decoration: line-through;">
-                                                                                ₹{{ $shipSchedule['fares']->bBaseFare }}
-                                                                            </p>
                                                                             <p class="text-white mb-0">
-                                                                                ₹{{ $shipSchedule['fares']->bBaseFare - 100 }}
-                                                                            </p>
-                                                                            <p class="text-white mb-0">
-                                                                                Seat:
-                                                                                {{ $shipSchedule['b_class_seat_availibility'] }}
+                                                                                ₹200
                                                                             </p>
                                                                             <p class="bg-green-text-white mb-0">
                                                                                 Book Now
@@ -2560,14 +2501,14 @@
                         @if (request('trip_type') == 1)
 
                             
-                            if ((shipName != 'Nautika') && (shipName.indexOf(gShipName) == -1)) {
+                            if (shipName.indexOf(gShipName) == -1) {
                                 var newUrl = "{{ route('booking-ferry') }}";
                                 window.location.href = newUrl;
                                 // $(document).find("#nav-contact-tab").removeClass('disabled')                                
                             }
                         @else
                             
-                            if ((shipName != 'Nautika') && (shipName.indexOf(gShipName) == -1)) {
+                            if (shipName.indexOf(gShipName) == -1) {
                                 $(document).find("#nav-contact-tab").removeClass('disabled').prop('disabled', false)
                                     .trigger("click");
                             }
@@ -2712,7 +2653,7 @@
                         var shipName = element.data('ship_name');
                         @if (request('trip_type') == 2)
                             // if (shipName != 'Nautika') {
-                            if ((shipName != 'Nautika') && (shipName.indexOf(gShipName) == -1)) {
+                            if (shipName.indexOf(gShipName) == -1) {
                                 var newUrl = "{{ route('booking-ferry') }}";
                                 window.location.href = newUrl;
                                 // $(document).find("#nav-contact-tab").removeClass('disabled')
@@ -2721,7 +2662,7 @@
                         @else
                             
                             // if (shipName != 'Nautika') {
-                            if ((shipName != 'Nautika') && (shipName.indexOf(gShipName) == -1)) {
+                            if (shipName.indexOf(gShipName) == -1) {
                                 $(document).find("#nav-extra-tab").removeClass('disabled').prop("disabled", false)
                                     .trigger("click");
                             }
@@ -3014,12 +2955,8 @@
                                     $('#modalGreenOceanSeat').modal('show');
                                 }
                             });
-                        // } else if (shipName != 'Nautika') {
                         } else {
                             var newUrl = "{{ route('booking-ferry') }}";
-
-                            console.log("else part");
-                            return false;
                             window.location.href = newUrl;
                         }
 
