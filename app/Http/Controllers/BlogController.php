@@ -39,11 +39,11 @@ class BlogController extends Controller
     }
 
     public function list(){
-        $blogs = DB::table('blogs')
-        ->where(['status' => 0, 'delete' => 0])
-        ->orderBy('id','desc')
-        ->get();
-        return view('blog.bloglist', compact('blogs'));
+        $data = DB::table('blogs')
+            ->where(['status' => 0, 'delete' => 0])
+            ->orderBy('id','desc')
+            ->get();
+        return view('blog.bloglist', compact('data'));
     }
     public function load_more(Request $request){
         $input=$request->all();

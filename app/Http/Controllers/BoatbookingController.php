@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BoatSchedule;
+use App\Models\BoatCustomBooking;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -12,8 +13,7 @@ use Carbon\Carbon;
 class BoatbookingController extends Controller
 {
    public function boat_booking(){
-
-    $boat_lists = BoatSchedule::where('status','Y')->get();
+    $boat_lists = BoatCustomBooking::where('status','Y')->get();
     $testimonials = DB::table('testimonials')->where('status',0)->where('delete',0)->get(); 
     $faqs = DB::table('faq')->where(['status'=> 0 , 'delete' => 0])->get();
     $date = date('Y-m-d', strtotime("+1 day"));
@@ -27,7 +27,7 @@ class BoatbookingController extends Controller
 
     public function boat_booking_search(Request $request){
    
-                $data['boat_lists'] = BoatSchedule::where('status','Y')->get();
+                $data['boat_lists'] = BoatCustomBooking::where('status','Y')->get();
                 
 
                 $id = $request->input('id');
@@ -75,7 +75,7 @@ class BoatbookingController extends Controller
 
     public function boatBookingPage()
     {
-        $boat_lists = \App\Models\BoatSchedule::where('status','Y')->get();
+        $boat_lists = BoatCustomBooking::where('status','Y')->get();
         return view('booking.boat.boat-booking', compact('boat_lists'));
     }
 }

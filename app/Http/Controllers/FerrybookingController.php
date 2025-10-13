@@ -413,6 +413,7 @@ class FerrybookingController extends Controller
 
         // ********************************** for round 3 Trip ********************************************
 
+    /*
         if ($trip_type == 3) {
 
             $data['ferry_locations'] = DB::table('ferry_locations')
@@ -421,6 +422,9 @@ class FerrybookingController extends Controller
 
             $round2_from_location = $request->round2_from_location;
             $round2_to_location = $request->input('round2_to_location');
+            
+                        dd($data);
+
 
             $date = date('Y-m-d', strtotime($request->input('round2_date')));
             $no_of_passenger = $request->input('passenger');
@@ -457,7 +461,7 @@ class FerrybookingController extends Controller
 
             $round_2_from_location_title = FerryLocation::where('id',  $round2_from_location)->first();
             $round_2_to_location_title = FerryLocation::where('id', $round2_to_location)->first();
-
+            
             $data['round2_route_titles'] = [
                 'from_location' => $round_2_from_location_title->title,
                 'to_location' => $round_2_to_location_title->title,
@@ -576,7 +580,7 @@ class FerrybookingController extends Controller
             $sortedArray3 = $sorted->values()->all();
 
             $data['apiScheduleData3'] = $sortedArray3;
-        }
+        } */
 
         $booking_data = array(
             'trip_type' => $trip_type,

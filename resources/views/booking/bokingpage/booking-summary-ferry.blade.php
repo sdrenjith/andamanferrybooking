@@ -75,7 +75,7 @@
                                         <label class="mb-0">Age</label>
                                     </div>
                                     <div class="order-input">
-                                        <input type="number" name="passenger_dob[{{ $i }}]" class="form-control" id="" placeholder="Age" min="2" max="99"  oninput="this.value = this.value.replace(/[^1-9]/g, '').slice(0, 2);" onkeyup="minagecheck(this)">
+                                        <input type="number" name="passenger_dob[{{ $i }}]" class="form-control" id="" placeholder="Age" min="1" max="99" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 2);" onkeyup="minagecheck(this)">
                                         
                                         <span class="text-danger"></span>
                                         @error('passenger_dob.' . $i)

@@ -1,9 +1,34 @@
 @extends('layouts.app')
+@section('title', 'Book Ferry Tickets Online | Fast & Secure Booking')
+@section('meta_title', 'Ferry Ticket Online | Fast & Secure Booking')
+@section('meta_description', 'Quickly book ferry tickets online with easy steps, secure payments, instant confirmation, and 24/7 support. Enjoy smooth and stress-free travel today!')
 
 @section('content')
     <main>
 
         <style>
+        .seat {
+    display: inline-block;
+    width: 35px;
+    height: 35px;
+    margin: 4px;
+    background: #ddd;
+    border-radius: 4px;
+    text-align: center;
+    line-height: 35px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.seat.selected {
+    background: green;
+    color: white;
+}
+.seat.booked {
+    background: red;
+    color: white;
+    pointer-events: none;
+}
+
             #luxuryContainer {
                 display: none;
             }
@@ -1055,66 +1080,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="row trop-relative p-0">
-                                    <div class="mb-visible">
-                                <div class="row trip-section my-3">
-                                <div class="col-12 trip-name p-0">Trip 3</div>
-                                </div>
-                            </div>
-                                        <div class="col-12 col-lg-3 mb-2 mb-lg-0">
-                                            <label for="location">From</label>
-                                            <select name="round2_from_location" class="form-select border-0 p-0"
-                                                id="round2_from_location">
-                                                {{-- <option value="">Select</option> --}}
-                                                @foreach ($ferry_locations as $index => $ferry_location)
-                                                    <option value="{{ $ferry_location->id }}"
-                                                        {{ old('round2_from_location', request('round2_from_location')) == $ferry_location->id ? 'selected' : '' }}>
-                                                        {{ $ferry_location->title }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-
-                                        <div class="col-12 col-lg-3 mb-2 mb-lg-0">
-                                            <label for="round2_to_location">To</label>
-                                            <select name="round2_to_location" class="form-select border-0 p-0"
-                                                id="round2_to_location">
-                                                @foreach ($ferry_locations as $index => $ferry_location)
-                                                    <option value="{{ $ferry_location->id }}"
-                                                        {{ old('round2_to_location', request('round2_to_location')) == $ferry_location->id ? 'selected' : '' }}>
-                                                        {{ $ferry_location->title }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-
-                                        </div>
-
-                                        <div class="col-12 col-lg-3 mb-2 mb-lg-0">
-                                            <label for="round2_date">Date</label>
-                                            <input type="date" class="my_date_picker" placeholder="Select Date"
-                                                id="round2_date" name="round2_date" min="<?php echo date('Y-m-d'); ?>"
-                                                value="{{ old('round2_date', request('round2_date')) }}" required>
-                                        </div>
-
-                                        <div class="col-12 col-lg-1 mb-2 mb-lg-0">
-                                            <label for="round2_pasanger">Passengers</label>
-                                            <input type="number" class="form-control bg-secondary" id="round2_pasanger"
-                                                value="{{ old('passenger', request('passenger')) }}" readonly>
-                                        </div>
-
-                                        <div class="col-12 col-lg-1 mb-2 mb-lg-0">
-                                            <label for="round2_infants">Infants</label>
-                                            <input type="number" class="form-control bg-secondary" id="round2_infants"
-                                                value="{{ old('infant', request('infant')) }}" readonly>
-                                        </div>
-                                        {{-- <input type="hidden" name="trip_type" value="round2_trip"> --}}
-
-                                        <div class="col-12 col-lg-1 mb-2 mb-lg-0 table-delet-btn">
-                                            <button type="button" class="btn btn-outline-danger trip-delete delete"><i
-                                                    class="bi bi-trash3-fill"></i></button>
-                                        </div>
-                                        
-                                    </div>
+                                    {{-- Trip 3 section removed as it was non-functional and causing confusion on mobile --}}
 
                                     <div class="row search-bar-btn pt-0 pt-lg-4">
                                     <div class="col-12 col-lg-2">
@@ -1132,13 +1098,10 @@
 
         <input type="hidden" name="trip1details" id="trip1details" value="">
         <input type="hidden" name="trip2details" id="trip2details" value="">
-        <input type="hidden" name="trip3details" id="trip3details" value="">
         <input type="hidden" name="trip1seatcount" id="trip1seatcount" value="0">
         <input type="hidden" name="trip2seatcount" id="trip2seatcount" value="0">
-        <input type="hidden" name="trip3seatcount" id="trip3seatcount" value="0">
         <input type="hidden" name="trip1seatNo" id="trip1seatNo" value="">
         <input type="hidden" name="trip2seatNo" id="trip2seatNo" value="">
-        <input type="hidden" name="trip3seatNo" id="trip3seatNo" value="">
 
         <div class="text-center  loaderDiv" >
             <div id="lds-spinner" class="lds-spinner d-none">
@@ -1164,6 +1127,8 @@
                         <div class="row secHead mb-4">
                             <div class="col-12 text-center">
                                 <h2>Search Results For Ferry</h2>
+                               
+
                             </div>
                         </div>
                         <div class="route row px-2">
@@ -2373,6 +2338,8 @@
                                                                             </button>
                                                                         </div>
                                                                     </div>
+                                                                    
+                                                                    
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -2388,6 +2355,9 @@
                     </div>
                 </div>
             </div>
+            
+            
+            
         </section>
 
 
@@ -2396,7 +2366,29 @@
 @endsection
 
 @push('js')
+
+
     <script type="text/javascript">
+        
+        document.addEventListener("DOMContentLoaded", () => {
+    // Confirm button functionality
+    document.querySelectorAll("#confirm_seats").forEach(btn => {
+        btn.addEventListener("click", function() {
+            const selectedSeats = Array.from(
+                this.closest(".modal").querySelectorAll(".seat.selected")
+            ).map(seat => seat.textContent.trim());
+
+            if (selectedSeats.length === 0) {
+                alert("Please select at least one seat.");
+                return;
+            }
+
+            alert("You selected: " + selectedSeats.join(", "));
+            // 🔑 later you can send these seat numbers to backend
+        });
+    });
+});
+
 
         function maxpassenger(element) {
             if (element.value < 1 || element.value > 20) {
@@ -2511,8 +2503,8 @@
                 var passenger = $('#passenger').val();
                 
                 if (avl_seat < passenger) {
-                    alert('Not Enough Seat Available')
-                    die();
+                    alert('Not Enough Seat Available');
+                    return;
                 }
                 
                 var element = $(this);
@@ -2659,8 +2651,8 @@
                 var passenger = $('#passenger').val();
 
                 if (avl_seat < passenger) {
-                    alert('Not Enough Seat Available');
-                    die();
+                    alert('Not Enough Seat Available');;
+                    return;
                 }
 
                 var element = $(this);
@@ -2838,8 +2830,8 @@
                 var passenger = $('#passenger').val();
 
                 if (avl_seat < passenger) {
-                    alert('Not Enough Seat Available')
-                    die();
+                    alert('Not Enough Seat Available');
+                    return;
                 }
 
                 var element = $(this);
@@ -3101,13 +3093,21 @@
             $(document).on('click', ".seat", function() {
                 element = $(this);
                 
+                // Don't allow selection of booked seats
+                if ($(this).hasClass('booked')) {
+                    return false;
+                }
+                
                 var no_of_pax = $("#passenger").val();
                 const curTripNo = element.data('trip-no');
 
+                // Check if seat is currently selected
+                var wasSelected = $(this).hasClass('selected');
+                
                 $(this).toggleClass("selected");
                 
                 if (curTripNo == 1) {
-                    if ($(this).hasClass('selected')) {
+                    if ($(this).hasClass('selected') && !wasSelected) {
                         var selectedSeat = parseInt($("#trip1seatcount").val(), 10);
                         selectedSeat += 1;
                         $("#trip1seatcount").val(selectedSeat);

@@ -18,6 +18,14 @@ class VerifyCsrfToken extends Middleware
         'booking_form_boat',
         'payment-response/*',
         'booking-form-ferry',
-        'booking-data-store'
+        'booking-data-store',
+        'phonepe/callback',
+        'phonepe/success',
+        'phonepe/success/*',
+        'phonepe/failed',
+        'phonepe/failed/*',
+        'phonepe/pending/*',
+        '/phonepe/webhook',
+        
     ];
 }

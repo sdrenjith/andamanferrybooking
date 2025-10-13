@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@section('title', 'Andaman Ferry Booking Online | Fast & Easy Boat Booking')
+@section('meta_title', 'Andaman Ferry Booking Online | Fast & Easy Boat Booking')
+@section('meta_description', 'Book your Andaman ferry online with ease. Fast, secure, and reliable boat booking for Havelock, Neil Island, and more. Reserve your seat today')
 
 @section('content')
 <main>
@@ -12,10 +15,9 @@
                                 <div class="col-12 col-md-6 col-lg-4 mb-2 mb-lg-0 border-end">
                                     <label for="location">Boat Name</label>
                                     <select name="id" class="form-select border-0 p-0" id="">
-                                        {{-- <option value="select">Select</option> --}}
                                         @foreach ($boat_lists as $boat_list)
                                         <option value="{{ $boat_list->id }}" {{ old('id', request('id')) == $boat_list->id ? 'selected' : '' }}>
-                                            {{ $boat_list->title }}
+                                            {{ $boat_list->name }} - {{ number_format($boat_list->price, 0) }}/-
                                         </option>
                                         @endforeach
                                     </select>

@@ -229,9 +229,11 @@ $(".tabBtn").click(function () {
     $(".tabs" + bannerTab + " ").css({ "opacity": "1", "z-index": "5" , "height" : "auto" , "overflow" : "auto"});
 });
 
-$(".my_date_picker").datepicker({
-    dateFormat: 'dd-mm-yy',
-    defaultDate: "today"
-});
+if ($.fn.datepicker) {
+    $(".my_date_picker").datepicker({
+        dateFormat: 'dd-mm-yy',
+        defaultDate: "today"
+    });
+}
 
 

@@ -3,13 +3,59 @@
 * {
     padding: 0;
     margin: 0;
+    /* Prevent gittering */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Prevent gittering on scroll */
+html, body {
+    scroll-behavior: smooth;
+    /* Prevent gittering */
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+    /* Prevent any potential layout shifts */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: auto;
+    /* Prevent horizontal scroll and improve performance */
+    overflow-x: hidden;
 }
 
 body {
     padding: 0;
     margin: 0;
     background: #FAFAFA;
-    font-family: 'League Spartan';
+    font-family: 'Inter', sans-serif;
+    /* Add hardware acceleration to prevent gittering */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: auto;
+    /* Prevent horizontal scroll and improve performance */
+    overflow-x: hidden;
+}
+
+/* Fix for gittering on mobile */
+@media only screen and (max-width: 767px) {
+    body {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+    
+    /* Prevent gittering on fixed elements */
+    .billMobile,
+    .navbar,
+    footer.mobile {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        will-change: transform;
+    }
+    
+    /* Smooth scrolling for ourStats */
+    .ourStats {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
 }
 
 .ad {
@@ -174,17 +220,6 @@ body {
 
 .socialIcon a:hover img {
     transform: scale(1.2);
-}
-
-
-@keyframes scroll {
-    0% {
-        transform: translateY(0%);
-    }
-
-    100% {
-        transform: translateY(100%);
-    }
 }
 
 .ourStats {
@@ -403,8 +438,6 @@ body {
 .owl-dots {
     display: none !important;
 }
-
-
 
 .ferryCard {
     display: flex;
@@ -793,9 +826,22 @@ body {
 }
 
 footer {
+    background: url("../images/footerBg.png") no-repeat top 0px center / auto 100%;
+    /* Prevent gittering */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: auto;
     color: #fff;
-    background: url("../images/footerBg.png") no-repeat top 0px center / 100% auto;
     padding: 155px 0px 40px 0px;
+    /* Add additional optimizations to prevent gittering */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000;
+    /* Ensure background doesn't cause layout shifts */
+    background-attachment: scroll;
+    background-size: auto 100%;
+    background-position: top 0px center;
 }
 
 footer h2 {
@@ -1088,6 +1134,16 @@ footer ul li {
 
 footer.mobile {
     display: none;
+    background: #172652;
+    position: relative;
+    /* Prevent gittering */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    /* Add additional optimizations to prevent gittering */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000;
 }
 
 
@@ -1167,10 +1223,33 @@ footer.mobile {
     position: fixed;
     top: 10px;
     width: 342px;
+    /* Prevent gittering */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .billMobile {
     display: none;
+    background: #172652 !important;
+    width: 100%;
+    position: fixed;
+    bottom: 0px;
+    border-radius: 0px;
+    z-index: 99999;
+    padding: 5px 0px;
+    border-top: 1px solid #fff;
+    /* Prevent gittering */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+    /* Add additional optimizations to prevent gittering */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000;
 }
 
 .searchResultsPage .ferryBanner {

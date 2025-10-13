@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@section('title', 'Contact Us – Andaman Ferry Online Booking Support')
+@section('meta_title', 'Contact Us | Andaman Ferry Online Booking Support')
+@section('meta_description', 'Need help with your Andaman ferry booking? Contact our support team for assistance with reservations, cancellations, rescheduling, and travel queries.')
 
 @section('content')
 <main class="contact-modern-bg py-5">
@@ -50,26 +53,43 @@
                     <div>
                         <h3 class="fw-bold mb-2 text-center">Contact Information</h3>
                         <p class="text-center text-muted mb-4">Available 24/7</p>
-                        <div class="mb-3 d-flex align-items-start">
-                            <i class="bi bi-geo-alt-fill contact-icon-modern me-3"></i>
+                        
+                        <div class="mb-4 d-flex align-items-start">
+                            <i class="bi bi-geo-alt-fill contact-icon-modern me-3 mt-1"></i>
                             <div>
-                                <div class="fw-semibold">Address</div>
-                                <div>1st floor, Premnagar Muthoot Finance Building<br>Port Blair, Andaman and Nicobar Island<br>PIN - 744102</div>
-                    </div>
+                                <div class="fw-semibold mb-1">Address</div>
+                                <div class="text-muted">1st floor, Premnagar Muthoot Finance Building<br>Port Blair, Andaman and Nicobar Island<br>PIN - 744102</div>
+                            </div>
                         </div>
-                        <div class="mb-3 d-flex align-items-center">
+                        
+                        <div class="mb-4 d-flex align-items-center">
                             <i class="bi bi-envelope-at-fill contact-icon-modern me-3"></i>
-                            <a href="mailto:andamanferrybookings@gmail.com" class="fw-semibold text-decoration-none text-dark">andamanferrybookings@gmail.com</a>
+                            <div>
+                                <div class="fw-semibold mb-1">Email</div>
+                                <a href="mailto:andamanferrybookings@gmail.com" class="text-decoration-none text-dark">andamanferrybookings@gmail.com</a>
+                            </div>
                         </div>
-                        <div class="mb-3 d-flex align-items-center">
+                        
+                        <div class="mb-4 d-flex align-items-center">
                             <i class="bi bi-telephone-fill contact-icon-modern me-3"></i>
-                            <a href="tel:+919679061419" class="fw-semibold text-decoration-none text-dark">+91 9679061419 / 9933281206</a>
+                            <div>
+                                <div class="fw-semibold mb-1">Phone</div>
+                                <a href="tel:+919679061419" class="text-decoration-none text-dark">+91 9679061419</a><br>
+                                <a href="tel:+919933281206" class="text-decoration-none text-dark">+91 9933281206</a>
+                            </div>
                         </div>
                     </div>
+                    
                     <div class="d-flex justify-content-center gap-3 mt-4">
-                        <a href="https://www.facebook.com/profile.php?id=61551926759700" target="_blank" class="social-link-modern"><i class="bi bi-facebook"></i></a>
-                        <a href="https://www.instagram.com/andamanferrybooking" target="_blank" class="social-link-modern"><i class="bi bi-instagram"></i></a>
-                        <a href="https://wa.me/919933281206" target="_blank" class="social-link-modern"><i class="bi bi-whatsapp"></i></a>
+                        <a href="https://www.facebook.com/profile.php?id=61551926759700" target="_blank" class="social-link-modern" title="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://www.instagram.com/andamanferrybooking" target="_blank" class="social-link-modern" title="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="https://wa.me/+919933281206" target="_blank" class="social-link-modern" title="WhatsApp">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
                     </div>
                 </div>
             </div>

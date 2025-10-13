@@ -408,11 +408,10 @@
                                     </div>
                                     <div class="row w-100 p-0 m-0 mt-2">
                                         <div class="departing-txt m-0 col-6 p-0">
-                                            <p class="departing-txt-date m-0">Amount/Prerson</p>
+                                            <p class="departing-txt-date m-0">Amount/Person</p>
                                         </div>
                                         <div class="col-6 p-0 departing-txt">
-                                            <p class="departing-txt-date d-inline-block m-0">{{ $boat_price }}
-                                            </p>
+                                            <p class="departing-txt-date d-inline-block m-0">₹{{ number_format($boat_price, 2) }}</p>
                                         </div>
                                     </div>
                                     <div class="row w-100 p-0 m-0 mt-2">
@@ -420,8 +419,7 @@
                                             <p class="departing-txt-date m-0">No of Passenger</p>
                                         </div>
                                         <div class="col-6 p-0 departing-txt">
-                                            <p class="departing-txt-date d-inline-block m-0">{{ $passengers }}
-                                            </p>
+                                            <p class="departing-txt-date d-inline-block m-0">{{ $passengers }}</p>
                                         </div>
                                     </div>
                                     <div class="row w-100 p-0 m-0 mt-2">
@@ -429,9 +427,7 @@
                                             <p class="departing-txt-date m-0">Total Amount</p>
                                         </div>
                                         <div class="col-6 p-0 departing-txt">
-                                            <p class="departing-txt-date d-inline-block m-0">
-                                                {{ $boat_price * $passengers }}
-                                            </p>
+                                            <p class="departing-txt-date d-inline-block m-0">₹{{ number_format($boat_price * $passengers, 2) }}</p>
                                         </div>
                                     </div>
                                 </div>

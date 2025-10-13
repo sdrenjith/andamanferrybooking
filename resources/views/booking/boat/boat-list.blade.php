@@ -1,45 +1,16 @@
 @extends('layouts.app')
 
+@section('title', 'Andaman Ferry Booking Online | Fast & Easy Boat Booking')
+@section('meta_title', 'Andaman Ferry Booking Online | Fast & Easy Boat Booking')
+@section('meta_description', 'Book your Andaman ferry online with ease. Fast, secure, and reliable boat booking for Havelock, Neil Island, and more. Reserve your seat today')
+
 @section('content')
 <main>
-    <section>
-        <div class="ferryBanner boatBook">
-            <div class="bookingConsole ">
-                <div class="position-relative tabContainer">
-                    <form action="{{ url('/search-result-boat') }}" method="GET">
-                        <div class="tabs opacity-100 row mx-0">
-                            <div class="col-12 col-md-6 col-lg-4 mb-2 mb-lg-0 border-end">
-                                <label for="location">Boat List</label>
-                                <select name="id" class="form-select border-0 p-0" id="">
-                                    {{-- <option value="select">Select</option> --}}
-                                    @foreach ($boat_lists as $index => $boat_list)
-                                    <option value="{{ $boat_list->id }}" {{ $index + 1 == 1 ? 'selected' : '' }}>
-                                        {{ $boat_list->title }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0 border-end">
-                                <label for="date">Date</label>
-                                <input type="date" class="my_date_picker" placeholder="Select Date" id="date" name="date" min="<?php echo date('Y-m-d'); ?>">
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0 border-end">
-                                <label for="location">Passengers</label>
-                                <input type="number" class="form-control" id="passengers" name="passengers" value="1" oninput="this.value = this.value.replace(/[^1-8]/g, '').slice(0, 1);" required>
-                            </div>
-
-                            <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0 ">
-                                <label for="location">Infants</label>
-                                <input type="tel" name="infants" maxlength="2" inputmode="numeric" id="infants" placeholder="No. of Infant" value="0">
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-2 mb-2 mb-lg-0">
-                                <button type="submit" class="btn button w-100"><i class="bi bi-search"></i>
-                                    Search</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <!-- Hero/Booking Section -->
+    <section class="modern-hero">
+        <div class="hero-content">
+            <h1>Book a Boat in Andaman</h1>
+            <p>Private charters & speed boats for island hopping</p>
         </div>
     </section>
 
@@ -286,3 +257,43 @@
     }
 </script>
 @endpush
+
+<style>
+    .modern-hero {
+        position: relative;
+        background: linear-gradient(135deg, rgba(20, 30, 48, 0.9), rgba(36, 59, 85, 0.8));
+        min-height: 38vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    .hero-content {
+        text-align: center;
+        z-index: 2;
+        position: relative;
+    }
+    .hero-content h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 1rem;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .hero-content p {
+        font-size: 1.1rem;
+        color: rgba(255,255,255,0.9);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    @media (max-width: 768px) {
+        .hero-content h1 { font-size: 1.5rem; }
+        .hero-content p { font-size: 1rem; }
+    }
+</style>
+
+{{-- Debug output for boat_lists --}}
+@foreach ($boat_lists as $boat_list)
+    <div>DEBUG: {{ $boat_list->name }} - {{ $boat_list->price }}</div>
+@endforeach

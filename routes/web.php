@@ -7,6 +7,10 @@ Route::get('/clear-cache', function () {
     return "Cache cleared successfully";
 });
 
+Route::get('/env-test', function () {
+    echo 'hi';
+    return env('RAZOR_KEY_ID');
+});
 
 Route::middleware(['web'])->group(function () {
 
@@ -14,6 +18,11 @@ Route::middleware(['web'])->group(function () {
     Route::get('/home_achievements', [App\Http\Controllers\HomeController::class, 'home_achievements']);
     Route::get('/home_banners', [App\Http\Controllers\HomeController::class, 'home_banners']);
     Route::get('/ferry-schedule', [App\Http\Controllers\HomeController::class, 'ferry_schedule']);
+Route::get('/api/google-reviews', [App\Http\Controllers\HomeController::class, 'getGoogleReviews']);
+
+// Chatbot routes
+Route::post('/api/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'chat']);
+Route::get('/api/chatbot/initial', [App\Http\Controllers\ChatbotController::class, 'getInitialMessage']);
 
     Route::get('/testimonials', [App\Http\Controllers\TestimonialsController::class, 'index']);
     Route::get('/home_testimonials', [App\Http\Controllers\TestimonialsController::class, 'home_testimonials']);
@@ -111,15 +120,15 @@ Route::middleware(['web'])->group(function () {
 
     // Route::get('/payment-initiate',[App\Http\controllers\BookingController::class,'payment_initiate'])->name('payment-initiate');
     Route::post('/payment-response/{order_id}',[App\Http\Controllers\BookingController::class,'payment_response'])->name('payment-response');
-    Route::post('/ticket_generate',[App\Http\Controllers\BookingController::class,'ticket_generate']);
+    Route::post('/ticket_generate', [App\Http\Controllers\BookingController::class, 'ticket_generate'])->name('ticket_generate');
 
     Route::get('user_register', [App\Http\Controllers\HomeController::class, 'user_register'])->name('user_register');
     Route::GET('verify_otp', [App\Http\Controllers\HomeController::class, 'verify_otp'])->name('verify_otp');
 
     Route::get('/ticket-cancellation-request',[App\Http\Controllers\OrderCancellationController::class,'ticket_cencel_request'])->name('ticket-cancellation-route');
     Route::post('/ticket-cancellation-preview',[App\Http\Controllers\OrderCancellationController::class,'ticket_cencel_preview']);
-    Route::post('/ticket-cenceled-details-ferry',[App\Http\Controllers\OrderCancellationController::class,'ticket_cencel_details_ferry'])->name('booking-cenceled');
-    Route::post('/ticket-cenceled-details-boat',[App\Http\Controllers\OrderCancellationController::class,'ticket_cencel_details_boat'])->name('booking-cenceled');
+    Route::post('/ticket-cenceled-details-ferry',[App\Http\Controllers\OrderCancellationController::class,'ticket_cencel_details_ferry'])->name('booking-cenceled-ferry');
+    Route::post('/ticket-cenceled-details-boat',[App\Http\Controllers\OrderCancellationController::class,'ticket_cencel_details_boat'])->name('booking-cenceled-boat');
 
     // Route::post('/login-check',[App\Http\Controllers\HomeController::class,'login_check'])->name('login-check');
     Route::post('/logout', [App\Http\Controllers\HomeController::class, 'logout'])->name('logout');
@@ -149,7 +158,33 @@ Route::middleware(['web'])->group(function () {
     Route::get('/test-green-api-call/{pnr}',[App\Http\Controllers\BookingController::class,'TestGreenOceanAPICall']);
 
     Route::get('/boat-booking', [App\Http\Controllers\BoatbookingController::class, 'boatBookingPage'])->name('boat_booking_page');
+
+    Route::post('/booking-form-boat-payment', [App\Http\Controllers\BookingController::class, 'boat_booking_payment'])->name('booking-form-boat-payment');
+
+    Route::match(['get', 'post'], '/booking-boat', [App\Http\Controllers\BookingController::class, 'booking_show_boat_summary'])->name('booking-boat');
+
+    Route::post('/ajax/boat-booking', [App\Http\Controllers\BookingController::class, 'ajaxBoatBooking']);
+    Route::get('/boat-payment/{order_id}', [App\Http\Controllers\BookingController::class, 'boatPaymentPage']);
+
+    Route::post('/payment-failed/{order_id}', [App\Http\Controllers\BookingController::class, 'paymentFailed']);
+
+    Route::get('/boat-booking/invoice/{order_id}', [App\Http\Controllers\BookingController::class, 'boatBookingInvoice'])->name('boat-booking.invoice');
+    Route::get('/boat-booking/invoice-pdf/{order_id}', [App\Http\Controllers\BookingController::class, 'boatBookingInvoicePdf'])->name('boat-booking.invoice-pdf');
+    Route::get('/ferry-booking/success/{order_id}', [App\Http\Controllers\BookingController::class, 'ferryBookingSuccess'])->name('ferry-booking.success');
 });
 
 // Handle razorpay webhook
 Route::post('/validate-payment', [App\Http\Controllers\RazorpayWebhookController::class, 'handleWebhook']);
+
+// PhonePe payment routes
+Route::match(['get', 'post'], '/phonepe/initiate-boat-payment', [App\Http\Controllers\PhonePeController::class, 'initiateBoatPayment'])->name('phonepe.boat.initiate');
+Route::match(['get', 'post'], '/phonepe/initiate-ferry-payment', [App\Http\Controllers\PhonePeController::class, 'initiateFerryPayment'])->name('phonepe.ferry.initiate');
+
+// PhonePe Webhook & Callback Routes
+Route::post('/phonepe/webhook', [App\Http\Controllers\PhonePeController::class, 'handleWebhook'])->name('phonepe.webhook');
+Route::any('/phonepe/callback', [App\Http\Controllers\PhonePeController::class, 'handleCallback'])->name('phonepe.callback');
+
+// PhonePe Status Pages
+Route::get('/phonepe/success/{transaction_id?}', [App\Http\Controllers\PhonePeController::class, 'success'])->name('phonepe.success');
+Route::get('/phonepe/failed/{transaction_id}', [App\Http\Controllers\PhonePeController::class, 'failed'])->name('phonepe.failed');
+Route::get('/phonepe/pending/{transaction_id}', [App\Http\Controllers\PhonePeController::class, 'pending'])->name('phonepe.pending');

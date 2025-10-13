@@ -263,4 +263,56 @@ class HomeController extends Controller
     {
         return view('static-page.ferry_schedule');
     }
+
+    public function getGoogleReviews()
+    {
+        // Google Places API configuration
+        $apiKey = env('GOOGLE_PLACES_API_KEY', '');
+        $placeId = 'ChIJdZOlij8XrjsR4BhVjWjYfHk'; // Your place ID from the Google Maps URL
+        
+        if (empty($apiKey)) {
+            return response()->json(['error' => 'Google Places API key not configured'], 500);
+        }
+
+        try {
+            // Fetch place details including reviews
+            $response = Http::get('https://maps.googleapis.com/maps/api/place/details/json', [
+                'place_id' => $placeId,
+                'fields' => 'name,rating,user_ratings_total,reviews',
+                'key' => $apiKey
+            ]);
+
+            $data = $response->json();
+
+            if ($data['status'] === 'OK') {
+                $result = $data['result'];
+                $reviews = $result['reviews'] ?? [];
+                
+                // Process and format reviews
+                $formattedReviews = [];
+                foreach (array_slice($reviews, 0, 5) as $review) { // Get latest 5 reviews
+                    $formattedReviews[] = [
+                        'author_name' => $review['author_name'],
+                        'rating' => $review['rating'],
+                        'text' => $review['text'],
+                        'time' => $review['time'],
+                        'relative_time_description' => $review['relative_time_description'],
+                        'profile_photo_url' => $review['profile_photo_url'] ?? null
+                    ];
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'place_name' => $result['name'],
+                    'rating' => $result['rating'],
+                    'total_ratings' => $result['user_ratings_total'],
+                    'reviews' => $formattedReviews
+                ]);
+            } else {
+                return response()->json(['error' => 'Failed to fetch reviews: ' . $data['status']], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error fetching reviews: ' . $e->getMessage()], 500);
+        }
+    }
 }

@@ -29,19 +29,36 @@ class BookingController extends Controller
 {
     public function booking_show_boat(Request $request)
     {
-
         $data['boatScheduleId'] = $request->query('boatScheduleId');
         $data['date'] = $request->query('date');
-        $date = Carbon::parse($data['date']);
-        $data['formattedDate'] = $date->format('D, d M, Y');
         $data['passengers'] = $request->query('passengers');
         $data['infants'] = $request->query('infants');
 
+        // Validate required parameters
+        if (!$data['boatScheduleId']) {
+            return redirect()->back()->with('error', 'Boat schedule ID is required.');
+        }
+
+        if (!$data['date']) {
+            return redirect()->back()->with('error', 'Date is required.');
+        }
+
+        if (!$data['passengers']) {
+            return redirect()->back()->with('error', 'Number of passengers is required.');
+        }
+
+        $date = Carbon::parse($data['date']);
+        $data['formattedDate'] = $date->format('D, d M, Y');
 
         $data['boat_datas'] = DB::table('boat_schedule')
             ->where('id', $data['boatScheduleId'])
             ->where('status', 'Y')
             ->first();
+
+        // Validate that boat schedule exists
+        if (!$data['boat_datas']) {
+            return redirect()->back()->with('error', 'Selected boat schedule is not available.');
+        }
 
         if (!empty($data['boat_datas'])) {
             if ($data['boat_datas']->is_chartered_boat == 'Y') {
@@ -59,10 +76,65 @@ class BookingController extends Controller
         return view('booking.bokingpage.booking-summary-boat', $data);
     }
 
+    public function booking_show_boat_summary(Request $request)
+    {
+        // Get form data from the boat booking form
+        $data['boat_name'] = $request->boat_name;
+        $data['date'] = $request->date;
+        $data['passengers'] = $request->passengers;
+        $data['infants'] = $request->infants;
+        $data['customer_name'] = $request->customer_name;
+        $data['age'] = $request->age;
+        $data['gender'] = $request->gender;
+        $data['customer_email'] = $request->customer_email;
+        $data['customer_phone'] = $request->customer_phone;
 
+        // Validate required fields
+        if (!$data['boat_name'] || !$data['date'] || !$data['passengers'] || !$data['customer_name'] || !$data['customer_email'] || !$data['customer_phone']) {
+            return redirect()->back()->with('error', 'Please fill in all required fields.');
+        }
+
+        // Get boat details from database
+        $data['boat_datas'] = DB::table('boat_schedule')
+            ->where('title', $data['boat_name'])
+            ->where('status', 'Y')
+            ->first();
+
+        if (!$data['boat_datas']) {
+            return redirect()->back()->with('error', 'Selected boat is not available.');
+        }
+
+        // Calculate pricing
+        if ($data['boat_datas']->is_chartered_boat == 'Y') {
+            $boat_price_detail = DB::table('boat_schedule_price')
+                ->where(['boat_schedule_id' => $data['boat_datas']->id, 'no_of_passenger' => $data['passengers']])
+                ->first();
+
+            if ($boat_price_detail) {
+                $data['boat_price'] = $boat_price_detail->per_passenger_price;
+            } else {
+                $data['boat_price'] = $data['boat_datas']->price;
+            }
+        } else {
+            $data['boat_price'] = $data['boat_datas']->price;
+        }
+
+        $data['multi_price'] = $data['boat_price'] * $data['passengers'];
+        $data['boatScheduleId'] = $data['boat_datas']->id;
+
+        // Format date
+        $date = Carbon::parse($data['date']);
+        $data['formattedDate'] = $date->format('D, d M, Y');
+
+        return view('booking.bokingpage.booking-summary-boat', $data);
+    }
 
     public function boat_booking(Request $request)
     {
+        // Validate required fields
+        if (!$request->boatScheduleId) {
+            return redirect()->back()->with('error', 'Boat schedule ID is required. Please select a valid boat schedule.');
+        }
 
         $rand_number = rand(100, 999);
 
@@ -75,80 +147,88 @@ class BookingController extends Controller
         $user = Auth::user();
         $user_id = $user->id ?? NULL;
 
-        $lastInsertedId = DB::table('booking')->insertGetId([
-            'schedule_id' => $request->boatScheduleId,
-            'type' => $request->type,
-            'order_id' => $orderId,
-            'c_name' => $request->c_name,
-            'c_email' => $request->c_email,
-            'c_mobile' => $request->c_mobile,
-            'c_contact' => $request->c_contact,
-            'payment_status' => 'pending',
-            'ship_name' => $request->boat_name ?? NUll,
-            'amount'         => $request->amount,
-            'no_of_passenger' => $request->no_of_passenger,
-            'date_of_jurney'  => $request->date_of_jurney,
-            'user_id'  =>  $user_id
-        ]);
+        // Get passenger details from the form
+        $passengerNames = $request->input('passenger_name', []);
+        $passengerTitles = $request->input('passenger_title', []);
+        $passengerDobs = $request->input('passenger_dob', []);
+        
+        // Use the first passenger as the primary contact
+        $primaryName = !empty($passengerNames) ? $passengerNames[1] : '';
+        $primaryTitle = !empty($passengerTitles) ? $passengerTitles[1] : '';
+        $primaryDob = !empty($passengerDobs) ? $passengerDobs[1] : '';
+
+        try {
+            $lastInsertedId = DB::table('booking')->insertGetId([
+                'schedule_id' => $request->boatScheduleId,
+                'type' => $request->type,
+                'order_id' => $orderId,
+                'c_name' => $primaryName,
+                'c_email' => $request->customer_email ?? '',
+                'c_mobile' => $request->customer_phone ?? '',
+                'c_contact' => $request->customer_phone ?? '',
+                'payment_status' => 'pending',
+                'ship_name' => $request->boat_name ?? NULL,
+                'amount' => $request->amount,
+                'no_of_passenger' => $request->no_of_passenger,
+                'date_of_jurney' => $request->date_of_jurney,
+                'user_id' => $user_id
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to create booking. Please try again. Error: ' . $e->getMessage());
+        }
 
         if (!empty($lastInsertedId)) {
-            $passengerTitles = $request->input('passenger_title');
-            $passengerNames = $request->input('passenger_name');
-            $passengerDobs = $request->input('passenger_dob');
-            $passengerGenders = $request->input('passenger_gender');
-            $passengerNationalities = $request->input('passenger_nationality');
-            $country_name = $request->input('country_name');
-            $passport_id = $request->input('passport_id');
-            $expiry_date = $request->input('expiry_date');
+            $passengerTitles = $request->input('passenger_title', []);
+            $passengerNames = $request->input('passenger_name', []);
+            $passengerDobs = $request->input('passenger_dob', []);
+            $passengerGenders = $request->input('passenger_gender', []);
+            $passengerNationalities = $request->input('passenger_nationality', []);
+            $country_name = $request->input('country_name', []);
+            $passport_id = $request->input('passport_id', []);
+            $expiry_date = $request->input('expiry_date', []);
 
-
-            if (
-                is_array($passengerTitles) && is_array($passengerNames) && is_array($passengerDobs) && is_array($passengerGenders) && is_array($passengerNationalities) &&
-                count($passengerTitles) === count($passengerNames) && count($passengerNames) === count($passengerDobs) && count($passengerDobs) === count($passengerGenders) && count($passengerGenders) === count($passengerNationalities)
-            ) {
+            // Insert passenger details if available
+            if (is_array($passengerTitles) && is_array($passengerNames) && is_array($passengerDobs) && 
+                count($passengerTitles) === count($passengerNames) && count($passengerNames) === count($passengerDobs)) {
 
                 foreach ($passengerTitles as $index => $title) {
-                    //$fullName = $title . ' ' . $passengerNames[$index];
+                    // Handle date fields properly - use NULL instead of empty string for dates
+                    $dobValue = null;
+                    $expiryDateValue = null;
+                    
+                    // Only set date values if they are not empty and valid
+                    if (!empty($passengerDobs[$index]) && $passengerDobs[$index] !== '') {
+                        $dobValue = $passengerDobs[$index];
+                    }
+                    
+                    if (!empty($expiry_date[$index]) && $expiry_date[$index] !== '') {
+                        $expiryDateValue = $expiry_date[$index];
+                    }
+                    
                     $passengerData = [
                         'booking_id' => $lastInsertedId,
-                        'title' => $passengerTitles[$index],
-                        'full_name' => $passengerNames[$index],
-                        'dob' => $passengerDobs[$index],
-                        'gender' => $passengerGenders[$index],
-                        'resident' => $passengerNationalities[$index],
+                        'title' => $passengerTitles[$index] ?? '',
+                        'full_name' => $passengerNames[$index] ?? '',
+                        'dob' => $dobValue,
+                        'gender' => $passengerGenders[$index] ?? '',
+                        'resident' => $passengerNationalities[$index] ?? 'Indian',
                         'country' => $country_name[$index] ?? 'India',
-                        'passport_id' => $passport_id[$index],
-                        'expiry_date' => $expiry_date[$index],
+                        'passport_id' => $passport_id[$index] ?? '',
+                        'expiry_date' => $expiryDateValue,
                         'trip_type' => 'Boat',
                     ];
 
                     DB::table('booking_passenger_details')->insert($passengerData);
                 }
 
-                $api_key  = env("RAZOR_KEY_ID");
-                $api_secret = env("RAZOR_KEY_SECRET");
-                $total_amount = $request->amount;
-                $mobile  = $request->c_mobile;
-                $name = $request->c_name;
-                $email = $request->c_email;
-                $user_id = $lastInsertedId;
-
-                $api = new Api($api_key, $api_secret);
-
-                $order = $api->order->create(array('receipt' => '123', 'amount' => $total_amount * 100, 'currency' => 'INR'));
-                $order_id = $order['id'];
-
-                Session::put('order_id', $order_id);
-                Session::put('amount', $total_amount);
-                Session::put('user_phone', $mobile);
-                Session::put('user_email', $email);
-                Session::put('user_name', $name);
+                // PhonePe Integration
                 Session::put('booking_id', $lastInsertedId);
-
-                return view('razorpay.payment', compact('user_id', 'order_id'));
-
-
-                // return redirect()->back()->with('success', 'Booking created successfully.');
+                Session::put('amount', $request->amount);
+                Session::put('user_phone', $request->c_mobile);
+                Session::put('user_email', $request->c_email);
+                Session::put('user_name', $request->c_name);
+                
+                return redirect()->route('phonepe.boat.initiate');
             } else {
                 return redirect()->back()->with('error', 'Passenger details are incomplete or mismatched.');
             }
@@ -157,13 +237,35 @@ class BookingController extends Controller
         return redirect()->back()->with('error', 'Booking creation failed.');
     }
 
+    public function boatPaymentPage($order_id)
+    {
+        // Get booking details from session or database
+        $booking_id = Session::get('booking_id');
+        
+        if (!$booking_id) {
+            return redirect()->route('home')->with('error', 'Booking session expired. Please start a new booking.');
+        }
+        
+        $booking = DB::table('booking')->where('id', $booking_id)->first();
+        
+        if (!$booking) {
+            return redirect()->route('home')->with('error', 'Booking not found.');
+        }
+        
+        $data = [
+            'booking' => $booking,
+            'order_id' => $order_id,
+            'booking_id' => $booking_id
+        ];
+        
+        return view('razorpay.boat-payment-success', $data);
+    }
 
     public function booking_show_ferry(Request $request)
     {
         $booking_data = Session::get('booking_data');
         $data['booking_data'] = $booking_data;
         $ferry_list = Session::get('ferry_list');
-
 
         if (!empty($request->booking_data)) {
             $booking_data_str = $request->booking_data;
@@ -174,19 +276,13 @@ class BookingController extends Controller
             }
         }
 
-        // dd($booking_data);
-
         if (!empty($booking_data) && !empty($ferry_list)) {
 
             // ===================== TRIP 1 ==================================
             $trip1FerryList = $ferry_list['apiScheduleData'];
             $ferryScheduleId = $booking_data['schedule'][1]['scheduleId'];
             $ferryScheduleType = $booking_data['schedule'][1]['ship'];
-            // $ferryScheduleType = $booking_data['schedule'][0]['tripSeatNo'];
 
-            //print_r($trip1FerryList);die;
-
-            // dd($trip1FerryList);
             $passenger = $booking_data['no_of_passenger'];
             $infants = $booking_data['no_of_infant'];
 
@@ -196,15 +292,12 @@ class BookingController extends Controller
                 }
             }
 
-            // dd($scheduleDet1);
-
             $selectedSche1 = [];
 
             if ($scheduleDet1['ship_name'] == 'Admin') {
                 foreach ($scheduleDet1['ferry_prices'] as $row) {
                     if ($row['class_id'] == $booking_data['schedule'][1]['shipClass']) {
-                        // $selectedSche1['fare'] = $row['price'];
-                        $selectedSche1['fare'] = 200;
+                        $selectedSche1['fare'] = $row['price'];
                         $selectedSche1['class_title'] = $row['class']['title'];
                     }
                 }
@@ -215,7 +308,6 @@ class BookingController extends Controller
                 $selectedSche1['ship_name'] = $scheduleDet1['ship']['title'];
                 $selectedSche1['departure_time'] = $scheduleDet1['departure_time'];
                 $selectedSche1['arrival_time'] = $scheduleDet1['arrival_time'];
-                // $selectedSche1['psf'] = 50;
                 $selectedSche1['psf'] = 0;
                 $selectedSche1['route_id'] = NULL;
             } else if ($scheduleDet1['ship_name'] == 'Nautika') {
@@ -230,15 +322,12 @@ class BookingController extends Controller
                 $selectedSche1['schedule_id'] = $scheduleDet1['id'];
                 $selectedSche1['class_id'] = $booking_data['schedule'][1]['shipClass'];
                 $selectedSche1['ship_name'] = $scheduleDet1['ship_name'];
-                // $selectedSche1['from_location'] = $booking_data1['from'];
-                // $selectedSche1['to_location'] = $booking_data1['to'];
                 $selectedSche1['departure_time'] = $scheduleDet1['departure_time'];
                 $selectedSche1['arrival_time'] = $scheduleDet1['arrival_time'];
                 $selectedSche1['trip_id'] = $scheduleDet1['tripId'];
                 $selectedSche1['vesselID'] = $scheduleDet1['vesselID'];
                 $selectedSche1['psf'] = 50;
                 $selectedSche1['route_id'] = NULL;
-
                 $selectedSche1['tripSeatNo'] = $booking_data['schedule'][1]['tripSeatNo'];
             } else if ($scheduleDet1['ship_name'] == 'Makruzz') {
                 $selectedSche1['class_id'] = $booking_data['schedule'][1]['shipClass'];
@@ -251,6 +340,7 @@ class BookingController extends Controller
                 $selectedSche1['route_id'] = NULL;
                 foreach ($scheduleDet1['ship_class'] as $sch) {
                     if ($sch->ship_class_id == $booking_data['schedule'][1]['shipClass']) {
+                        $sch->ship_class_price = 250;
                         $selectedSche1['fare'] = $sch->ship_class_price;
                         $selectedSche1['psf'] = $sch->psf;
                         $selectedSche1['class_title'] = $sch->psf;
@@ -258,16 +348,13 @@ class BookingController extends Controller
                     }
                 }
             } else if (str_contains($scheduleDet1['ship_name'], 'Green Ocean')) {
-                // dd($booking_data['schedule']);
                 $selectedSche1['class_id'] = $booking_data['schedule'][1]['shipClass'];
                 $selectedSche1['schedule_id'] = $booking_data['schedule'][1]['scheduleId'];
                 $selectedSche1['trip_id'] = NULL;
                 $selectedSche1['ship_id'] = $booking_data['schedule'][1]['ship_id'];
                 $selectedSche1['ship_name'] = $scheduleDet1['ship_name'];
                 $selectedSche1['departure_time'] = $scheduleDet1['departure_time'];
-                // $selectedSche1['arrival_time'] = $scheduleDet1['ship_class'][0]->arrival_time;
                 $selectedSche1['arrival_time'] = $scheduleDet1['arraival_time'];
-                // $selectedSche1['fare'] = $scheduleDet1['ship_class'][0]->arrival_time;
                 $selectedSche1['route_id'] = $booking_data['schedule'][1]['route_id'];
                 $selectedSche1['trip_seat_no'] = $booking_data['schedule'][1]['tripSeatNo'];
 
@@ -275,14 +362,12 @@ class BookingController extends Controller
                     if ($sch->class_id == $booking_data['schedule'][1]['shipClass']) {
                         $selectedSche1['fare'] = $sch->adult_seat_rate;
                         $selectedSche1['psf'] = $sch->port_fee;
-                        // $selectedSche1['class_title'] = $sch->psf;
                         $selectedSche1['class_title'] = $sch->class_name;
                     }
                 }
             }
 
             $data['trip1'] = $selectedSche1;
-
 
             // ============================ TRIP 2 =====================================================
             if ($booking_data['trip_type'] >= 2) {
@@ -297,12 +382,11 @@ class BookingController extends Controller
                 }
 
                 $selectedSche2 = [];
-                // print_r($scheduleDet2);die;
+
                 if ($scheduleDet2['ship_name'] == 'Admin') {
                     foreach ($scheduleDet2['ferry_prices'] as $row) {
                         if ($row['class_id'] == $booking_data['schedule'][2]['shipClass']) {
-                            // $selectedSche2['fare'] = $row['price'];
-                            $selectedSche2['fare'] = 200;
+                            $selectedSche2['fare'] = $row['price'];
                             $selectedSche2['class_title'] = $row['class']['title'];
                         }
                     }
@@ -313,7 +397,6 @@ class BookingController extends Controller
                     $selectedSche2['ship_name'] = $scheduleDet2['ship']['title'];
                     $selectedSche2['departure_time'] = $scheduleDet2['departure_time'];
                     $selectedSche2['arrival_time'] = $scheduleDet2['arrival_time'];
-                    // $selectedSche2['psf'] = 50;
                     $selectedSche2['psf'] = 0;
                     $selectedSche2['route_id'] = NULL;
 
@@ -329,8 +412,6 @@ class BookingController extends Controller
                     $selectedSche2['schedule_id'] = $scheduleDet2['id'];
                     $selectedSche2['class_id'] = $booking_data['schedule'][2]['shipClass'];
                     $selectedSche2['ship_name'] = $scheduleDet2['ship_name'];
-                    // $selectedSche2['from_location'] = $booking_data1['from'];
-                    // $selectedSche2['to_location'] = $booking_data1['to'];
                     $selectedSche2['departure_time'] = $scheduleDet2['departure_time'];
                     $selectedSche2['arrival_time'] = $scheduleDet2['arrival_time'];
                     $selectedSche2['trip_id'] = $scheduleDet2['tripId'];
@@ -355,27 +436,20 @@ class BookingController extends Controller
                         }
                     }
                 } else if (str_contains($scheduleDet2['ship_name'], 'Green Ocean')) {
-                    // dd($booking_data['schedule']);
                     $selectedSche2['class_id'] = $booking_data['schedule'][2]['shipClass'];
                     $selectedSche2['schedule_id'] = $booking_data['schedule'][2]['scheduleId'];
                     $selectedSche2['trip_id'] = NULL;
-                    // $selectedSche2['ship_id'] = $scheduleDet2['ship_id'];
                     $selectedSche2['ship_id'] = $booking_data['schedule'][2]['ship_id'];
-
                     $selectedSche2['ship_name'] = $scheduleDet2['ship_name'];
                     $selectedSche2['departure_time'] = $scheduleDet2['departure_time'];
-                    // $selectedSche2['arrival_time'] = $scheduleDet2['ship_class'][0]->arrival_time;
                     $selectedSche2['arrival_time'] = $scheduleDet2['arraival_time'];
-                    // $selectedSche2['fare'] = $scheduleDet2['ship_class'][0]->arrival_time;
                     $selectedSche2['route_id'] = $booking_data['schedule'][2]['route_id'];
-
                     $selectedSche2['trip_seat_no'] = $booking_data['schedule'][2]['tripSeatNo'];
 
                     foreach ($scheduleDet2['ship_class'] as $sch) {
                         if ($sch->class_id == $booking_data['schedule'][2]['shipClass']) {
                             $selectedSche2['fare'] = $sch->adult_seat_rate;
                             $selectedSche2['psf'] = $sch->port_fee;
-                            // $selectedSche2['class_title'] = $sch->psf;
                             $selectedSche2['class_title'] = $sch->class_name;
                         }
                     }
@@ -384,11 +458,9 @@ class BookingController extends Controller
                 $data['trip2'] = $selectedSche2;
             }
 
-            // ============================ TRIP 2 =====================================================
+            // ============================ TRIP 3 =====================================================
             if ($booking_data['trip_type'] == 3) {
-
                 $trip3FerryList = $ferry_list['apiScheduleData3'];
-
                 $ferryScheduleId = $booking_data['schedule'][3]['scheduleId'];
                 $ferryScheduleType = $booking_data['schedule'][3]['ship'];
 
@@ -402,8 +474,7 @@ class BookingController extends Controller
                 if ($scheduleDet3['ship_name'] == 'Admin') {
                     foreach ($scheduleDet3['ferry_prices'] as $row) {
                         if ($row['class_id'] == $booking_data['schedule'][3]['shipClass']) {
-                            // $selectedSche3['fare'] = $row['price'];
-                            $selectedSche3['fare'] = 200;
+                            $selectedSche3['fare'] = $row['price'];
                             $selectedSche3['class_title'] = $row['class']['title'];
                         }
                     }
@@ -414,7 +485,6 @@ class BookingController extends Controller
                     $selectedSche3['ship_name'] = $scheduleDet3['ship']['title'];
                     $selectedSche3['departure_time'] = $scheduleDet3['departure_time'];
                     $selectedSche3['arrival_time'] = $scheduleDet3['arrival_time'];
-                    // $selectedSche3['psf'] = 50;
                     $selectedSche3['psf'] = 0;
                     $selectedSche3['route_id'] = NULL;
 
@@ -430,8 +500,6 @@ class BookingController extends Controller
                     $selectedSche3['schedule_id'] = $scheduleDet3['id'];
                     $selectedSche3['class_id'] = $booking_data['schedule'][3]['shipClass'];
                     $selectedSche3['ship_name'] = $scheduleDet3['ship_name'];
-                    // $selectedSche3['from_location'] = $booking_data1['from'];
-                    // $selectedSche3['to_location'] = $booking_data1['to'];
                     $selectedSche3['departure_time'] = $scheduleDet3['departure_time'];
                     $selectedSche3['arrival_time'] = $scheduleDet3['arrival_time'];
                     $selectedSche3['trip_id'] = $scheduleDet3['tripId'];
@@ -440,7 +508,6 @@ class BookingController extends Controller
                     $selectedSche3['tripSeatNo'] = $booking_data['schedule'][3]['tripSeatNo'];
                     $selectedSche3['route_id'] = NULL;
                 } else if ($scheduleDet3['ship_name'] == 'Makruzz') {
-
                     $selectedSche3['class_id'] = $booking_data['schedule'][3]['shipClass'];
                     $selectedSche3['schedule_id'] = $booking_data['schedule'][3]['scheduleId'];
                     $selectedSche3['trip_id'] = NULL;
@@ -456,24 +523,19 @@ class BookingController extends Controller
                         }
                     }
                 } else if (str_contains($scheduleDet3['ship_name'], 'Green Ocean')) {
-                    // dd($booking_data['schedule']);
                     $selectedSche3['class_id'] = $booking_data['schedule'][3]['shipClass'];
                     $selectedSche3['schedule_id'] = $booking_data['schedule'][3]['scheduleId'];
                     $selectedSche3['trip_id'] = NULL;
-                    // $selectedSche3['ship_id'] = $scheduleDet3['ship_id'];
                     $selectedSche3['ship_id'] = $booking_data['schedule'][3]['ship_id'];
                     $selectedSche3['ship_name'] = $scheduleDet3['ship_name'];
                     $selectedSche3['departure_time'] = $scheduleDet3['departure_time'];
-                    // $selectedSche3['arrival_time'] = $scheduleDet3['ship_class'][0]->arrival_time;
                     $selectedSche3['arrival_time'] = $scheduleDet3['arraival_time'];
-                    // $selectedSche3['fare'] = $scheduleDet3['ship_class'][0]->arrival_time;
                     $selectedSche3['route_id'] = $booking_data['schedule'][3]['route_id'];
                     $selectedSche3['trip_seat_no'] = $booking_data['schedule'][3]['tripSeatNo'];
                     foreach ($scheduleDet3['ship_class'] as $sch) {
                         if ($sch->class_id == $booking_data['schedule'][3]['shipClass']) {
                             $selectedSche3['fare'] = $sch->adult_seat_rate;
                             $selectedSche3['psf'] = $sch->port_fee;
-                            // $selectedSche3['class_title'] = $sch->psf;
                             $selectedSche3['class_title'] = $sch->class_name;
                         }
                     }
@@ -481,14 +543,6 @@ class BookingController extends Controller
 
                 $data['trip3'] = $selectedSche3;
             }
-            // print_r($selectedSche1);
-            // echo '<br>';
-            // print_r($selectedSche2);
-            // echo '<br>';
-            // print_r($selectedSche3);
-            // die;
-
-            // dd($data);
 
             Session::put('trip_data', $data);
 
@@ -499,7 +553,6 @@ class BookingController extends Controller
 
     public function ferry_booking(Request $request)
     {
-
         $rand_number = rand(100, 999);
         $timestamp = time();
         $timestamp_last7 = substr($timestamp, -7);
@@ -512,10 +565,6 @@ class BookingController extends Controller
         $user_id = $user->id ?? NULL;
         $trip_data = Session::get('trip_data');
 
-        // dd(Session::get('booking_data'));
-
-        // print_r(  $trip_data);
-        // die();
         if (isset($trip_data['trip1'])) {
             $trip1_booking_id = DB::table('booking')->insertGetId([
                 'schedule_id' => $trip_data['trip1']['schedule_id'],
@@ -529,9 +578,8 @@ class BookingController extends Controller
                 'amount'         => Session::get('total_trip1_amount'),
                 'no_of_passenger' => $trip_data['booking_data']['no_of_passenger'],
                 'date_of_jurney'  => $trip_data['booking_data']['date'],
-                //'return_date'  => $request->return_date,
                 'trip_id'  => $trip_data['trip1']['trip_id'],
-                'route_id'  => $trip_data['trip1']['route_id'], // for green ocean
+                'route_id'  => $trip_data['trip1']['route_id'],
                 'vessel_id'  => $trip_data['trip1']['vesselID'] ?? NULL,
                 'departure_time'  => $trip_data['trip1']['departure_time'],
                 'arrival_time'  => $trip_data['trip1']['arrival_time'],
@@ -548,7 +596,6 @@ class BookingController extends Controller
             ]);
         }
 
-
         if (isset($trip_data['trip2'])) {
             $trip2_booking_id = DB::table('booking')->insertGetId([
                 'schedule_id' => $trip_data['trip2']['schedule_id'],
@@ -562,9 +609,8 @@ class BookingController extends Controller
                 'amount'         => Session::get('total_trip2_amount'),
                 'no_of_passenger' => $trip_data['booking_data']['no_of_passenger'],
                 'date_of_jurney'  => $trip_data['booking_data']['round1_date'],
-                //'return_date'  => $request->return_date,
                 'trip_id'  => $trip_data['trip2']['trip_id'],
-                'route_id'  => $trip_data['trip2']['route_id'], // for green ocean
+                'route_id'  => $trip_data['trip2']['route_id'],
                 'vessel_id'  => $trip_data['trip2']['vesselID'] ?? NULL,
                 'departure_time'  => $trip_data['trip2']['departure_time'],
                 'arrival_time'  => $trip_data['trip2']['arrival_time'],
@@ -594,9 +640,8 @@ class BookingController extends Controller
                 'amount'         => Session::get('total_trip3_amount'),
                 'no_of_passenger' => $trip_data['booking_data']['no_of_passenger'],
                 'date_of_jurney'  => $trip_data['booking_data']['round2_date'],
-                //'return_date'  => $request->return_date,
                 'trip_id'  => $trip_data['trip3']['trip_id'],
-                'route_id'  => $trip_data['trip3']['route_id'], // for green ocean
+                'route_id'  => $trip_data['trip3']['route_id'],
                 'vessel_id'  => $trip_data['trip3']['vesselID'] ?? NULL,
                 'departure_time'  => $trip_data['trip3']['departure_time'],
                 'arrival_time'  => $trip_data['trip3']['arrival_time'],
@@ -628,19 +673,6 @@ class BookingController extends Controller
                 count($passengerTitles) === count($passengerNames) && count($passengerNames) === count($passengerDobs) && count($passengerDobs) === count($passengerGenders) && count($passengerGenders) === count($passengerNationalities)
             ) {
 
-                // // Agent wallet balance check for Green Ocean
-                // $hash_sequence = "today_date|public_key";
-                // $godata['today_date'] = date("d-m-Y"); // Today Date as DD-MM-YYYY
-                // $godata['public_key'] = env('GREEN_OCEAN_PUBLIC_KEY'); // Public Key Shared by Green Ocean
-                // $godata['hash_string'] = $this->getHashKey($godata, env('GREEN_OCEAN_PRIVATE_KEY'), $hash_sequence); // Hash value of sequenced string
-                // $json_go = json_encode($godata);
-
-                // $wallet_result = $this->greenOceanApiCall('wallet-balance', $godata);
-                // $wallet_data = json_decode($wallet_result);
-                // if ($wallet_data['status'] == 'success') {
-                //     # code...
-                // }
-
                 foreach ($passengerTitles as $index => $title) {
                     if ($passengerDobs[$index] <= 1 && $passengerTitles[$index] == 'INFANT' && $trip_data['trip1']['ship_name'] != 'Nautika') {
                         $paxFare = 0;
@@ -649,7 +681,6 @@ class BookingController extends Controller
                     } else {
                         $paxFare = $trip_data['trip1']['fare'];
                     }
-
 
                     $ferryPassengerData = [
                         'booking_id' => $trip1_booking_id,
@@ -669,31 +700,15 @@ class BookingController extends Controller
                     DB::table('booking_passenger_details')->insert($ferryPassengerData);
                 }
 
-                $api_key  = env("RAZOR_KEY_ID");
-                $api_secret = env("RAZOR_KEY_SECRET");
-                // $total_amount = $request->amount;
-                $mobile  = $request->c_mobile;
-                $name = $request->c_name;
-                $email = $request->c_email;
-                $total_amount = Session::get('total_amount');
-
-                $api = new Api($api_key, $api_secret);
-
-                $order = $api->order->create(array('receipt' => '123', 'amount' => $total_amount * 100, 'currency' => 'INR')); // commented by NS for test purpose
-                // $order = $api->order->create(array('receipt' => '123', 'amount' => 1 * 100, 'currency' => 'INR')); // price set to 1 for test only
-                $order_id = $order['id'];
-
-                Session::put('order_id', $order_id);
-
-                Session::put('user_phone', $mobile);
-                Session::put('user_email', $email);
-                Session::put('user_name', $name);
+                // PhonePe Integration - Store session data
+                Session::put('user_phone', $request->c_mobile);
+                Session::put('user_email', $request->c_email);
+                Session::put('user_name', $request->c_name);
                 Session::put('booking_id', $trip1_booking_id);
                 Session::put('trip_type', $trip_type);
-
+                    
                 if (!empty($trip2_booking_id)) {
                     foreach ($passengerTitles as $index => $title) {
-                        // $fullName = $title . ' ' . $passengerNames[$index];
                         if ($passengerDobs[$index] <= 1 && $passengerTitles[$index] == 'INFANT' && $trip_data['trip2']['ship_name'] != 'Nautika') {
                             $paxFare = 0;
                         } else if ($passengerDobs[$index] <= 1 && $passengerTitles[$index] == 'INFANT' && $trip_data['trip2']['ship_name'] == 'Nautika') {
@@ -724,7 +739,6 @@ class BookingController extends Controller
 
                 if (!empty($trip3_booking_id)) {
                     foreach ($passengerTitles as $index => $title) {
-                        // $fullName = $title . ' ' . $passengerNames[$index];
                         if ($passengerDobs[$index] <= 1 && $passengerTitles[$index] == 'INFANT' && $trip_data['trip3']['ship_name'] != 'Nautika') {
                             $paxFare = 0;
                         } else if ($passengerDobs[$index] <= 1 && $passengerTitles[$index] == 'INFANT' && $trip_data['trip3']['ship_name'] == 'Nautika') {
@@ -751,22 +765,316 @@ class BookingController extends Controller
 
                     Session::put('trip3_booking_id', $trip3_booking_id);
                 }
-                return view('razorpay.payment', compact('order_id',));
+                
+                return redirect()->route('phonepe.ferry.initiate');
             }
         }
     }
 
+    /**
+     * NEW METHOD: Handle Ferry Booking APIs after successful payment
+     * This method is called from PhonePeController after payment verification
+     * 
+     * COMMENTED OUT: All API calls to Nautika, Makruzz, and Green Ocean
+     * Reason: Manual processing - team will handle bookings directly
+     * Bookings are marked as "Pending Confirmation" in pnr_status table
+     */
+    public function handleFerryBookingAPIs($booking_id, $trip2_booking_id = null, $trip3_booking_id = null)
+    {
+        $trip_data = Session::get('trip_data');
+        
+        if (!$trip_data) {
+            \Log::error('Trip data not found in session for booking API processing', [
+                'booking_id' => $booking_id
+            ]);
+            return;
+        }
+
+        // ================= TRIP 1 PROCESSING =================
+        $results = DB::table('booking')->where('id', $booking_id)->first();
+        $passenger_result = DB::table('booking_passenger_details')->where('booking_id', $booking_id)->get();
+
+        if ($results->ship_name == 'Admin') {
+            // Admin bookings - No API call needed, direct confirmation
+            $booking_response = [
+                'booking_id' => $booking_id,
+                'pnr_id' => NULL,
+                'booking_status' => 'Confirmed',
+                'razorpay_payment_id' => NULL,
+                'seat_status' => 1,
+                'booking_vendor' => 'Admin',
+            ];
+            DB::table('pnr_status')->insert($booking_response);
+            
+        } else if ($results->ship_name == 'Nautika') {
+            // ===== NAUTIKA API CALL - COMMENTED OUT =====
+            // \Log::info('Nautika booking - API call commented out, will be processed manually', [
+            //     'booking_id' => $booking_id,
+            //     'ship_name' => $results->ship_name
+            // ]);
+            
+            /*
+            // COMMENTED OUT - Original Nautika API Call
+            $departure_time = $results->departure_time;
+            $booking_ts = Carbon::createFromFormat('H:i:s', $departure_time)->timestamp;
+
+            list($adults, $infants) = $passenger_result->partition(function ($passenger) {
+                return $passenger->title !== 'INFANT';
+            });
+
+            $bClassSeats = [];
+            $pClassSeats = [];
+            $seatss = json_decode($trip_data['trip1']['tripSeatNo']);
+
+            if ($trip_data['trip1']['class_id'] === 'pClass') {
+                $pClassSeats = $seatss;
+            } else if ($trip_data['trip1']['class_id'] === 'bClass') {
+                $bClassSeats = $seatss;
+            }
+
+            // ... Rest of Nautika API call code commented out ...
+            // $nautika_booked_details = $this->nautikaApiCall('bookSeats', $finalData);
+            */
+
+            // Insert pending confirmation record
+            $booking_response = [
+                'booking_id' => $booking_id,
+                'pnr_id' => NULL,
+                'booking_status' => 'Pending Confirmation',
+                'razorpay_payment_id' => NULL,
+                'seat_status' => 0,
+                'booking_vendor' => 'Nautika',
+            ];
+            DB::table('pnr_status')->insert($booking_response);
+            
+        } else if ($results->ship_name == 'Makruzz') {
+            // ===== MAKRUZZ API CALL - COMMENTED OUT =====
+            // \Log::info('Makruzz booking - API call commented out, will be processed manually', [
+            //     'booking_id' => $booking_id,
+            //     'ship_name' => $results->ship_name
+            // ]);
+            
+            /*
+            // COMMENTED OUT - Original Makruzz API Call
+            $passengers = [];
+            foreach ($passenger_result as $key => $passenger) {
+                $name = $passenger->full_name;
+                $title = $passenger->title;
+                $passengers[++$key] = array(
+                    'title' => $title,
+                    'name' => $name,
+                    'age' =>  $passenger->dob,
+                    'sex' => $passenger->gender,
+                    'nationality' => $passenger->resident,
+                    "fcountry" => $passenger->country,
+                    "fpassport" => $passenger->passport_id,
+                    "fexpdate" => $passenger->expiry_date,
+                );
+            }
+            // ... Rest of Makruzz API call code commented out ...
+            // $makruzz_booked_details = $this->makApiCall('savePassengers', $data_json);
+            */
+
+            // Insert pending confirmation record
+            $booking_response = [
+                'booking_id' => $booking_id,
+                'pnr_id' => NULL,
+                'booking_status' => 'Pending Confirmation',
+                'razorpay_payment_id' => NULL,
+                'seat_status' => 0,
+                'booking_vendor' => 'Makruzz',
+            ];
+            DB::table('pnr_status')->insert($booking_response);
+            
+        } else if (str_contains($results->ship_name, 'Green Ocean')) {
+            // ===== GREEN OCEAN API CALL - COMMENTED OUT =====
+            // \Log::info('Green Ocean booking - API call commented out, will be processed manually', [
+            //     'booking_id' => $booking_id,
+            //     'ship_name' => $results->ship_name
+            // ]);
+            
+            /*
+            // COMMENTED OUT - Original Green Ocean API Call
+            $hash_sequence = "ship_id|from_id|dest_to|route_id|class_id|number_of_adults|number_of_infants|travel_date|seat_id|public_key";
+            $godata['ship_id'] = $trip_data['trip1']['ship_id'];
+            $godata['from_id'] = $results->from_location;
+            // ... Rest of Green Ocean API call code commented out ...
+            // $booking_api_res = $this->greenOceanApiCall('book-ticket', $godata);
+            */
+
+            // Insert pending confirmation record
+            $booking_response = [
+                'booking_id' => $booking_id,
+                'pnr_id' => NULL,
+                'booking_status' => 'Pending Confirmation',
+                'razorpay_payment_id' => NULL,
+                'seat_status' => 0,
+                'booking_vendor' => $results->ship_name,
+            ];
+            DB::table('pnr_status')->insert($booking_response);
+            
+        } else if ($results->ship_name == 'ITT Majestic') {
+            // ITT Majestic - No API needed
+            $booking_response = [
+                'booking_id' => $booking_id,
+                'pnr_id' => NULL,
+                'booking_status' => 'Confirmed',
+                'razorpay_payment_id' => NULL,
+                'seat_status' => 1,
+                'booking_vendor' => $results->ship_name,
+            ];
+            DB::table('pnr_status')->insert($booking_response);
+        }
+
+        // ================= TRIP 2 PROCESSING (if exists) =================
+        if (!empty($trip2_booking_id)) {
+            $results2 = DB::table('booking')->where('id', $trip2_booking_id)->first();
+            $passenger_result2 = DB::table('booking_passenger_details')->where('booking_id', $trip2_booking_id)->get();
+
+            if ($results2->ship_name == 'Admin') {
+                $booking_response2 = [
+                    'booking_id' => $trip2_booking_id,
+                    'pnr_id' => NULL,
+                    'booking_status' => 'Confirmed',
+                    'razorpay_payment_id' => NULL,
+                    'seat_status' => 1,
+                    'booking_vendor' => 'Admin',
+                ];
+                DB::table('pnr_status')->insert($booking_response2);
+                
+            } else if ($results2->ship_name == 'Nautika') {
+                // NAUTIKA API CALL COMMENTED OUT FOR TRIP 2
+                $booking_response2 = [
+                    'booking_id' => $trip2_booking_id,
+                    'pnr_id' => NULL,
+                    'booking_status' => 'Pending Confirmation',
+                    'razorpay_payment_id' => NULL,
+                    'seat_status' => 0,
+                    'booking_vendor' => 'Nautika',
+                ];
+                DB::table('pnr_status')->insert($booking_response2);
+                
+            } else if ($results2->ship_name == 'Makruzz') {
+                // MAKRUZZ API CALL COMMENTED OUT FOR TRIP 2
+                $booking_response2 = [
+                    'booking_id' => $trip2_booking_id,
+                    'pnr_id' => NULL,
+                    'booking_status' => 'Pending Confirmation',
+                    'razorpay_payment_id' => NULL,
+                    'seat_status' => 0,
+                    'booking_vendor' => 'Makruzz',
+                ];
+                DB::table('pnr_status')->insert($booking_response2);
+                
+            } else if (str_contains($results2->ship_name, 'Green Ocean')) {
+                // GREEN OCEAN API CALL COMMENTED OUT FOR TRIP 2
+                $booking_response2 = [
+                    'booking_id' => $trip2_booking_id,
+                    'pnr_id' => NULL,
+                    'booking_status' => 'Pending Confirmation',
+                    'razorpay_payment_id' => NULL,
+                    'seat_status' => 0,
+                    'booking_vendor' => $results2->ship_name,
+                ];
+                DB::table('pnr_status')->insert($booking_response2);
+                
+            } else if ($results2->ship_name == 'ITT Majestic') {
+                $booking_response2 = [
+                    'booking_id' => $trip2_booking_id,
+                    'pnr_id' => NULL,
+                    'booking_status' => 'Confirmed',
+                    'razorpay_payment_id' => NULL,
+                    'seat_status' => 1,
+                    'booking_vendor' => $results2->ship_name,
+                ];
+                DB::table('pnr_status')->insert($booking_response2);
+            }
+        }
+
+        // ================= TRIP 3 PROCESSING (if exists) =================
+        if (!empty($trip3_booking_id)) {
+            $results3 = DB::table('booking')->where('id', $trip3_booking_id)->first();
+            $passenger_result3 = DB::table('booking_passenger_details')->where('booking_id', $trip3_booking_id)->get();
+
+            if ($results3->ship_name == 'Admin') {
+                $booking_response3 = [
+                    'booking_id' => $trip3_booking_id,
+                    'pnr_id' => NULL,
+                    'booking_status' => 'Confirmed',
+                    'razorpay_payment_id' => NULL,
+                    'seat_status' => 1,
+                    'booking_vendor' => 'Admin',
+                ];
+                DB::table('pnr_status')->insert($booking_response3);
+                
+            } else if ($results3->ship_name == 'Nautika') {
+                // NAUTIKA API CALL COMMENTED OUT FOR TRIP 3
+                $booking_response3 = [
+                    'booking_id' => $trip3_booking_id,
+                    'pnr_id' => NULL,
+                    'booking_status' => 'Pending Confirmation',
+                    'razorpay_payment_id' => NULL,
+                    'seat_status' => 0,
+                    'booking_vendor' => 'Nautika',
+                ];
+                DB::table('pnr_status')->insert($booking_response3);
+                
+            } else if ($results3->ship_name == 'Makruzz') {
+                // MAKRUZZ API CALL COMMENTED OUT FOR TRIP 3
+                $booking_response3 = [
+                    'booking_id' => $trip3_booking_id,
+                    'pnr_id' => NULL,
+                    'booking_status' => 'Pending Confirmation',
+                    'razorpay_payment_id' => NULL,
+                    'seat_status' => 0,
+                    'booking_vendor' => 'Makruzz',
+                ];
+                DB::table('pnr_status')->insert($booking_response3);
+                
+            } else if (str_contains($results3->ship_name, 'Green Ocean')) {
+                // GREEN OCEAN API CALL COMMENTED OUT FOR TRIP 3
+                $booking_response3 = [
+                    'booking_id' => $trip3_booking_id,
+                    'pnr_id' => NULL,
+                    'booking_status' => 'Pending Confirmation',
+                    'razorpay_payment_id' => NULL,
+                    'seat_status' => 0,
+                    'booking_vendor' => $results3->ship_name,
+                ];
+                DB::table('pnr_status')->insert($booking_response3);
+                
+            } else if ($results3->ship_name == 'ITT Majestic') {
+                $booking_response3 = [
+                    'booking_id' => $trip3_booking_id,
+                    'pnr_id' => NULL,
+                    'booking_status' => 'Confirmed',
+                    'razorpay_payment_id' => NULL,
+                    'seat_status' => 1,
+                    'booking_vendor' => $results3->ship_name,
+                ];
+                DB::table('pnr_status')->insert($booking_response3);
+            }
+        }
+
+        \Log::info('Ferry booking API processing completed (with API calls commented out)', [
+            'booking_id' => $booking_id,
+            'trip2_booking_id' => $trip2_booking_id,
+            'trip3_booking_id' => $trip3_booking_id
+        ]);
+    }
+
+    // ========== KEEP EXISTING METHODS BELOW (NOT USED WITH PHONEPE) ==========
 
     public function payment_response(Request $request, $order_id)
     {
-
+        // THIS METHOD IS FOR RAZORPAY - NOT USED WITH PHONEPE
+        // Keeping for backward compatibility
+        
         if (Auth::id()) {
             $userId = Auth::id();
         } else {
             $userId = NULL;
         }
-
-        // dd($request);
 
         $success = true;
         $error = "payment_failed";
@@ -777,7 +1085,6 @@ class BookingController extends Controller
             $api = new Api($api_key, $api_secret);
             try {
                 $attributes = array(
-                    // 'razorpay_order_id' => Session::get('order_id'),
                     'razorpay_order_id' => $order_id,
                     'razorpay_payment_id' => $_POST['razorpay_payment_id'],
                     'razorpay_signature' => $_POST['razorpay_signature']
@@ -794,7 +1101,6 @@ class BookingController extends Controller
                     $notes_value = (array) $payment['notes'];
                     foreach ($notes_value as $key => $value) {
                         $address = $value['address'];
-                        //$merchant_order_id = $value['merchant_order_id'];
                     }
                 }
             } catch (SignatureVerificationError $e) {
@@ -804,7 +1110,6 @@ class BookingController extends Controller
         }
 
         if ($success === true) {
-
             $tran_data = array(
                 'user_id' => Session::get('user_id'),
                 'order_id' => !empty($payment['order_id']) ? $request->razorpay_order_id : NULL,
@@ -825,7 +1130,6 @@ class BookingController extends Controller
                 'vpa' => !empty($payment['vpa']) ? $payment['vpa'] : NULL,
                 'email' => !empty($payment['email']) ? $payment['email'] : NULL,
                 'contact' => !empty($payment['contact']) ? $payment['contact'] : NULL,
-
                 'address' => !empty($address) ? $address : NULL,
                 'fee' => !empty($payment['fee']) ? $payment['fee'] : NULL,
                 'tax' => !empty($payment['tax']) ? $payment['tax'] : NULL,
@@ -834,7 +1138,6 @@ class BookingController extends Controller
                 'error_source' => !empty($payment['error_source']) ? $payment['error_source'] : NULL,
                 'error_step' => !empty($payment['error_step']) ? $payment['error_step'] : NULL,
                 'error_reason' => !empty($payment['error_reason']) ? $payment['error_reason'] : NULL,
-                //'bank_transaction_id' => !empty($bank_transaction_id)? $bank_transaction_id : NULL,
                 'created_at' => !empty($payment['created_at']) ? date('Y-m-d H:i:s', strtotime($payment['created_at'])) : NULL
             );
 
@@ -842,1136 +1145,47 @@ class BookingController extends Controller
 
             if ($success) {
                 $booking_id = Session::get('booking_id');
-                $inserted_trip2_booking_id = Session::get('trip2_booking_id');
-                $inserted_trip3_booking_id = Session::get('trip3_booking_id');
-
-                DB::table('booking')->where('id', $booking_id)->update(['payment_status' => 'success']);
-                DB::table('booking')->where('id', $inserted_trip2_booking_id)->update(['payment_status' => 'success']);
-                DB::table('booking')->where('id', $inserted_trip3_booking_id)->update(['payment_status' => 'success']);
+                $booking_type = $request->get('type', 'ferry');
+                
+                if ($booking_type === 'boat') {
+                    DB::table('booking')->where('id', $booking_id)->update(['payment_status' => 'success']);
+                } else {
+                    $inserted_trip2_booking_id = Session::get('trip2_booking_id');
+                    $inserted_trip3_booking_id = Session::get('trip3_booking_id');
+                    
+                    DB::table('booking')->where('id', $booking_id)->update(['payment_status' => 'success']);
+                    if ($inserted_trip2_booking_id) {
+                        DB::table('booking')->where('id', $inserted_trip2_booking_id)->update(['payment_status' => 'success']);
+                    }
+                    if ($inserted_trip3_booking_id) {
+                        DB::table('booking')->where('id', $inserted_trip3_booking_id)->update(['payment_status' => 'success']);
+                    }
+                }
+                
                 $data = [
                     'order_id' => $order_id,
                     'user_id' => $userId,
                     'payment_details' => $tran_data
                 ];
 
-                //**************** for nautika booking call api ******************************
-
-                $trip_data = Session::get('trip_data');
-
-                // $booking_id= Session::get('booking_id');
-
-                if (Session::get('trip2_booking_id')) {
-                    $trip2_booking_id = Session::get('trip2_booking_id');
+                if ($booking_type === 'boat') {
+                    $data['booking_id'] = $booking_id;
+                    $data['order_id'] = $order_id;
+                    
+                    Session::forget(['order_id', 'amount', 'user_phone', 'user_email', 'user_name', 'booking_id']);
+                    
+                    return view('razorpay.success', $data);
                 }
 
-                if (Session::get('trip3_booking_id')) {
-                    $trip3_booking_id = Session::get('trip3_booking_id');
-                }
-
-                $trip_type = Session::get('trip_type');
-                $order_id = Session::get('order_id');
-
-                $results = [];
-                $results2 = [];
-
-                // *********** for single booking **************
-                $results = DB::table('booking')->select('*')->where('id', $booking_id)->first();
-
-                $passenger_result = DB::table('booking_passenger_details')->select('*')->where('booking_id', $booking_id)->get();
-
-                // ************************************ NAUTIKA **************************************************
-
-
-                if (!empty($results->ship_name) && $results->ship_name == 'Nautika') {
-                    $departure_time = $results->departure_time;
-                    $booking_ts = Carbon::createFromFormat('H:i:s', $departure_time)->timestamp;
-
-                    list($adults, $infants) = $passenger_result->partition(function ($passenger) {
-                        return $passenger->title !== 'INFANT';
-                    });
-
-
-                    // $pax = $adults->map(function($passenger) use ($trip_data) {
-                    $bClassSeats = [];
-                    $pClassSeats = [];
-
-                    $seatss = json_decode($trip_data['trip1']['tripSeatNo']);
-
-                    if ($trip_data['trip1']['class_id'] === 'pClass') {
-                        $pClassSeats = $seatss;
-                    } else if ($trip_data['trip1']['class_id'] === 'bClass') {
-                        $bClassSeats = $seatss;
-                    }
-
-                    $pax = $adults->map(function ($passenger, $index) use ($trip_data, $bClassSeats, $pClassSeats) {
-                        $seat_str = ($trip_data['trip1']['tripSeatNo']);
-                        $seats_array = json_decode($seat_str);
-
-                        $tier = '';
-                        if ($trip_data['trip1']['class_id'] === 'pClass') {
-                            $tier = 'P';
-                        } else if ($trip_data['trip1']['class_id'] === 'bClass') {
-                            $tier = 'B';
-                        }
-
-                        return array(
-                            'id' => $passenger->id,
-                            'name' => $passenger->title . ' ' . $passenger->full_name,
-                            'age' => $passenger->dob,
-                            'gender' => $passenger->gender,
-                            'nationality' => $passenger->resident,
-                            'passport' => $passenger->passport_id,
-                            'tier' => $tier,
-                            'seat' => $seats_array[$index], // Seat assignment using the index
-                            'isCancelled' => 0,
-                        );
-                    })->toArray();
-
-                    // Map infants
-                    $infantPax = $infants->map(function ($passenger) {
-                        return array(
-                            'id' => $passenger->id,
-                            'name' => $passenger->title . ' ' . $passenger->full_name,
-                            'age' => $passenger->dob,
-                            'gender' => $passenger->gender,
-                            'nationality' => $passenger->resident,
-                            'passport' => $passenger->passport_id,
-                            'tier' => '',
-                            'seat' => '',
-                            'isCancelled' => 0,
-                        );
-                    })->toArray();
-
-                    // $bClassSeats = $pClassSeats = [];
-                    // foreach ($variable as $key => $value) {
-                    //     if($value['class'] == 'pclass'){
-                    //         $pClassSeats[] = $value['seat'];
-                    //     }
-                    //     if($value['class'] == 'bclass'){
-                    //         $bClassSeats[] = $value['seat'];
-                    //     }
-                    // }
-
-                    $from_location_title = '';
-                    $to_location_title = '';
-
-                    if ($trip_data['booking_data']['form_location'] == 1) {
-                        $from_location_title = 'Port Blair';
-                    } elseif ($trip_data['booking_data']['form_location'] == 2) {
-                        $from_location_title = 'Swaraj Dweep';
-                    } elseif ($trip_data['booking_data']['form_location'] == 3) {
-                        $from_location_title = 'Shaheed Dweep';
-                    }
-
-                    if ($trip_data['booking_data']['to_location'] == 1) {
-                        $to_location_title = 'Port Blair';
-                    } elseif ($trip_data['booking_data']['to_location'] == 2) {
-                        $to_location_title = 'Swaraj Dweep';
-                    } elseif ($trip_data['booking_data']['to_location'] == 3) {
-                        $to_location_title = 'Shaheed Dweep';
-                    }
-
-
-                    // Construct bookingData array
-                    $bookingData = array(
-                        array(
-                            'bookingTS' => $booking_ts,
-                            'id' => $results->schedule_id,
-                            'tripId' => $results->trip_id,
-                            'vesselID' => $results->vessel_id,
-                            'from' => $from_location_title,
-                            'to' =>  $to_location_title,
-                            'paxDetail' => array(
-                                'email' => $results->c_email,
-                                'phone' => $results->c_mobile,
-                                'gstin' => '',
-                                'pax' => $pax,
-                                'infantPax' => $infantPax,
-                                'bClassSeats' => $bClassSeats,
-                                'pClassSeats' => $pClassSeats,
-                            ),
-                            'userData' => array(
-                                'apiUser' => array(
-                                    'userName' => env('NAUTIKA_API_USERNAME'),
-                                    'agency' => '',
-                                    'token' => env('NAUTIKA_TOKEN'),
-                                    'walletBalance' => 5000,
-                                ),
-                            ),
-                            'paymentData' => array(
-                                'gstin' => '',
-                            ),
-                        )
-                    );
-
-
-                    $finalData = array(
-                        'bookingData' => $bookingData,
-                        'userName' => env('NAUTIKA_API_USERNAME'),
-                        'token' => env('NAUTIKA_TOKEN'),
-                    );
-
-                    // print_r($finalData);die;
-
-                    $nautika_booked_details = $this->nautikaApiCall('bookSeats',  $finalData);
-                    // print_r($nautika_booked_details);die;
-                    foreach ($nautika_booked_details as $nautika) {
-                        if (!empty($nautika->pnr)) {
-                            $booking_response = array(
-                                'booking_id' => $booking_id,
-                                'pnr_id' => $nautika->pnr,
-                                'booking_status' => 'Success',
-                                'razorpay_payment_id' => $payment['id'],
-                                'seat_status' => $nautika->seatStatus,
-                                'booking_vendor' => 'Nautika',
-                            );
-                        } else {
-                            $booking_response = array(
-                                'booking_id' => $booking_id,
-                                'pnr_id' => NULL,
-                                'booking_status' => 'Failed',
-                                'razorpay_payment_id' => $payment['id'],
-                                'seat_status' => 0,
-                                'booking_vendor' => 'Nautika',
-                            );
-                        }
-
-                        DB::table('pnr_status')->insert($booking_response);
-                    }
-
-                    //********** *Makruzz booking ******
-                } elseif (!empty($results->ship_name) && $results->ship_name == 'Makruzz') {
-                    $passengers = [];
-                    foreach ($passenger_result as $key => $passenger) {
-                        //$dob = Carbon::parse($passenger->dob);
-                        $name = $passenger->full_name;
-                        $title = $passenger->title;
-                        // $name = Str::after($name, ' ');
-
-                        $passengers[++$key] = array(
-                            'title' => $title,
-                            'name' => $name,
-                            'age' =>  $passenger->dob,
-                            'sex' => $passenger->gender,
-                            'nationality' => $passenger->resident,
-                            "fcountry" => $passenger->country,
-                            "fpassport" => $passenger->passport_id,
-                            "fexpdate" => $passenger->expiry_date,
-                        );
-                    }
-
-                    $data = array(
-                        'passenger' => $passengers,
-                        'c_name' => $results->c_name,
-                        'c_mobile' => $results->c_mobile,
-                        'c_email' => $results->c_email,
-                        'p_contact' => $results->c_mobile,
-                        'c_remark' => 'test',
-                        'no_of_passenger' => count($passengers),
-                        'schedule_id' => $results->schedule_id,
-                        'travel_date' => $results->date_of_jurney,
-                        'class_id' => $results->makruzz_class,
-                        'fare' => $results->amount,
-                        'tc_check' => true,
-                    );
-
-                    $data_json = array('data' => $data);
-
-                    $makruzz_booked_details = $this->makApiCall('savePassengers', $data_json);
-                    // var_dump($makruzz_booked_details);die;
-                    $makruzz_booking_id = $makruzz_booked_details->data->booking_id;
-
-                    $data = array(
-                        'booking_id' => $booking_id,
-                    );
-                    $data10 = array('data' => array('booking_id' => $makruzz_booking_id));
-
-                    $response = $this->makApiCall('confirm_booking', $data10);
-
-                    if (!empty($response->data->pnr)) {
-                        $booking_response = array(
-                            'booking_id' => $booking_id,
-                            'pnr_id' => $response->data->pnr,
-                            'booking_status' => 'Success',
-                            'razorpay_payment_id' => $payment['id'],
-                            'makruzz_booking_id' => $makruzz_booking_id,
-                            'seat_status' => 1,
-                            'booking_vendor' => 'Makruzz',
-                        );
-
-                        $this->sendMailMakruzz($booking_id, $response->data->pnr);
-                    } else {
-                        $booking_response = array(
-                            'booking_id' => $booking_id,
-                            'pnr_id' => NULL,
-                            'booking_status' => 'Failed',
-                            'razorpay_payment_id' => $payment['id'],
-                            'makruzz_booking_id' => NULL,
-                            'seat_status' => 0,
-                            'booking_vendor' => 'Makruzz',
-                        );
-                    }
-
-                    DB::table('pnr_status')->insert($booking_response);
-
-                    // green ocean single booking
-                }
-                // ************************************ Green Ocean **************************************************
-                elseif (!empty($results->ship_name) && str_contains($results->ship_name, 'Green Ocean')) {
-
-                    $hash_sequence = "ship_id|from_id|dest_to|route_id|class_id|number_of_adults|number_of_infants|travel_date|seat_id|public_key";
-                    $godata['ship_id'] = $trip_data['trip1']['ship_id']; // Ship ID from 1-search-ferry.php response selected seat class
-                    $godata['from_id'] = $results->from_location; // 1: Port Blair, 2 : Havelock, 3: Neil
-                    $godata['dest_to'] = $results->to_location; // 1: Port Blair, 2 : Havelock, 3: Neil
-                    $godata['route_id'] = $trip_data['trip1']['route_id'];  // Route ID from 1-search-ferry.php response selected seat class
-                    $godata['class_id'] = $trip_data['trip1']['class_id'];  // Class ID from 1-search-ferry.php response selected seat class
-
-                    $godata['number_of_adults'] = $trip_data['booking_data']['no_of_passenger']; // No of Adults
-                    $godata['number_of_infants'] = $trip_data['booking_data']['no_of_infant']; // No of Infants
-
-
-                    $p_prefix = $p_name = $p_age = $p_gender = $p_nationality = $p_passport_numb = $p_passport_expairy = $p_country = [];
-                    $i_prefix = $i_name = $i_age = $i_gender = [];
-                    foreach ($passenger_result as $key => $passenger) {
-                        //$dob = Carbon::parse($passenger->dob);
-                        $name = $passenger->full_name;
-                        $title = $passenger->title;
-                        // $name = Str::after($name, ' ');
-
-                        if ($passenger->title == 'INFANT') {
-                            $i_prefix[] = $passenger->title;
-                            $i_name[] = $passenger->full_name;
-                            $i_age[] = $passenger->dob;
-                            $i_gender[] = $passenger->gender;
-                        } else {
-                            $p_prefix[] = $passenger->title;
-                            $p_name[] = $passenger->full_name;
-                            $p_age[] = $passenger->dob;
-                            $p_gender[] = $passenger->gender;
-                            $p_nationality[] = $passenger->resident;
-                            $p_passport_numb[] = $passenger->passport_id;
-                            $p_passport_expairy[] = $passenger->expiry_date;
-                            $p_country[] = $passenger->country;
-                        }
-                    }
-
-                    // Adult Passenger details
-                    $godata['passenger_prefix'] = $p_prefix; //["Mr","Mrs"];  // only Allowed Mr/Dr/Master/Mrs/Ms/Miss/
-                    $godata['passenger_name'] = $p_name;
-                    $godata['passenger_age'] = $p_age;
-                    $godata['gender'] = $p_gender; // only Allowed Male/Female
-                    $godata['nationality'] = $p_nationality; // Only Allowed Indian/Foreigner
-
-                    // Passport details are passed only for adults, not asked for infants.
-                    $godata['passport_numb'] = $p_passport_numb;  // pass passport number
-                    $godata['passport_expairy'] = $p_passport_expairy; // pass passport expiry date as DD-MM-YYYY format
-                    $godata['country'] = $p_country; // pass passport country name as string
-
-                    $godata['infant_prefix'] = $i_prefix;
-                    $godata['infant_name'] = $i_name;
-                    $godata['infant_age'] = $i_age;
-                    $godata['infant_gender'] = $i_gender;
-
-                    $godata['travel_date'] = date('d-m-Y', strtotime($results->date_of_jurney));
-                    $godata['seat_id'] = (array) json_decode($trip_data['trip1']['trip_seat_no']);
-
-
-                    $godata['public_key'] = env('GREEN_OCEAN_PUBLIC_KEY'); // Public Key Shared by Green Ocean
-                    $godata['hash_string'] = $this->getHashKey($godata, env('GREEN_OCEAN_PRIVATE_KEY'), $hash_sequence); // Hash value of sequenced string
-
-                    $booking_json = json_encode($godata);
-
-                    $booking_api_res = $this->greenOceanApiCall('book-ticket', $godata);
-
-
-                    if (!empty($booking_api_res->pnr)) {
-                        $booking_response_green = array(
-                            'booking_id' => $booking_id,
-                            'pnr_id' => $booking_api_res->pnr,
-                            'razorpay_payment_id' => $payment['id'],
-                            'makruzz_booking_id' => NULL,
-                            'booking_status' => 'Success',
-                            'seat_status' => 1,
-                            'booking_vendor' => $results->ship_name,
-                        );
-
-                        $this->sendMailGreenOcean($booking_api_res->pnr);
-                    } else {
-                        $booking_response_green = array(
-                            'booking_id' => $booking_id,
-                            'pnr_id' => NULL,
-                            'razorpay_payment_id' => $payment['id'],
-                            'makruzz_booking_id' => NULL,
-                            'booking_status' => 'Failed',
-                            'seat_status' => 0,
-                            'booking_vendor' => $results->ship_name,
-                        );
-                    }
-                    DB::table('pnr_status')->insert($booking_response_green);
-                } elseif (!empty($results->ship_name) && ($results->ship_name == 'ITT Majestic')) {
-
-                    $booking_response = array(
-                        'booking_id' => $booking_id,
-                        'pnr_id' => NULL,
-                        'razorpay_payment_id' => $payment['id'],
-                        'makruzz_booking_id' => NULL,
-                        'booking_status' => 'Success',
-                        'seat_status' => 0,
-                        'booking_vendor' => 'Green Ocean',
-                    );
-
-                    DB::table('pnr_status')->insert($booking_response);
-
-                    // green ocean single booking
-                } elseif ($results->type == 'boat') {
-                    $booking_response = array(
-                        'booking_id' => $booking_id,
-                        'pnr_id' => NULL,
-                        'booking_status' => 'Success',
-                        'razorpay_payment_id' => $payment['id'],
-                        'makruzz_booking_id' => NULL,
-                        'seat_status' => 0,
-                        'booking_vendor' => 'Boat',
-                    );
-
-                    DB::table('pnr_status')->insert($booking_response);
-                }
-
-                // ************************** when trip 2 booking ************************
-                if (!empty($trip2_booking_id)) {
-
-                    $results2 = DB::table('booking')->select('*')->where('id', $trip2_booking_id)->first();
-                    $passenger_result = DB::table('booking_passenger_details')->select('*')->where('booking_id', $trip2_booking_id)->get();
-                    $departure_time = $results2->departure_time;
-                    $booking_ts = Carbon::createFromFormat('H:i:s', $departure_time)->timestamp;
-
-                    if ($results2->ship_name == 'Nautika') {
-                        list($return_adults, $return_infants) = $passenger_result->partition(function ($passenger) {
-                            return $passenger->title !== 'INFANT';
-                        });
-
-                        $bClassSeats = [];
-                        $pClassSeats = [];
-
-                        $seatss = json_decode($trip_data['trip2']['tripSeatNo']);
-
-                        if ($trip_data['trip2']['class_id'] === 'pClass') {
-                            $pClassSeats = $seatss;
-                        } else if ($trip_data['trip2']['class_id'] === 'bClass') {
-                            $bClassSeats = $seatss;
-                        }
-
-                        $return_pax = $return_adults->map(function ($passenger, $index) use ($trip_data, $bClassSeats, $pClassSeats) {
-                            $tier = '';
-                            if ($trip_data['trip2']['class_id'] === 'pClass') {
-                                $tier = 'P';
-                            } else if ($trip_data['trip2']['class_id'] === 'bClass') {
-                                $tier = 'B';
-                            }
-                            $seat_str = ($trip_data['trip2']['tripSeatNo']);
-                            $seats_array = json_decode($seat_str);
-
-                            return array(
-                                'id' => $passenger->id,
-                                'name' => $passenger->title . ' ' . $passenger->full_name,
-                                'age' => $passenger->dob,
-                                'gender' => $passenger->gender,
-                                'nationality' => $passenger->resident,
-                                'passport' => $passenger->passport_id ?? NULL,
-                                'tier' => $tier,
-                                'seat' =>  $seats_array[$index],
-                                'isCancelled' => 0,
-                            );
-                        })->toArray();
-
-                        // Map infants
-                        $return_infantPax = $return_infants->map(function ($passenger) {
-                            return array(
-                                'id' => $passenger->id,
-                                'name' => $passenger->title . ' ' . $passenger->full_name,
-                                'age' => $passenger->dob,
-                                'gender' => $passenger->gender,
-                                'nationality' => $passenger->resident,
-                                'passport' => '',
-                                'tier' => '',
-                                'seat' => '',
-                                'isCancelled' => 0,
-                            );
-                        })->toArray();
-
-
-                        $round1_from_location_title = '';
-                        $round1_to_location_title = '';
-
-                        if ($trip_data['booking_data']['round1_from_location'] == 1) {
-                            $round1_from_location_title = 'Port Blair';
-                        } elseif ($trip_data['booking_data']['round1_from_location'] == 2) {
-                            $round1_from_location_title = 'Swaraj Dweep';
-                        } elseif ($trip_data['booking_data']['round1_from_location'] == 3) {
-                            $round1_from_location_title = 'Shaheed Dweep';
-                        }
-
-                        if ($trip_data['booking_data']['round1_to_location'] == 1) {
-                            $round1_to_location_title = 'Port Blair';
-                        } elseif ($trip_data['booking_data']['round1_to_location'] == 2) {
-                            $round1_to_location_title = 'Swaraj Dweep';
-                        } elseif ($trip_data['booking_data']['round1_to_location'] == 3) {
-                            $round1_to_location_title = 'Shaheed Dweep';
-                        }
-
-
-                        $bookingData2 = array(
-                            array(
-                                'bookingTS' => $booking_ts,
-                                'id' => $results2->schedule_id,
-                                'tripId' => $results2->trip_id,
-                                'vesselID' => $results2->vessel_id,
-                                'from' =>  $round1_from_location_title,
-                                'to' => $round1_to_location_title,
-                                'paxDetail' => array(
-                                    'email' => $results2->c_email,
-                                    'phone' => $results2->c_mobile,
-                                    'gstin' => '',
-                                    'pax' => $return_pax,
-                                    'infantPax' => $return_infantPax, // Add similar logic for infants if required
-                                    'bClassSeats' => $bClassSeats,
-                                    'pClassSeats' => $pClassSeats,
-                                ),
-                                'userData' => array(
-                                    'apiUser' => array(
-                                        'userName' => env('NAUTIKA_API_USERNAME'),
-                                        'agency' => '',
-                                        'token' => env('NAUTIKA_TOKEN'),
-                                        'walletBalance' => 5000,
-                                    ),
-                                ),
-                                'paymentData' => array(
-                                    'gstin' => '',
-                                ),
-                            )
-                        );
-
-                        $finalData2 = array(
-                            'bookingData' => $bookingData2,
-                            'userName' => env('NAUTIKA_API_USERNAME'),
-                            'token' => env('NAUTIKA_TOKEN'),
-
-                        );
-
-                        $nautika_booked_details2 = $this->nautikaApiCall('bookSeats',  $finalData2);
-
-                        foreach ($nautika_booked_details2 as $nautika) {
-                            if (!empty($nautika->pnr)) {
-                                $booking_response2 = array(
-                                    'booking_id' => $trip2_booking_id,
-                                    'pnr_id' => $nautika->pnr,
-                                    'booking_status' => 'Success',
-                                    'razorpay_payment_id' => $payment['id'],
-                                    'seat_status' => $nautika->seatStatus,
-                                    'booking_vendor' => 'Nautika',
-                                );
-                            } else {
-                                $booking_response2 = array(
-                                    'booking_id' => $trip2_booking_id,
-                                    'pnr_id' => Null,
-                                    'booking_status' => 'Failed',
-                                    'razorpay_payment_id' => $payment['id'],
-                                    'seat_status' => 0,
-                                    'booking_vendor' => 'Nautika',
-                                );
-                            }
-
-                            DB::table('pnr_status')->insert($booking_response2);
-                        }
-                    } elseif (($results2->ship_name) == 'Makruzz') {
-
-                        $passengers = [];
-                        foreach ($passenger_result as $key => $passenger) {
-                            $dob = Carbon::parse($passenger->dob);
-                            $name = $passenger->full_name;
-                            $title = $passenger->title;
-
-                            $passengers[++$key] = array(
-                                'title' => $title,
-                                'name' => $name,
-                                'age' =>  $passenger->dob,
-                                'sex' => $passenger->gender,
-                                'nationality' => $passenger->resident,
-                                "fcountry" => $passenger->country,
-                                "fpassport" => $passenger->passport_id,
-                                "fexpdate" => $passenger->expiry_date,
-                            );
-                        }
-
-                        $data2 = array(
-                            'passenger' => $passengers,
-                            'c_name' => $results2->c_name,
-                            'c_mobile' => $results2->c_mobile,
-                            'c_email' => $results2->c_email,
-                            'p_contact' => $results2->c_mobile,
-                            'c_remark' => 'test',
-                            'no_of_passenger' => count($passengers),
-                            'schedule_id' => $results2->schedule_id,
-                            'travel_date' => $results2->date_of_jurney,
-                            'class_id' => $results2->makruzz_class,
-                            'fare' => $results2->amount,
-                            'tc_check' => true,
-                        );
-
-                        $data_json = array('data' => $data2);
-                        $makruzz_booked_details = $this->makApiCall('savePassengers', $data_json);
-
-                        $mak_booking_id = $makruzz_booked_details->data->booking_id;
-
-                        $data = array(
-                            'booking_id' => $mak_booking_id,
-                        );
-                        $data10 = array('data' => array('booking_id' => $mak_booking_id));
-
-                        $response = $this->makApiCall('confirm_booking', $data10);
-
-                        if (!empty($response->data->pnr)) {
-                            $booking_response2 = array(
-                                'booking_id' => $trip2_booking_id,
-                                'pnr_id' => $response->data->pnr,
-                                'razorpay_payment_id' => $payment['id'],
-                                'makruzz_booking_id' => $mak_booking_id,
-                                'booking_status' => 'Success',
-                                'seat_status' => 1,
-                                'booking_vendor' => 'Makruzz',
-                            );
-
-                            $this->sendMailMakruzz($trip2_booking_id, $response->data->pnr);
-                        } else {
-                            $booking_response2 = array(
-                                'booking_id' => $trip2_booking_id,
-                                'pnr_id' => NULL,
-                                'razorpay_payment_id' => $payment['id'],
-                                'makruzz_booking_id' => NULL,
-                                'booking_status' => 'Failed',
-                                'seat_status' => 0,
-                                'booking_vendor' => 'Makruzz',
-                            );
-                        }
-
-                        DB::table('pnr_status')->insert($booking_response2);
-
-                        // green ocean single booking
-
-                    }
-                    // ************************************ Green Ocean **************************************************
-                    elseif (!empty($results2->ship_name) && str_contains($results2->ship_name, 'Green Ocean')) {
-
-                        $hash_sequence = "ship_id|from_id|dest_to|route_id|class_id|number_of_adults|number_of_infants|travel_date|seat_id|public_key";
-                        $godata['ship_id'] = $trip_data['trip2']['ship_id']; // Ship ID from 1-search-ferry.php response selected seat class
-                        $godata['from_id'] = $results2->from_location; // 1: Port Blair, 2 : Havelock, 3: Neil
-                        $godata['dest_to'] = $results2->to_location; // 1: Port Blair, 2 : Havelock, 3: Neil
-                        $godata['route_id'] = $trip_data['trip2']['route_id'];  // Route ID from 1-search-ferry.php response selected seat class
-                        $godata['class_id'] = $trip_data['trip2']['class_id'];  // Class ID from 1-search-ferry.php response selected seat class
-
-                        $godata['number_of_adults'] = $trip_data['booking_data']['no_of_passenger']; // No of Adults
-                        $godata['number_of_infants'] = $trip_data['booking_data']['no_of_infant']; // No of Infants
-
-
-                        $p_prefix = $p_name = $p_age = $p_gender = $p_nationality = $p_passport_numb = $p_passport_expairy = $p_country = [];
-                        $i_prefix = $i_name = $i_age = $i_gender = [];
-                        foreach ($passenger_result as $key => $passenger) {
-                            //$dob = Carbon::parse($passenger->dob);
-                            $name = $passenger->full_name;
-                            $title = $passenger->title;
-
-                            if ($passenger->title == 'INFANT') {
-                                $i_prefix[] = $passenger->title;
-                                $i_name[] = $passenger->full_name;
-                                $i_age[] = $passenger->dob;
-                                $i_gender[] = $passenger->gender;
-                            } else {
-                                $p_prefix[] = $passenger->title;
-                                $p_name[] = $passenger->full_name;
-                                $p_age[] = $passenger->dob;
-                                $p_gender[] = $passenger->gender;
-                                $p_nationality[] = $passenger->resident;
-                                $p_passport_numb[] = $passenger->passport_id;
-                                $p_passport_expairy[] = $passenger->expiry_date;
-                                $p_country[] = $passenger->country;
-                            }
-                        }
-
-                        // Adult Passenger details
-                        $godata['passenger_prefix'] = $p_prefix; //["Mr","Mrs"];  // only Allowed Mr/Dr/Master/Mrs/Ms/Miss/
-                        $godata['passenger_name'] = $p_name;
-                        $godata['passenger_age'] = $p_age;
-                        $godata['gender'] = $p_gender; // only Allowed Male/Female
-                        $godata['nationality'] = $p_nationality; // Only Allowed Indian/Foreigner
-
-                        // Passport details are passed only for adults, not asked for infants.
-                        $godata['passport_numb'] = $p_passport_numb;  // pass passport number
-                        $godata['passport_expairy'] = $p_passport_expairy; // pass passport expiry date as DD-MM-YYYY format
-                        $godata['country'] = $p_country; // pass passport country name as string
-
-                        $godata['infant_prefix'] = $i_prefix;
-                        $godata['infant_name'] = $i_name;
-                        $godata['infant_age'] = $i_age;
-                        $godata['infant_gender'] = $i_gender;
-
-                        $godata['travel_date'] = date('d-m-Y', strtotime($results2->date_of_jurney));
-                        $godata['seat_id'] = (array) json_decode($trip_data['trip2']['trip_seat_no']);
-
-
-                        $godata['public_key'] = env('GREEN_OCEAN_PUBLIC_KEY'); // Public Key Shared by Green Ocean
-                        $godata['hash_string'] = $this->getHashKey($godata, env('GREEN_OCEAN_PRIVATE_KEY'), $hash_sequence); // Hash value of sequenced string
-
-                        // $booking_json = json_encode($godata);
-
-                        $booking_api_res = $this->greenOceanApiCall('book-ticket', $godata);
-
-
-                        if (!empty($booking_api_res->pnr)) {
-                            $booking_response_green = array(
-                                'booking_id' => $trip2_booking_id,
-                                'pnr_id' => $booking_api_res->pnr,
-                                'razorpay_payment_id' => $payment['id'],
-                                'makruzz_booking_id' => NULL,
-                                'booking_status' => 'Success',
-                                'seat_status' => 1,
-                                'booking_vendor' => $results2->ship_name,
-                            );
-
-                            $this->sendMailGreenOcean($booking_api_res->pnr);
-
-                        } else {
-                            $booking_response_green = array(
-                                'booking_id' => $trip2_booking_id,
-                                'pnr_id' => NULL,
-                                'razorpay_payment_id' => $payment['id'],
-                                'makruzz_booking_id' => NULL,
-                                'booking_status' => 'Failed',
-                                'seat_status' => 0,
-                                'booking_vendor' => $results2->ship_name,
-                            );
-                        }
-                        DB::table('pnr_status')->insert($booking_response_green);
-                    } elseif ($results2->ship_name == 'ITT Majestic') {
-                        $booking_response_itt = array(
-                            'booking_id' => $trip2_booking_id,
-                            'pnr_id' => NULL,
-                            'razorpay_payment_id' => $payment['id'],
-                            'makruzz_booking_id' => NULL,
-                            'booking_status' => 'Success',
-                            'seat_status' => 0,
-                            'booking_vendor' => $results2->ship_name,
-                        );
-
-                        DB::table('pnr_status')->insert($booking_response_itt);
-                    }
-                }
-
-                // ************************** when trip 3 booking ************************
-                if (!empty($trip3_booking_id)) {
-
-                    $results3 = DB::table('booking')->select('*')->where('id', $trip3_booking_id)->first();
-
-                    $passenger_result = DB::table('booking_passenger_details')->select('*')->where('booking_id', $trip3_booking_id)->get();
-
-                    $departure_time = $results3->departure_time;
-                    $booking_ts = Carbon::createFromFormat('H:i:s', $departure_time)->timestamp;
-
-                    if ($results3->ship_name == 'Nautika') {
-
-                        list($return_adults, $return_infants) = $passenger_result->partition(function ($passenger) {
-                            return $passenger->title !== 'INFANT';
-                        });
-
-                        $bClassSeats = [];
-                        $pClassSeats = [];
-
-                        $seatss = json_decode($trip_data['trip3']['tripSeatNo']);
-
-                        if ($trip_data['trip3']['class_id'] === 'pClass') {
-                            $pClassSeats = $seatss;
-                        } else if ($trip_data['trip3']['class_id'] === 'bClass') {
-                            $bClassSeats = $seatss;
-                        }
-
-                        $return_pax = $return_adults->map(function ($passenger, $index)  use ($trip_data, $bClassSeats, $pClassSeats) {
-                            $tier = '';
-                            $seat_str = ($trip_data['trip3']['tripSeatNo']);
-                            $seats_array = json_decode($seat_str);
-
-                            if ($trip_data['trip3']['class_id'] === 'pClass') {
-                                $tier = 'P';
-                            } else if ($trip_data['trip3']['class_id'] === 'bClass') {
-                                $tier = 'B';
-                            }
-
-                            return array(
-                                'id' => $passenger->id,
-                                'name' => $passenger->title . ' ' . $passenger->full_name,
-                                'age' => $passenger->dob,
-                                'gender' => $passenger->gender,
-                                'nationality' => $passenger->resident,
-                                'passport' =>  $passenger->passport_id,
-                                'tier' => $tier,
-                                'seat' => $seats_array[$index],
-                                'isCancelled' => 0,
-                            );
-                        })->toArray();
-
-
-                        // Map infants
-                        $return_infantPax = $return_infants->map(function ($passenger) {
-                            return array(
-                                'id' => $passenger->id,
-                                'name' => $passenger->title . ' ' . $passenger->full_name,
-                                'age' => $passenger->dob,
-                                'gender' => $passenger->gender,
-                                'nationality' => $passenger->resident,
-                                'passport' => '',
-                                'tier' => '',
-                                'seat' => '',
-                                'isCancelled' => 0,
-                            );
-                        })->toArray();
-
-
-                        $round2_from_location_title = '';
-                        $round2_to_location_title = '';
-
-                        if ($trip_data['booking_data']['round2_from_location'] == 1) {
-                            $round2_from_location_title = 'Port Blair';
-                        } elseif ($trip_data['booking_data']['round2_from_location'] == 2) {
-                            $round2_from_location_title = 'Swaraj Dweep';
-                        } elseif ($trip_data['booking_data']['round2_from_location'] == 3) {
-                            $round2_from_location_title = 'Shaheed Dweep';
-                        }
-
-                        if ($trip_data['booking_data']['round2_to_location'] == 1) {
-                            $round2_to_location_title = 'Port Blair';
-                        } elseif ($trip_data['booking_data']['round2_to_location'] == 2) {
-                            $round2_to_location_title = 'Swaraj Dweep';
-                        } elseif ($trip_data['booking_data']['round2_to_location'] == 3) {
-                            $round2_to_location_title = 'Shaheed Dweep';
-                        }
-
-                        $bookingData2 = array(
-                            array(
-                                'bookingTS' => $booking_ts,
-                                'id' => $results3->schedule_id,
-                                'tripId' => $results3->trip_id,
-                                'vesselID' => $results3->vessel_id,
-                                'from' => $round2_from_location_title,
-                                'to' => $round2_to_location_title,
-                                'paxDetail' => array(
-                                    'email' => $results3->c_email,
-                                    'phone' => $results3->c_mobile,
-                                    'gstin' => '',
-                                    'pax' => $return_pax,
-                                    'infantPax' => $return_infantPax, // Add similar logic for infants if required
-                                    'bClassSeats' => $bClassSeats,
-                                    'pClassSeats' => $pClassSeats,
-                                ),
-                                'userData' => array(
-                                    'apiUser' => array(
-                                        'userName' => env('NAUTIKA_API_USERNAME'),
-                                        'agency' => '',
-                                        'token' => env('NAUTIKA_API_USERNAME'),
-                                        'walletBalance' => 5000,
-                                    ),
-                                ),
-                                'paymentData' => array(
-                                    'gstin' => '',
-                                ),
-                            )
-                        );
-
-                        $finalData2 = array(
-                            'bookingData' => $bookingData2,
-                            'userName' => env('NAUTIKA_API_USERNAME'),
-                            'token' => env('NAUTIKA_TOKEN'),
-
-                        );
-                        $nautika_booked_details3 = $this->nautikaApiCall('bookSeats',  $finalData2);
-
-                        foreach ($nautika_booked_details3 as $nautika) {
-                            if (!empty($nautika->pnr)) {
-                                $booking_response2 = array(
-                                    'booking_id' => $trip3_booking_id,
-                                    'pnr_id' => $nautika->pnr,
-                                    'booking_status' => 'Success',
-                                    'razorpay_payment_id' => $payment['id'],
-                                    'seat_status' => $nautika->seatStatus,
-                                    'booking_vendor' => 'Nautika',
-                                );
-                            } else {
-                                $booking_response2 = array(
-                                    'booking_id' => $trip3_booking_id,
-                                    'pnr_id' => Null,
-                                    'booking_status' => 'Failed',
-                                    'razorpay_payment_id' => $payment['id'],
-                                    'seat_status' => 0,
-                                    'booking_vendor' => 'Nautika',
-                                );
-                            }
-
-                            DB::table('pnr_status')->insert($booking_response2);
-                        }
-                    } elseif (($results3->ship_name) == 'Makruzz') {
-
-                        $passengers = [];
-                        foreach ($passenger_result as $key => $passenger) {
-
-                            $dob = Carbon::parse($passenger->dob);
-                            $name = $passenger->full_name;
-                            $title = $passenger->title;
-
-                            $passengers[++$key] = array(
-                                'title' => $title,
-                                'name' => $name,
-                                'age' =>  $passenger->dob,
-                                'sex' => $passenger->gender,
-                                'nationality' => $passenger->resident,
-                                "fcountry" => $passenger->country,
-                                "fpassport" => $passenger->passport_id,
-                                "fexpdate" => $passenger->expiry_date,
-                            );
-                        }
-
-                        $data2 = array(
-                            'passenger' => $passengers,
-                            'c_name' => $results3->c_name,
-                            'c_mobile' => $results3->c_mobile,
-                            'c_email' => $results3->c_email,
-                            'p_contact' => $results3->c_mobile,
-                            'c_remark' => 'test',
-                            'no_of_passenger' => count($passengers),
-                            'schedule_id' => $results3->schedule_id,
-                            'travel_date' => $results3->date_of_jurney,
-                            'class_id' => $results3->makruzz_class,
-                            'fare' => $results3->amount,
-                            'tc_check' => true,
-                        );
-
-                        $data_json = array('data' => $data2);
-
-                        $makruzz_booked_details = $this->makApiCall('savePassengers', $data_json);
-
-                        // echo"<pre>";
-                        // print_r($makruzz_booked_details);
-                        // die();
-
-                        $mak_booking_id = $makruzz_booked_details->data->booking_id;
-
-                        $data = array(
-                            'booking_id' => $mak_booking_id,
-                        );
-                        $data10 = array('data' => array('booking_id' => $mak_booking_id));
-
-                        $response = $this->makApiCall('confirm_booking', $data10);
-
-                        if (!empty($response->data->pnr)) {
-                            $booking_response9 = array(
-                                'booking_id' => $trip3_booking_id,
-                                'pnr_id' => $response->data->pnr,
-                                'razorpay_payment_id' => $payment['id'],
-                                'makruzz_booking_id' => $mak_booking_id,
-                                'booking_status' => 'Success',
-                                'seat_status' => 1,
-                                'booking_vendor' => 'Makruzz',
-                            );
-
-                            $this->sendMailMakruzz($trip3_booking_id, $response->data->pnr);
-                        } else {
-                            $booking_response9 = array(
-                                'booking_id' => $trip3_booking_id,
-                                'pnr_id' => NULL,
-                                'razorpay_payment_id' => $payment['id'],
-                                'makruzz_booking_id' => NULL,
-                                'booking_status' => 'Failed',
-                                'seat_status' => 0,
-                                'booking_vendor' => 'Makruzz',
-                            );
-                        }
-
-                        DB::table('pnr_status')->insert($booking_response9);
-
-                        // green ocean single booking
-                    }
-                    // ************************************ Green Ocean **************************************************
-                    elseif (!empty($results3->ship_name) && str_contains($results3->ship_name, 'Green Ocean')) {
-
-                        $hash_sequence = "ship_id|from_id|dest_to|route_id|class_id|number_of_adults|number_of_infants|travel_date|seat_id|public_key";
-                        $godata['ship_id'] = $trip_data['trip3']['ship_id']; // Ship ID from 1-search-ferry.php response selected seat class
-                        $godata['from_id'] = $results3->from_location; // 1: Port Blair, 2 : Havelock, 3: Neil
-                        $godata['dest_to'] = $results3->to_location; // 1: Port Blair, 2 : Havelock, 3: Neil
-                        $godata['route_id'] = $trip_data['trip3']['route_id'];  // Route ID from 1-search-ferry.php response selected seat class
-                        $godata['class_id'] = $trip_data['trip3']['class_id'];  // Class ID from 1-search-ferry.php response selected seat class
-
-                        $godata['number_of_adults'] = $trip_data['booking_data']['no_of_passenger']; // No of Adults
-                        $godata['number_of_infants'] = $trip_data['booking_data']['no_of_infant']; // No of Infants
-
-
-                        $p_prefix = $p_name = $p_age = $p_gender = $p_nationality = $p_passport_numb = $p_passport_expairy = $p_country = [];
-                        $i_prefix = $i_name = $i_age = $i_gender = [];
-                        foreach ($passenger_result as $key => $passenger) {
-                            //$dob = Carbon::parse($passenger->dob);
-                            $name = $passenger->full_name;
-                            $title = $passenger->title;
-
-                            if ($passenger->title == 'INFANT') {
-                                $i_prefix[] = $passenger->title;
-                                $i_name[] = $passenger->full_name;
-                                $i_age[] = $passenger->dob;
-                                $i_gender[] = $passenger->gender;
-                            } else {
-                                $p_prefix[] = $passenger->title;
-                                $p_name[] = $passenger->full_name;
-                                $p_age[] = $passenger->dob;
-                                $p_gender[] = $passenger->gender;
-                                $p_nationality[] = $passenger->resident;
-                                $p_passport_numb[] = $passenger->passport_id;
-                                $p_passport_expairy[] = $passenger->expiry_date;
-                                $p_country[] = $passenger->country;
-                            }
-                        }
-
-                        // Adult Passenger details
-                        $godata['passenger_prefix'] = $p_prefix; //["Mr","Mrs"];  // only Allowed Mr/Dr/Master/Mrs/Ms/Miss/
-                        $godata['passenger_name'] = $p_name;
-                        $godata['passenger_age'] = $p_age;
-                        $godata['gender'] = $p_gender; // only Allowed Male/Female
-                        $godata['nationality'] = $p_nationality; // Only Allowed Indian/Foreigner
-
-                        // Passport details are passed only for adults, not asked for infants.
-                        $godata['passport_numb'] = $p_passport_numb;  // pass passport number
-                        $godata['passport_expairy'] = $p_passport_expairy; // pass passport expiry date as DD-MM-YYYY format
-                        $godata['country'] = $p_country; // pass passport country name as string
-
-                        $godata['infant_prefix'] = $i_prefix;
-                        $godata['infant_name'] = $i_name;
-                        $godata['infant_age'] = $i_age;
-                        $godata['infant_gender'] = $i_gender;
-
-                        $godata['travel_date'] = date('d-m-Y', strtotime($results3->date_of_jurney));
-                        $godata['seat_id'] = (array) json_decode($trip_data['trip3']['trip_seat_no']);
-
-
-                        $godata['public_key'] = env('GREEN_OCEAN_PUBLIC_KEY'); // Public Key Shared by Green Ocean
-                        $godata['hash_string'] = $this->getHashKey($godata, env('GREEN_OCEAN_PRIVATE_KEY'), $hash_sequence); // Hash value of sequenced string
-
-                        // $booking_json = json_encode($godata);
-
-                        $booking_api_res = $this->greenOceanApiCall('book-ticket', $godata);
-
-
-                        if (!empty($booking_api_res->pnr)) {
-                            $booking_response_green = array(
-                                'booking_id' => $trip3_booking_id,
-                                'pnr_id' => $booking_api_res->pnr,
-                                'razorpay_payment_id' => $payment['id'],
-                                'makruzz_booking_id' => NULL,
-                                'booking_status' => 'Success',
-                                'seat_status' => 1,
-                                'booking_vendor' => $results3->ship_name,
-                            );
-
-                            $this->sendMailGreenOcean($booking_api_res->pnr);
-
-                        } else {
-                            $booking_response_green = array(
-                                'booking_id' => $trip3_booking_id,
-                                'pnr_id' => NULL,
-                                'razorpay_payment_id' => $payment['id'],
-                                'makruzz_booking_id' => NULL,
-                                'booking_status' => 'Failed',
-                                'seat_status' => 0,
-                                'booking_vendor' => $results3->ship_name,
-                            );
-                        }
-                        DB::table('pnr_status')->insert($booking_response_green);
-                    } elseif ($results3->ship_name == 'ITT Majestic') {
-
-                        $booking_response_itt = array(
-                            'booking_id' => $trip3_booking_id,
-                            'pnr_id' => NULL,
-                            'razorpay_payment_id' => $payment['id'],
-                            'makruzz_booking_id' => NULL,
-                            'booking_status' => 'Success',
-                            'seat_status' => 0,
-                            'booking_vendor' => $results3->ship_name,
-                        );
-
-                        DB::table('pnr_status')->insert($booking_response_itt);
-                    }
-                }
+                // Ferry booking - Call the new method with API calls commented out
+                $this->handleFerryBookingAPIs(
+                    $booking_id,
+                    Session::get('trip2_booking_id'),
+                    Session::get('trip3_booking_id')
+                );
+
+                return view('razorpay.success', $data);
             }
-
-            // Session::forget('order_id');
-            // Session::forget('amount');
-            // Session::forget('user_name');
-            // Session::forget('user_phone');
-            // Session::forget('$trip1_booking_id');
-
-            // Session::forget('ferryScheduleId');
-            // Session::forget('nautika_class_id');
-            // Session::forget('makruzz_class_id');
-            // Session::forget('ferry_class_title');
-            // Session::forget('tripId');
-            // Session::forget('vesselID');
-            // Session::forget('from_location');
-            // Session::forget('to_location');
-            // Session::forget('departure_date');
-            // Session::forget('arrival_time');
-            // Session::forget('to');
-            // Session::forget('date');
-            // Session::forget('passenger');
-            // Session::forget('price');
-            // Session::forget('ship_name');
-
-            // Session::forget('single_trip');
-            // Session::forget('booking_id');
-            // Session::forget('trip2_booking_id');
-            // Session::forget('trip3_booking_id');
-
-            $user_email = Session::get('user_email');
-
-            // var_dump($results);
-            // echo "<br>";
-            // echo "<br>";
-            // var_dump($results2);
-
-            // print_r($results->ship_name);
-            // print_r($results2->ship_name);
-            // die();
-
-            $shipNameArray = array(
-                'Green Ocean 1',
-                'Green Ocean 2',
-                'ITT Majestic',
-                'Makruzz'
-            );
-
-            $bookingId1 = in_array($results->ship_name, $shipNameArray) ? $booking_id : NULL;
-            $bookingId2 = (!empty($trip2_booking_id) && in_array($results2->ship_name, $shipNameArray)) ? $trip2_booking_id : NULL;
-            $bookingId3 = (!empty($trip3_booking_id) && in_array($results3->ship_name, $shipNameArray)) ? $trip3_booking_id : NULL;
-
-            // Send the email
-            $greet = '';
-
-            // $this->send_email($user_email, $bookingId1, $bookingId2, $bookingId3, $greet);
-
-            $greet = 'Hello Admin';
-            $user_email = 'andamanferrybookings@gmail.com';
-            // $this->send_email($user_email, $booking_id, $trip2_booking_id, $trip3_booking_id, $greet);
-
-
-            $data['order_id'] = $order_id;
-            $data['booking_id'] = $booking_id ?? NULL;
-            $data['trip2_booking_id'] = !empty($trip2_booking_id) ?? NULL;
-            $data['trip3_booking_id'] = !empty($trip3_booking_id) ?? NULL;
-
-            // print_r($data);die;
-
-            return view('razorpay.success', $data);
         } else {
             echo 'Payment Failed';
             die;
@@ -1980,7 +1194,6 @@ class BookingController extends Controller
 
     public function ticket_generate(request $request)
     {
-
         $booking_id = $request->booking_id;
         $trip2_booking_id = $request->trip2_booking_id;
         $trip3_booking_id = $request->trip3_booking_id;
@@ -2004,14 +1217,8 @@ class BookingController extends Controller
             ->first();
 
         $data['bookingPassengerDetails'] = [];
-
-        $data['bookings'] = DB::table('booking')
-            ->where('id', $booking_id)
-            ->get();
-
-        //$data['bookingPassengerDetails'] = [];
+        $data['bookings'] = DB::table('booking')->where('id', $booking_id)->get();
         $bookingPassengerDetails = [];
-
 
         foreach ($data['bookings'] as $booking) {
             $passengers = DB::table('booking_passenger_details as b_p_d')
@@ -2028,7 +1235,6 @@ class BookingController extends Controller
 
     public function send_email($user_email, $booking_id, $trip2_booking_id, $trip3_booking_id, $greet)
     {
-
         $details = [
             'booking_id' => $booking_id,
             'trip2_booking_id' => $trip2_booking_id,
@@ -2041,20 +1247,8 @@ class BookingController extends Controller
         return 'Email has been sent!';
     }
 
-    // public function store_selected_seats(Request $request) {
-
-    //     $tripNo = $request->tripNo;
-    //     $seats = $request->seat_nos;
-
-    //     Session::put('trip_no', $tripNo);
-    //     Session::put('seats_' . $tripNo, $seats);
-
-    //     return response()->json(['status' => 'success', 'message' => 'Selected seats stored successfully' ]);
-    // }
-
     public function sendMailMakruzz($booking_id, $pnr)
     {
-
         $bookingDetails = DB::table('booking')->where('id', $booking_id)->first();
 
         $data = array(
@@ -2063,7 +1257,7 @@ class BookingController extends Controller
         );
 
         $response = Http::withHeaders([
-            'debug' => true, // Custom header to trigger debugging
+            'debug' => true,
             'Accept' => 'application/json'
         ])->timeout(20)->withoutVerifying()->post('nautika-api-call/email/sendmail.php', $data);
     }
@@ -2071,26 +1265,13 @@ class BookingController extends Controller
     public function sendMailGreenOcean($pnr)
     {
         $godata['pnr'] = $pnr;
-        // $godata['pnr'] = "TPMHE";
         $hash_sequence = "pnr|public_key";
-        $godata['public_key'] = env('GREEN_OCEAN_PUBLIC_KEY'); // Public Key Shared by Green Ocean
-        $godata['hash_string'] = $this->getHashKey($godata, env('GREEN_OCEAN_PRIVATE_KEY'), $hash_sequence); // Hash value of sequenced string
-
-        // $booking_json = json_encode($godata);
-        // dd($godata);
-
-        // echo "PNR: $pnr<br>";
+        $godata['public_key'] = env('GREEN_OCEAN_PUBLIC_KEY');
+        $godata['hash_string'] = $this->getHashKey($godata, env('GREEN_OCEAN_PRIVATE_KEY'), $hash_sequence);
 
         $booking_api_res = $this->greenOceanApiCall('ticket-pnr', $godata);
 
-        // dd($booking_api_res);
         if ($booking_api_res->status == 'success' && $booking_api_res->data->status == 'Okay') {
-
-            // $pdf_filename = 'ticket_' . $pnr . '.pdf';
-
-            // $pdf = Pdf::loadView('booking.bokingpage.green-ocean-ticket-template', ['ticket_data' => $booking_api_res->data]);
-            // return $pdf->download($pdf_filename);
-
             $booking_data = DB::table('pnr_status as ps')
             ->select('b.*','ps.pnr_id', 'fl.name as form_location', 'tl.name as to_location')
             ->join('booking as b','b.id','=','ps.booking_id')
@@ -2104,13 +1285,9 @@ class BookingController extends Controller
             }
 
             $booking_data->payment_method = $booking_api_res->data->payment_method;
-
             $booking_data->passengers = DB::table('booking_passenger_details')->where(['booking_id' => $booking_data->id])->get();
 
-            // $ticketTemplate = view('booking.bokingpage.green-ocean-mail-template', ['booking_data' => $booking_data])->render();
             $ticketTemplate = view('emails.green-ocean-mail-template', ['booking_data' => $booking_data])->render();
-
-            // $user_email = "newtonsamaddar@gmail.com";
             $user_email = $booking_data->c_email;
 
             $data = array(
@@ -2120,42 +1297,20 @@ class BookingController extends Controller
             );
 
             $response = Http::withHeaders([
-                'debug' => true, // Custom header to trigger debugging
+                'debug' => true,
                 'Accept' => 'application/json'
             ])->timeout(20)->withoutVerifying()->post('nautika-api-call/email/sendmailgo.php', $data);
-
-                // dd($response);
-
         } else {
             echo $booking_api_res->message;
-            // dd($booking_api_res);
         }
-
-
-        // $ticketTemplate = View::make('booking.bokingpage.green-ocean-ticket-template', compact('booking_api_res'))->render();
-
-        // $data = array(
-        //     'bookingDetails' => (array) $bookingDetails,
-        //     'pnr' => $pnr
-        // );
-
-        // $response = Http::withHeaders([
-        //     'debug' => true, // Custom header to trigger debugging
-        //     'Accept' => 'application/json'
-        // ])->timeout(20)->withoutVerifying()->post('nautika-api-call/email/sendmail.php', $data);
     }
-
 
     public function TestGreenOceanAPICall($pnr)
     {
         $godata['pnr'] = $pnr;
-        // $godata['pnr'] = "TPMHE";
         $hash_sequence = "pnr|public_key";
-        $godata['public_key'] = env('GREEN_OCEAN_PUBLIC_KEY'); // Public Key Shared by Green Ocean
-        $godata['hash_string'] = $this->getHashKey($godata, env('GREEN_OCEAN_PRIVATE_KEY'), $hash_sequence); // Hash value of sequenced string
-
-        // $booking_json = json_encode($godata);
-        // dd($godata);
+        $godata['public_key'] = env('GREEN_OCEAN_PUBLIC_KEY');
+        $godata['hash_string'] = $this->getHashKey($godata, env('GREEN_OCEAN_PRIVATE_KEY'), $hash_sequence);
 
         echo "PNR: $pnr<br>";
 
@@ -2169,8 +1324,6 @@ class BookingController extends Controller
             ->where(['ps.pnr_id' => $pnr])
             ->toSql();
 
-        // dd($booking_api_res);
         dd($booking_data);
-
     }
 }
