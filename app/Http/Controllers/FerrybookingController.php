@@ -956,15 +956,15 @@ class FerrybookingController extends Controller
                 'departure_time' => '08:00:00',
                 'arrival_time' => '10:30:00',
                 'ship_name' => 'Green Ocean 1',
-                'ship_image' => 'images/greenocean.jpeg',
+                'ship_image' => 'uploads/ship/1722411651.jpg',
                 'from' => 'Port Blair',
                 'to' => 'Swaraj Dweep (Havelock)',
                 'ship' => [
-                    'image' => 'green_ocean_1.jpg',
+                    'image' => 'uploads/ship/1722411651.jpg',
                     'title' => 'Green Ocean 1',
                     'images' => [
                         [
-                            'image_path' => 'green_ocean_1.jpg'
+                            'image_path' => 'uploads/ship/1722411651.jpg'
                         ]
                     ]
                 ],
