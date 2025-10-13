@@ -162,30 +162,35 @@
 
     <footer class="modern-footer w-100 mobile-scroll-safe" style="background: #0b2e36; color: #f5f7fa; margin-top: 0; padding-top: 3rem; padding-bottom: 2rem;">
         <div class="container-fluid px-5">
-            <div class="row justify-content-center align-items-center text-center gy-4">
-                <div class="col-12 col-lg-3 mb-4 mb-lg-0 d-flex flex-column align-items-center">
+            <div class="row gy-4">
+                <!-- Left Column: Logo and Social Icons -->
+                <div class="col-12 col-lg-4 footer-left">
                     <a href="https://andamanferrybooking.com/"><img src="{{ asset('assets/images/andaman_ferry_logo_header.png') }}" width="220" alt="Andaman Ferry Logo" class="mb-3"></a>
-                    <div class="footer-logos d-flex flex-wrap justify-content-center gap-3 mb-3">
+                    <div class="footer-logos d-flex flex-wrap gap-3 mb-3">
                         <img src="{{ asset('assets/images/logo/tourismlogo1.png') }}" width="130" alt="Tourism">
                         <img src="{{ asset('assets/images/logo/Incredible india.png') }}" width="130" alt="Incredible India">
                         <img src="{{ asset('assets/images/start-up-india-logo.png') }}" width="130" alt="Startup India">
                     </div>
+                    <div class="footer-social">
+                        <a href="https://www.instagram.com/andamanferrybooking" target="_blank"><img src="{{ asset('assets/images/instagram.svg') }}" width="36" alt="Instagram"></a>
+                        <a href="https://www.facebook.com/profile.php?id=61551926759700" target="_blank"><img src="{{ asset('assets/images/facebook.svg') }}" width="36" alt="Facebook"></a>
+                        <a href="https://g.co/kgs/QszVZdd" target="_blank"><img src="{{ asset('assets/images/google.png') }}" width="32" alt="Google"></a>
+                    </div>
                 </div>
-                <div class="col-12 col-lg-4 mb-4 mb-lg-0 d-flex flex-column align-items-center">
+                
+                <!-- Center Column: Contact Information -->
+                <div class="col-12 col-lg-4 footer-center">
                     <h5 class="footer-title">Contact Information</h5>
                     <ul class="footer-list mb-3">
                         <li>1st floor, Premnagar Muthoot Finance Building<br>Port Blair, Andaman and Nicobar Island<br>PIN code 744102</li>
                         <li><a href="mailto:andamanferrybookings@gmail.com"><i class="bi bi-envelope-at"></i> andamanferrybookings@gmail.com</a></li>
-                        <li><a href="tel:+91 9679061419"><i class="bi bi-telephone"></i></a></li>
-                        <li><a href="https://wa.me/+919933281206" target="_blank"><i class="bi bi-whatsapp"></i> </a></li>
+                        <li><a href="tel:+91 9679061419"><i class="bi bi-telephone"></i> +91 9679061419</a></li>
+                        <li><a href="https://wa.me/+919933281206" target="_blank"><i class="bi bi-whatsapp"></i> +91 9933281206</a></li>
                     </ul>
-                    <div class="footer-social mt-2">
-                        <a href="https://www.instagram.com/andamanferrybooking" target="_blank"><img src="{{ asset('assets/images/instagram.svg') }}" width="36" alt="Instagram"></a>
-                        <a href="https://www.facebook.com/profile.php?id=61551926759700" target="_blank"><img src="{{ asset('assets/images/facebook.svg') }}" width="36" alt="Facebook"></a>
-                        <a href="https://g.co/kgs/QszVZdd" target="_blank"><img src="images/google.png" width="32" alt="Google"></a>
-                    </div>
                 </div>
-                <div class="col-12 col-lg-3 mb-4 mb-lg-0 d-flex flex-column align-items-center">
+                
+                <!-- Right Column: Quick Links -->
+                <div class="col-12 col-lg-4 footer-right">
                     <h5 class="footer-title">Quick Links</h5>
                     <ul class="footer-list">
                         <li><a href="{{ url('/terms-and-conditions') }}">Terms and Conditions</a></li>
