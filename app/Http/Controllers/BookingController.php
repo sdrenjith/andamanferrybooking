@@ -542,15 +542,15 @@ class BookingController extends Controller
                 'amount'         => Session::get('total_trip1_amount'),
                 'no_of_passenger' => $trip_data['booking_data']['no_of_passenger'],
                 'date_of_jurney'  => $trip_data['booking_data']['date'],
-                'trip_id'  => $trip_data['trip1']['trip_id'],
+                'trip_id'  => (int) $trip_data['trip1']['trip_id'],
                 'route_id'  => $trip_data['trip1']['route_id'],
-                'vessel_id'  => $trip_data['trip1']['vesselID'] ?? NULL,
+                'vessel_id'  => (int) ($trip_data['trip1']['vesselID'] ?? 0),
                 'departure_time'  => $trip_data['trip1']['departure_time'],
                 'arrival_time'  => $trip_data['trip1']['arrival_time'] ?? null,
                 'nautika_class'  =>  $trip_data['trip1']['ship_name'] == 'Nautika' ? $trip_data['trip1']['class_id'] : NULL,
                 'makruzz_class'  => $trip_data['trip1']['ship_name'] == 'Makruzz' ? $trip_data['trip1']['class_id'] : NULL,
                 'green_ocean_class'  => $trip_data['booking_data']['schedule'][1] == 'Admin' ? $trip_data['trip1']['class_id'] : NULL,
-                'ferry_class'  => $trip_data['trip1']['class_title'],
+                'ferry_class'  => $trip_data['trip1']['class_title'] ?? 'Standard',
                 'from_location'  => $trip_data['booking_data']['form_location'],
                 'to_location'  => $trip_data['booking_data']['to_location'],
                 'ship_id'  => $trip_data['trip1']['ship_id'] ?? NULL,
@@ -573,15 +573,15 @@ class BookingController extends Controller
                 'amount'         => Session::get('total_trip2_amount'),
                 'no_of_passenger' => $trip_data['booking_data']['no_of_passenger'],
                 'date_of_jurney'  => $trip_data['booking_data']['round1_date'],
-                'trip_id'  => $trip_data['trip2']['trip_id'],
+                'trip_id'  => (int) $trip_data['trip2']['trip_id'],
                 'route_id'  => $trip_data['trip2']['route_id'],
-                'vessel_id'  => $trip_data['trip2']['vesselID'] ?? NULL,
+                'vessel_id'  => (int) ($trip_data['trip2']['vesselID'] ?? 0),
                 'departure_time'  => $trip_data['trip2']['departure_time'],
                 'arrival_time'  => $trip_data['trip2']['arrival_time'] ?? null,
                 'nautika_class'  =>  $trip_data['trip2']['ship_name'] == 'Nautika' ? $trip_data['trip2']['class_id'] : NULL,
                 'makruzz_class'  => $trip_data['trip2']['ship_name'] == 'Makruzz' ? $trip_data['trip2']['class_id'] : NULL,
                 'green_ocean_class'  => $trip_data['booking_data']['schedule'][1] == 'Admin' ? $trip_data['trip2']['class_id'] : NULL,
-                'ferry_class'  => $trip_data['trip2']['class_title'],
+                'ferry_class'  => $trip_data['trip2']['class_title'] ?? 'Standard',
                 'from_location'  => $trip_data['booking_data']['round1_from_location'],
                 'to_location'  => $trip_data['booking_data']['round1_to_location'],
                 'ship_id'  => $trip_data['trip2']['ship_id'] ?? NULL,
@@ -604,15 +604,15 @@ class BookingController extends Controller
                 'amount'         => Session::get('total_trip3_amount'),
                 'no_of_passenger' => $trip_data['booking_data']['no_of_passenger'],
                 'date_of_jurney'  => $trip_data['booking_data']['round2_date'],
-                'trip_id'  => $trip_data['trip3']['trip_id'],
+                'trip_id'  => (int) $trip_data['trip3']['trip_id'],
                 'route_id'  => $trip_data['trip3']['route_id'],
-                'vessel_id'  => $trip_data['trip3']['vesselID'] ?? NULL,
+                'vessel_id'  => (int) ($trip_data['trip3']['vesselID'] ?? 0),
                 'departure_time'  => $trip_data['trip3']['departure_time'],
                 'arrival_time'  => $trip_data['trip3']['arrival_time'] ?? null,
                 'nautika_class'  =>  $trip_data['trip3']['ship_name'] == 'Nautika' ? $trip_data['trip3']['class_id'] : NULL,
                 'makruzz_class'  => $trip_data['trip3']['ship_name'] == 'Makruzz' ? $trip_data['trip3']['class_id'] : NULL,
                 'green_ocean_class'  => $trip_data['booking_data']['schedule'][1] == 'Admin' ? $trip_data['trip3']['class_id'] : NULL,
-                'ferry_class'  => $trip_data['trip3']['class_title'],
+                'ferry_class'  => $trip_data['trip3']['class_title'] ?? 'Standard',
                 'from_location'  => $trip_data['booking_data']['round2_from_location'],
                 'to_location'  => $trip_data['booking_data']['round2_to_location'],
                 'ship_id'  => $trip_data['trip3']['ship_id'] ?? NULL,
@@ -643,7 +643,7 @@ class BookingController extends Controller
                     } else if ($passengerDobs[$index] <= 1 && $passengerTitles[$index] == 'INFANT' && $trip_data['trip1']['ship_name'] == 'Nautika') {
                         $paxFare = $trip_data['trip1']['infantFare'];
                     } else {
-                        $paxFare = $trip_data['trip1']['fare'];
+                        $paxFare = $trip_data['trip1']['fare'] ?? 200;
                     }
 
                     $ferryPassengerData = [
@@ -678,7 +678,7 @@ class BookingController extends Controller
                         } else if ($passengerDobs[$index] <= 1 && $passengerTitles[$index] == 'INFANT' && $trip_data['trip2']['ship_name'] == 'Nautika') {
                             $paxFare = $trip_data['trip2']['infantFare'];
                         } else {
-                            $paxFare = $trip_data['trip2']['fare'];
+                            $paxFare = $trip_data['trip2']['fare'] ?? 200;
                         }
 
                         $ferryPassengerData2 = [
@@ -708,7 +708,7 @@ class BookingController extends Controller
                         } else if ($passengerDobs[$index] <= 1 && $passengerTitles[$index] == 'INFANT' && $trip_data['trip3']['ship_name'] == 'Nautika') {
                             $paxFare = $trip_data['trip3']['infantFare'];
                         } else {
-                            $paxFare = $trip_data['trip3']['fare'];
+                            $paxFare = $trip_data['trip3']['fare'] ?? 200;
                         }
                         $ferryPassengerData3 = [
                             'booking_id' => $trip3_booking_id,

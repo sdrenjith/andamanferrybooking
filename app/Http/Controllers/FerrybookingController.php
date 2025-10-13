@@ -914,8 +914,8 @@ class FerrybookingController extends Controller
         $mockData = [
             (object) [
                 'id' => 'nautika_001',
-                'tripId' => 'trip_001',
-                'vesselID' => 'vessel_001',
+                'tripId' => 1,
+                'vesselID' => 1,
                 'dTime' => (object) ['hour' => 8, 'minute' => 0],
                 'aTime' => (object) ['hour' => 10, 'minute' => 30],
                 'from' => $data2['from'],
@@ -951,8 +951,8 @@ class FerrybookingController extends Controller
         $mockData = [
             [
                 'id' => 'green_ocean_001',
-                'tripId' => 'trip_go_001',
-                'vesselID' => 'vessel_go_001',
+                'tripId' => 2,
+                'vesselID' => 2,
                 'departure_time' => '08:00:00',
                 'arrival_time' => '10:30:00',
                 'ship_name' => 'Green Ocean 1',
