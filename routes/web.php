@@ -172,6 +172,8 @@ Route::get('/api/chatbot/initial', [App\Http\Controllers\ChatbotController::clas
     Route::get('/boat-booking/invoice/{order_id}', [App\Http\Controllers\BookingController::class, 'boatBookingInvoice'])->name('boat-booking.invoice');
     Route::get('/boat-booking/invoice-pdf/{order_id}', [App\Http\Controllers\BookingController::class, 'boatBookingInvoicePdf'])->name('boat-booking.invoice-pdf');
     Route::get('/ferry-booking/success/{order_id}', [App\Http\Controllers\BookingController::class, 'ferryBookingSuccess'])->name('ferry-booking.success');
+    Route::get('/boat-booking/success/{order_id}', [App\Http\Controllers\BookingController::class, 'boatPaymentSuccess'])->name('boat-payment-success');
+    Route::get('/boat-booking/cancel/{order_id}', [App\Http\Controllers\BookingController::class, 'boatPaymentCancel'])->name('boat-payment-cancel');
 });
 
 // Handle razorpay webhook

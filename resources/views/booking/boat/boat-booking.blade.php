@@ -109,46 +109,6 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Customer Details -->
-                                    <div class="row g-4">
-                                        <div class="col-12 col-md-4">
-                                            <label for="customer_name" class="form-label fw-semibold text-dark mb-2">
-                                                <i class="bi bi-person me-2 text-primary"></i>Full Name
-                                            </label>
-                                            <input type="text" class="form-control form-control-lg border-0 shadow-sm rounded-3" id="customer_name" name="customer_name" required placeholder="Enter your name">
-                                        </div>
-                                        <div class="col-12 col-md-4">
-                                            <label for="age" class="form-label fw-semibold text-dark mb-2">
-                                                <i class="bi bi-calendar me-2 text-primary"></i>Age
-                                            </label>
-                                            <input type="number" class="form-control form-control-lg border-0 shadow-sm rounded-3" id="age" name="age" min="1" max="120" required placeholder="Age">
-                                        </div>
-                                        <div class="col-12 col-md-4">
-                                            <label for="gender" class="form-label fw-semibold text-dark mb-2">
-                                                <i class="bi bi-gender-ambiguous me-2 text-primary"></i>Gender
-                                            </label>
-                                            <select class="form-control form-control-lg border-0 shadow-sm rounded-3" id="gender" name="gender" required>
-                                                <option value="">Select</option>
-                                                <option value="Male">Male</option>
-                                                <option value="Female">Female</option>
-                                                <option value="Other">Other</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="row g-4 mt-1">
-                                        <div class="col-12 col-md-6">
-                                            <label for="customer_email" class="form-label fw-semibold text-dark mb-2">
-                                                <i class="bi bi-envelope me-2 text-primary"></i>Email
-                                            </label>
-                                            <input type="email" class="form-control form-control-lg border-0 shadow-sm rounded-3" id="customer_email" name="customer_email" required placeholder="Enter your email">
-                                        </div>
-                                        <div class="col-12 col-md-6">
-                                            <label for="customer_phone" class="form-label fw-semibold text-dark mb-2">
-                                                <i class="bi bi-telephone me-2 text-primary"></i>Phone
-                                            </label>
-                                            <input type="tel" class="form-control form-control-lg border-0 shadow-sm rounded-3" id="customer_phone" name="customer_phone" required placeholder="Enter your phone number">
-                                        </div>
-                                    </div>
                                     
                                     <!-- Search Button -->
                                     <div class="col-12 mt-4">
@@ -316,11 +276,54 @@ $(document).ready(function() {
         var boatName = getSelectedBoatName();
         var date = $('#boat_date').val();
         var passengers = parseInt($('#passengers').val()) || 1;
+        var infants = parseInt($('#infants').val()) || 0;
         var total = price * passengers;
-        $('#amount').val(total);
-        $('#boat_name').val(boatName);
-        $('#date_of_jurney').val(date);
-        $('#no_of_passenger').val(passengers);
+        
+        // Add hidden fields for the data we need to pass
+        if ($('#amount').length === 0) {
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'amount',
+                name: 'amount',
+                value: total
+            }).appendTo('#boatBookingForm');
+        } else {
+            $('#amount').val(total);
+        }
+        
+        if ($('#boat_name').length === 0) {
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'boat_name',
+                name: 'boat_name',
+                value: boatName
+            }).appendTo('#boatBookingForm');
+        } else {
+            $('#boat_name').val(boatName);
+        }
+        
+        if ($('#date_of_jurney').length === 0) {
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'date_of_jurney',
+                name: 'date_of_jurney',
+                value: date
+            }).appendTo('#boatBookingForm');
+        } else {
+            $('#date_of_jurney').val(date);
+        }
+        
+        if ($('#no_of_passenger').length === 0) {
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'no_of_passenger',
+                name: 'no_of_passenger',
+                value: passengers
+            }).appendTo('#boatBookingForm');
+        } else {
+            $('#no_of_passenger').val(passengers);
+        }
+        
         $('#boatBookingForm').submit();
     });
 });

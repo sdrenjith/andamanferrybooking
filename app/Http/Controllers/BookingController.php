@@ -83,20 +83,15 @@ class BookingController extends Controller
         $data['date'] = $request->date;
         $data['passengers'] = $request->passengers;
         $data['infants'] = $request->infants;
-        $data['customer_name'] = $request->customer_name;
-        $data['age'] = $request->age;
-        $data['gender'] = $request->gender;
-        $data['customer_email'] = $request->customer_email;
-        $data['customer_phone'] = $request->customer_phone;
 
-        // Validate required fields
-        if (!$data['boat_name'] || !$data['date'] || !$data['passengers'] || !$data['customer_name'] || !$data['customer_email'] || !$data['customer_phone']) {
+        // Validate required fields (only boat selection, date, and passengers)
+        if (!$data['boat_name'] || !$data['date'] || !$data['passengers']) {
             return redirect()->back()->with('error', 'Please fill in all required fields.');
         }
 
-        // Get boat details from database
-        $data['boat_datas'] = DB::table('boat_schedule')
-            ->where('title', $data['boat_name'])
+        // Get boat details from BoatCustomBooking table (same as dropdown)
+        $data['boat_datas'] = DB::table('boat_custom_booking')
+            ->where('name', $data['boat_name'])
             ->where('status', 'Y')
             ->first();
 
@@ -104,21 +99,8 @@ class BookingController extends Controller
             return redirect()->back()->with('error', 'Selected boat is not available.');
         }
 
-        // Calculate pricing
-        if ($data['boat_datas']->is_chartered_boat == 'Y') {
-            $boat_price_detail = DB::table('boat_schedule_price')
-                ->where(['boat_schedule_id' => $data['boat_datas']->id, 'no_of_passenger' => $data['passengers']])
-                ->first();
-
-            if ($boat_price_detail) {
-                $data['boat_price'] = $boat_price_detail->per_passenger_price;
-            } else {
-                $data['boat_price'] = $data['boat_datas']->price;
-            }
-        } else {
-            $data['boat_price'] = $data['boat_datas']->price;
-        }
-
+        // Use the price from BoatCustomBooking (same as dropdown)
+        $data['boat_price'] = $data['boat_datas']->price;
         $data['multi_price'] = $data['boat_price'] * $data['passengers'];
         $data['boatScheduleId'] = $data['boat_datas']->id;
 
@@ -237,7 +219,220 @@ class BookingController extends Controller
         return redirect()->back()->with('error', 'Booking creation failed.');
     }
 
-    public function boatPaymentPage($order_id)
+    public function boatPaymentPage($order_id, Request $request)
+    {
+        // Log ALL incoming parameters first for debugging
+        \Log::info('Boat Payment Callback - All Parameters', [
+            'order_id' => $order_id,
+            'all_params' => $request->all(),
+            'url' => $request->fullUrl()
+        ]);
+        
+        // Get booking details from session or database
+        $booking_id = Session::get('booking_id');
+        
+        if (!$booking_id) {
+            \Log::error('Boat Payment - No booking_id in session', [
+                'order_id' => $order_id,
+                'session_data' => Session::all()
+            ]);
+            return redirect()->route('home')->with('error', 'Booking session expired. Please start a new booking.');
+        }
+        
+        $booking = DB::table('booking')->where('id', $booking_id)->first();
+        
+        if (!$booking) {
+            \Log::error('Boat Payment - Booking not found', [
+                'booking_id' => $booking_id,
+                'order_id' => $order_id
+            ]);
+            return redirect()->route('home')->with('error', 'Booking not found.');
+        }
+        
+        // Get payment parameters
+        $payment_status = $request->get('status');
+        $payment_id = $request->get('payment_id');
+        $error_code = $request->get('error_code');
+        $error_description = $request->get('error_description');
+        $razorpay_payment_id = $request->get('razorpay_payment_id');
+        $razorpay_order_id = $request->get('razorpay_order_id');
+        $razorpay_signature = $request->get('razorpay_signature');
+        
+        // Additional PhonePe parameters
+        $transactionId = $request->get('transactionId');
+        $code = $request->get('code'); // PhonePe also sends 'code' parameter
+        
+        // Log detailed payment callback info
+        \Log::info('Boat Payment Callback - Parsed Data', [
+            'order_id' => $order_id,
+            'booking_id' => $booking_id,
+            'payment_status' => $payment_status,
+            'payment_id' => $payment_id,
+            'transactionId' => $transactionId,
+            'code' => $code,
+            'error_code' => $error_code,
+            'error_description' => $error_description,
+            'razorpay_payment_id' => $razorpay_payment_id,
+            'current_booking_status' => $booking->payment_status
+        ]);
+        
+        // ============= HANDLE RAZORPAY PAYMENTS =============
+        if ($razorpay_payment_id && $razorpay_order_id && $razorpay_signature) {
+            \Log::info('Processing Razorpay payment', ['booking_id' => $booking_id]);
+            
+            $generated_signature = hash_hmac('sha256', $razorpay_order_id . "|" . $razorpay_payment_id, env('RAZORPAY_KEY_SECRET'));
+            
+            if (hash_equals($generated_signature, $razorpay_signature)) {
+                // Payment successful
+                DB::table('booking')
+                    ->where('id', $booking_id)
+                    ->update([
+                        'payment_status' => 'confirmed',
+                        'razorpay_payment_id' => $razorpay_payment_id,
+                        'updated_at' => now()
+                    ]);
+                
+                \Log::info('Razorpay payment successful', ['booking_id' => $booking_id]);
+                
+                $data = [
+                    'booking' => $booking,
+                    'order_id' => $order_id,
+                    'booking_id' => $booking_id
+                ];
+                
+                return view('razorpay.success', $data);
+            } else {
+                // Invalid signature
+                \Log::error('Razorpay signature verification failed', ['booking_id' => $booking_id]);
+                
+                DB::table('booking')
+                    ->where('id', $booking_id)
+                    ->update([
+                        'payment_status' => 'failed',
+                        'updated_at' => now()
+                    ]);
+                
+                return redirect()->route('boat_booking_page')->with('error', 'Payment verification failed. Please try again.');
+            }
+        }
+        
+        // ============= HANDLE PHONEPE CANCELLATION/FAILURE =============
+        // Check for various cancellation/failure scenarios from PhonePe
+        $isCancelled = (
+            $payment_status === 'CANCELLED' || 
+            $payment_status === 'FAILED' || 
+            $payment_status === 'CANCELLED_BY_USER' ||
+            $payment_status === 'PAYMENT_ERROR' ||
+            $payment_status === 'PAYMENT_DECLINED' ||
+            $code === 'PAYMENT_CANCELLED' ||
+            $code === 'PAYMENT_ERROR' ||
+            !empty($error_code) ||
+            $request->has('error') // Generic error parameter
+        );
+        
+        if ($isCancelled) {
+            \Log::info('PhonePe payment cancelled/failed', [
+                'booking_id' => $booking_id,
+                'payment_status' => $payment_status,
+                'code' => $code,
+                'error_code' => $error_code,
+                'error_description' => $error_description
+            ]);
+            
+            // Update booking status to cancelled
+            DB::table('booking')
+                ->where('id', $booking_id)
+                ->update([
+                    'payment_status' => 'cancelled',
+                    'payment_failed_reason' => $error_description ?? 'Payment cancelled by user',
+                    'updated_at' => now()
+                ]);
+            
+            return redirect()->route('boat_booking_page')->with('error', 'Payment was cancelled or failed. Please try again.');
+        }
+        
+        // ============= HANDLE PHONEPE SUCCESS =============
+        if (($payment_status === 'SUCCESS' || $payment_status === 'COMPLETED') && ($payment_id || $transactionId)) {
+            \Log::info('PhonePe payment successful', [
+                'booking_id' => $booking_id,
+                'payment_id' => $payment_id,
+                'transactionId' => $transactionId
+            ]);
+            
+            // Update booking status to confirmed
+            DB::table('booking')
+                ->where('id', $booking_id)
+                ->update([
+                    'payment_status' => 'confirmed',
+                    'razorpay_payment_id' => $payment_id ?? $transactionId,
+                    'updated_at' => now()
+                ]);
+            
+            $data = [
+                'booking' => $booking,
+                'order_id' => $order_id,
+                'booking_id' => $booking_id
+            ];
+            
+            return view('razorpay.success', $data);
+        }
+        
+        // ============= HANDLE PENDING/AMBIGUOUS CASES =============
+        // If booking is confirmed (from a previous successful payment), show success
+        if ($booking->payment_status === 'confirmed') {
+            \Log::info('Booking already confirmed, showing success page', ['booking_id' => $booking_id]);
+            
+            $data = [
+                'booking' => $booking,
+                'order_id' => $order_id,
+                'booking_id' => $booking_id
+            ];
+            
+            return view('razorpay.success', $data);
+        }
+        
+        // If booking is cancelled or failed, redirect to booking page
+        if (in_array($booking->payment_status, ['cancelled', 'failed'])) {
+            \Log::info('Booking was cancelled/failed, redirecting to booking page', [
+                'booking_id' => $booking_id,
+                'status' => $booking->payment_status
+            ]);
+            
+            return redirect()->route('boat_booking_page')->with('error', 'Payment was not completed. Please try again.');
+        }
+        
+        // Default case: Payment is pending or status is unclear
+        // DO NOT show success page, redirect to booking page instead
+        \Log::warning('Payment status unclear, redirecting to booking page', [
+            'booking_id' => $booking_id,
+            'booking_status' => $booking->payment_status,
+            'payment_status' => $payment_status,
+            'all_params' => $request->all()
+        ]);
+        
+        // If this is a direct URL access (no payment parameters), it's likely a cancellation
+        if (empty($payment_status) && empty($razorpay_payment_id) && empty($payment_id) && empty($transactionId)) {
+            \Log::info('Direct URL access detected - likely payment cancellation', [
+                'booking_id' => $booking_id,
+                'url' => $request->fullUrl()
+            ]);
+            
+            // Update booking status to cancelled if it's still pending
+            if ($booking->payment_status === 'pending') {
+                DB::table('booking')
+                    ->where('id', $booking_id)
+                    ->update([
+                        'payment_status' => 'cancelled',
+                        'payment_failed_reason' => 'Payment cancelled by user',
+                        'updated_at' => now()
+                    ]);
+            }
+        }
+        
+        return redirect()->route('boat_booking_page')->with('error', 'Payment was not completed. Please try again.');
+    }
+
+    public function boatPaymentSuccess($order_id, Request $request)
     {
         // Get booking details from session or database
         $booking_id = Session::get('booking_id');
@@ -252,13 +447,156 @@ class BookingController extends Controller
             return redirect()->route('home')->with('error', 'Booking not found.');
         }
         
+        // Get payment details from PhonePe
+        $payment_id = $request->get('payment_id');
+        $transaction_id = $request->get('transaction_id');
+        
+        // Log successful payment
+        \Log::info('Boat Payment Success', [
+            'order_id' => $order_id,
+            'booking_id' => $booking_id,
+            'payment_id' => $payment_id,
+            'transaction_id' => $transaction_id
+        ]);
+        
+        // Update booking status to confirmed
+        DB::table('booking')
+            ->where('id', $booking_id)
+            ->update([
+                'payment_status' => 'confirmed',
+                'razorpay_payment_id' => $payment_id,
+                'updated_at' => now()
+            ]);
+        
         $data = [
             'booking' => $booking,
             'order_id' => $order_id,
             'booking_id' => $booking_id
         ];
         
-        return view('razorpay.boat-payment-success', $data);
+        return view('razorpay.success', $data);
+    }
+
+    public function boatPaymentCancel($order_id, Request $request)
+    {
+        // Get booking details from session or database
+        $booking_id = Session::get('booking_id');
+        
+        if (!$booking_id) {
+            return redirect()->route('home')->with('error', 'Booking session expired. Please start a new booking.');
+        }
+        
+        $booking = DB::table('booking')->where('id', $booking_id)->first();
+        
+        if (!$booking) {
+            return redirect()->route('home')->with('error', 'Booking not found.');
+        }
+        
+        // Log cancelled payment
+        \Log::info('Boat Payment Cancelled', [
+            'order_id' => $order_id,
+            'booking_id' => $booking_id,
+            'reason' => $request->get('reason', 'User cancelled payment')
+        ]);
+        
+        // Update booking status to cancelled
+        DB::table('booking')
+            ->where('id', $booking_id)
+            ->update([
+                'payment_status' => 'cancelled',
+                'updated_at' => now()
+            ]);
+        
+        // Redirect to boat booking page with error message
+        return redirect()->route('boat_booking_page')->with('error', 'Payment was cancelled. Please try again.');
+    }
+
+    public function paymentFailed($order_id, Request $request)
+    {
+        // Get booking details
+        $booking_id = Session::get('booking_id');
+        
+        if (!$booking_id) {
+            return response()->json(['error' => 'Booking session expired'], 400);
+        }
+        
+        // Update booking status to failed
+        DB::table('booking')
+            ->where('id', $booking_id)
+            ->update([
+                'payment_status' => 'failed',
+                'payment_failed_reason' => $request->get('reason', 'Payment failed'),
+                'updated_at' => now()
+            ]);
+        
+        \Log::info('Payment Failed', [
+            'order_id' => $order_id,
+            'booking_id' => $booking_id,
+            'reason' => $request->get('reason', 'Payment failed')
+        ]);
+        
+        return response()->json(['success' => true]);
+    }
+
+    public function ajaxBoatBooking(Request $request)
+    {
+        // Validate required fields (only boat selection, date, passengers, and amount)
+        $validator = Validator::make($request->all(), [
+            'boat_name' => 'required|string',
+            'date_of_jurney' => 'required|date',
+            'no_of_passenger' => 'required|integer|min:1',
+            'amount' => 'required|numeric|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 400);
+        }
+
+        // Generate order ID
+        $combined = time() . rand(1000, 9999);
+        $orderId = substr($combined, 0, 10);
+
+        $user = Auth::user();
+        $user_id = $user->id ?? NULL;
+
+        try {
+            $lastInsertedId = DB::table('booking')->insertGetId([
+                'schedule_id' => null, // For boat bookings, this might be null
+                'type' => 'boat',
+                'order_id' => $orderId,
+                'c_name' => '', // Will be filled in summary page
+                'c_email' => '', // Will be filled in summary page
+                'c_mobile' => '', // Will be filled in summary page
+                'c_contact' => '', // Will be filled in summary page
+                'payment_status' => 'pending',
+                'ship_name' => $request->boat_name,
+                'amount' => $request->amount,
+                'no_of_passenger' => $request->no_of_passenger,
+                'date_of_jurney' => $request->date_of_jurney,
+                'user_id' => $user_id,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+            if ($lastInsertedId) {
+                // Store booking ID in session for payment processing
+                Session::put('booking_id', $lastInsertedId);
+                
+                return response()->json([
+                    'success' => true,
+                    'order_id' => $orderId,
+                    'booking_id' => $lastInsertedId
+                ]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Failed to create booking'], 500);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Boat booking creation failed', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Booking creation failed'], 500);
+        }
     }
 
     public function booking_show_ferry(Request $request)
@@ -1321,5 +1659,41 @@ class BookingController extends Controller
             ->toSql();
 
         dd($booking_data);
+    }
+
+    public function boat_booking_payment(Request $request)
+    {
+        // Validate payment status from Razorpay
+        $razorpay_payment_id = $request->razorpay_payment_id;
+        $razorpay_order_id = $request->razorpay_order_id;
+        $razorpay_signature = $request->razorpay_signature;
+        
+        // Verify payment signature
+        $generated_signature = hash_hmac('sha256', $razorpay_order_id . "|" . $razorpay_payment_id, env('RAZORPAY_KEY_SECRET'));
+        
+        if (!hash_equals($generated_signature, $razorpay_signature)) {
+            return redirect()->back()->with('error', 'Payment verification failed. Please try again.');
+        }
+        
+        // Get booking details
+        $booking_id = $request->booking_id;
+        $order_id = $request->order_id;
+        
+        if (!$booking_id || !$order_id) {
+            return redirect()->back()->with('error', 'Invalid booking details.');
+        }
+        
+        // Update booking status to confirmed
+        DB::table('booking')
+            ->where('id', $booking_id)
+            ->where('order_id', $order_id)
+            ->update([
+                'payment_status' => 'confirmed',
+                'razorpay_payment_id' => $razorpay_payment_id,
+                'updated_at' => now()
+            ]);
+        
+        // Redirect to success page
+        return redirect()->route('boat-payment-success', ['order_id' => $order_id]);
     }
 }

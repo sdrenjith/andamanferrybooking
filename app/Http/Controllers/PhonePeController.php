@@ -440,50 +440,67 @@ class PhonePeController extends Controller
                     'session_data' => Session::all()
                 ]);
                 
-                // Try to get booking ID from session data first
-                $sessionBookingId = Session::get('booking_id');
-                $sessionTripData = Session::get('trip_data');
+                // Empty callback usually means payment was cancelled
+                \Log::warning('Empty PhonePe callback - likely payment cancellation', [
+                    'request_data' => $request->all(),
+                    'session_data' => Session::all()
+                ]);
                 
-                if ($sessionBookingId && $sessionTripData) {
-                    \Log::info('Using booking ID from session data', [
-                        'booking_id' => $sessionBookingId,
-                        'trip_data' => $sessionTripData
+                // Try to get booking ID from session data to mark as cancelled
+                $sessionBookingId = Session::get('booking_id');
+                
+                if ($sessionBookingId) {
+                    \Log::info('Marking session booking as cancelled due to empty callback', [
+                        'booking_id' => $sessionBookingId
                     ]);
                     
-                    // Update booking status
+                    // Update booking status to cancelled
                     DB::table('booking')
                         ->where('id', $sessionBookingId)
-                        ->update(['payment_status' => 'success']);
+                        ->update([
+                            'payment_status' => 'cancelled',
+                            'payment_failed_reason' => 'Payment cancelled by user',
+                            'updated_at' => now()
+                        ]);
                     
-                    // Send email
-                    $this->sendEmailForBooking($sessionBookingId);
-                    
-                    return redirect()->route('phonepe.success', ['transaction_id' => $sessionBookingId]);
+                    // Get booking type to redirect appropriately
+                    $booking = DB::table('booking')->where('id', $sessionBookingId)->first();
+                    if ($booking && $booking->type === 'boat') {
+                        return redirect()->route('boat_booking_page')->with('error', 'Payment was cancelled. Please try again.');
+                    } else {
+                        return redirect()->route('ferry-booking')->with('error', 'Payment was cancelled. Please try again.');
+                    }
                 }
                 
-                // Fallback: Try to get the most recent booking and send email anyway
+                // If no session booking ID, try to get the most recent pending booking
                 $recentBooking = DB::table('booking')
                     ->where('payment_status', 'pending')
                     ->orderBy('id', 'desc')
                     ->first();
                     
                 if ($recentBooking) {
-                    \Log::info('Found recent pending booking, processing email', [
+                    \Log::info('Marking recent pending booking as cancelled due to empty callback', [
                         'booking_id' => $recentBooking->id
                     ]);
                     
-                    // Update booking status
+                    // Update booking status to cancelled
                     DB::table('booking')
                         ->where('id', $recentBooking->id)
-                        ->update(['payment_status' => 'success']);
+                        ->update([
+                            'payment_status' => 'cancelled',
+                            'payment_failed_reason' => 'Payment cancelled by user',
+                            'updated_at' => now()
+                        ]);
                     
-                    // Send email
-                    $this->sendEmailForBooking($recentBooking->id);
-                    
-                    return redirect()->route('phonepe.success', ['transaction_id' => $recentBooking->id]);
+                    // Get booking type to redirect appropriately
+                    if ($recentBooking->type === 'boat') {
+                        return redirect()->route('boat_booking_page')->with('error', 'Payment was cancelled. Please try again.');
+                    } else {
+                        return redirect()->route('ferry-booking')->with('error', 'Payment was cancelled. Please try again.');
+                    }
                 }
                 
-                return redirect()->route('home')->with('error', 'Invalid payment session');
+                return redirect()->route('home')->with('error', 'Payment session expired. Please start a new booking.');
             }
 
             $orderId        = data_get($request->all(), 'payload.orderId');
@@ -528,6 +545,30 @@ class PhonePeController extends Controller
                     ]);
             }
 
+            // Check for cancelled/failed states first
+            if (in_array($state, ['CANCELLED', 'FAILED', 'PAYMENT_ERROR', 'PAYMENT_DECLINED', 'CANCELLED_BY_USER'])) {
+                \Log::info('PhonePe payment cancelled/failed', [
+                    'merchant_order_id' => $merchantOrderId,
+                    'state' => $state
+                ]);
+                
+                DB::table('booking')
+                    ->where('phonepe_transaction_id', $merchantOrderId)
+                    ->update([
+                        'payment_status' => 'cancelled',
+                        'payment_failed_reason' => 'Payment cancelled by user',
+                        'updated_at'     => Carbon::now()
+                    ]);
+
+                // Get booking type to redirect appropriately
+                $booking = DB::table('booking')->where('phonepe_transaction_id', $merchantOrderId)->first();
+                if ($booking && $booking->type === 'boat') {
+                    return redirect()->route('boat_booking_page')->with('error', 'Payment was cancelled. Please try again.');
+                } else {
+                    return redirect()->route('ferry-booking')->with('error', 'Payment was cancelled. Please try again.');
+                }
+            }
+            
             if ($state === 'COMPLETED') {
                 DB::table('booking')
                     ->where('phonepe_transaction_id', $merchantOrderId)
@@ -550,14 +591,26 @@ class PhonePeController extends Controller
                 return redirect()->route('phonepe.success', ['transaction_id' => $merchantOrderId]);
 
             } else {
+                \Log::warning('PhonePe payment in unknown state', [
+                    'merchant_order_id' => $merchantOrderId,
+                    'state' => $state
+                ]);
+                
                 DB::table('booking')
                     ->where('phonepe_transaction_id', $merchantOrderId)
                     ->update([
                         'payment_status' => 'failed',
+                        'payment_failed_reason' => 'Payment failed - unknown state: ' . $state,
                         'updated_at'     => Carbon::now()
                     ]);
 
-                return redirect()->route('phonepe.failed', ['transaction_id' => $merchantOrderId]);
+                // Get booking type to redirect appropriately
+                $booking = DB::table('booking')->where('phonepe_transaction_id', $merchantOrderId)->first();
+                if ($booking && $booking->type === 'boat') {
+                    return redirect()->route('boat_booking_page')->with('error', 'Payment failed. Please try again.');
+                } else {
+                    return redirect()->route('ferry-booking')->with('error', 'Payment failed. Please try again.');
+                }
             }
 
         } catch (PhonePeException $e) {

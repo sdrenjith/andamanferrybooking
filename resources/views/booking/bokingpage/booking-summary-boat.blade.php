@@ -33,7 +33,7 @@
                 <input type="hidden" name="no_of_passenger" value="{{ $passengers }}">
                 <input type="hidden" name="date_of_jurney" value="{{ $date }}">
                 <input type="hidden" name="amount" value="{{ $multi_price }}">
-                <input type="hidden" name="boat_name" value="{{ $boat_datas->title }}">
+                <input type="hidden" name="boat_name" value="{{ $boat_datas->name }}">
 
 
                 <div class="row">
@@ -403,7 +403,7 @@
                                     </div>
                                     <div class="row w-100 p-0 m-0 departing-destination">
                                         <div class="col-sm-12 destination-time px-0">
-                                            {{ $boat_datas->title }}
+                                            {{ $boat_datas->name }}
                                         </div>
                                     </div>
                                     <div class="row w-100 p-0 m-0 mt-2">
