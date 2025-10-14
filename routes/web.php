@@ -494,3 +494,31 @@ Route::get('/debug-email/{booking_id}', function($booking_id) {
         return 'Error: ' . $e->getMessage() . '<br>Trace: ' . $e->getTraceAsString();
     }
 });
+
+// Test email for specific booking (production ready)
+Route::get('/test-email-booking/{booking_id}', function($booking_id) {
+    try {
+        $booking = DB::table('booking')->where('id', $booking_id)->first();
+        
+        if (!$booking) {
+            return "Booking ID {$booking_id} not found.";
+        }
+        
+        // Send email using PHPMailerHelper directly
+        $result = \App\Helpers\PHPMailerHelper::sendBookingConfirmationEmail(
+            $booking->c_email,
+            $booking_id,
+            null,
+            null,
+            ''
+        );
+        
+        if ($result) {
+            return "✅ Email sent successfully to {$booking->c_email} for booking ID: {$booking_id}";
+        } else {
+            return "❌ Failed to send email to {$booking->c_email} for booking ID: {$booking_id}";
+        }
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});

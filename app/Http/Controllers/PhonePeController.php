@@ -565,9 +565,9 @@ class PhonePeController extends Controller
         // Create PNR status entry - Boat bookings confirmed immediately
         DB::table('pnr_status')->insert([
             'booking_id' => $booking_id,
-            'pnr_id' => NULL,
+            'pnr_id' => 'BOAT_' . $booking_id,
             'booking_status' => 'Confirmed',
-            'razorpay_payment_id' => NULL,
+            'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
             'seat_status' => 1,
             'booking_vendor' => 'Boat'
         ]);
