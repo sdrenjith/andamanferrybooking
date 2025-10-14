@@ -188,3 +188,24 @@ Route::any('/phonepe/callback', [App\Http\Controllers\PhonePeController::class, 
 Route::get('/phonepe/success/{transaction_id?}', [App\Http\Controllers\PhonePeController::class, 'success'])->name('phonepe.success');
 Route::get('/phonepe/failed/{transaction_id}', [App\Http\Controllers\PhonePeController::class, 'failed'])->name('phonepe.failed');
 Route::get('/phonepe/pending/{transaction_id}', [App\Http\Controllers\PhonePeController::class, 'pending'])->name('phonepe.pending');
+
+// Test email route
+Route::get('/test-email', function() {
+    try {
+        $result = \App\Helpers\PHPMailerHelper::sendBookingConfirmationEmail(
+            'test@example.com', // Replace with your email for testing
+            1, // Replace with actual booking ID
+            null,
+            null,
+            ''
+        );
+        
+        if ($result) {
+            return 'Email sent successfully!';
+        } else {
+            return 'Email failed to send.';
+        }
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});

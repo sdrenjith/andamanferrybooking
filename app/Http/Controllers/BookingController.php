@@ -1199,14 +1199,46 @@ class BookingController extends Controller
 
     public function send_email($user_email, $booking_id, $trip2_booking_id, $trip3_booking_id, $greet)
     {
-        $details = [
-            'booking_id' => $booking_id,
-            'trip2_booking_id' => $trip2_booking_id,
-            'trip3_booking_id' => $trip3_booking_id,
-            'greet' => $greet,
-        ];
+        try {
+            // Try Laravel Mail first
+            $details = [
+                'booking_id' => $booking_id,
+                'trip2_booking_id' => $trip2_booking_id,
+                'trip3_booking_id' => $trip3_booking_id,
+                'greet' => $greet,
+            ];
 
-        Mail::to($user_email)->send(new TestMail($details));
+            Mail::to($user_email)->send(new TestMail($details));
+            \Log::info('Laravel Mail sent successfully', ['email' => $user_email]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Laravel Mail failed, trying PHP mailer', [
+                'error' => $e->getMessage(),
+                'email' => $user_email
+            ]);
+            
+            // Fallback to PHP mailer
+            try {
+                $result = \App\Helpers\PHPMailerHelper::sendBookingConfirmationEmail(
+                    $user_email,
+                    $booking_id,
+                    $trip2_booking_id,
+                    $trip3_booking_id,
+                    $greet
+                );
+                
+                if ($result) {
+                    \Log::info('PHP mailer sent successfully', ['email' => $user_email]);
+                } else {
+                    \Log::error('PHP mailer also failed', ['email' => $user_email]);
+                }
+            } catch (\Exception $phpMailerError) {
+                \Log::error('PHP mailer error', [
+                    'error' => $phpMailerError->getMessage(),
+                    'email' => $user_email
+                ]);
+            }
+        }
 
         return 'Email has been sent!';
     }

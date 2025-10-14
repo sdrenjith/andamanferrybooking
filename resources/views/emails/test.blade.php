@@ -41,12 +41,13 @@
 
             
             <div style="text-align: center; display: inline-block; background: #44707e; color: #FFF; font-size: 18px; padding: 5px 45px; border-radius: 5px;">
-                <P>We Are Processing Your Ticket Booking Request</P>
+                <P>Payment Successful - Advance Booking Confirmed</P>
             </div>
         </div>
 
         <h5> Hi , &nbsp; {{$single_booking[0]->c_name}}, </h5>
-        <h5> We have finished processing your order.</h5>
+        <h5> Your advance booking payment has been received successfully!</h5>
+        <h5> Our team will contact you shortly to confirm your ferry booking details.</h5>
         @if(ucfirst($single_booking[0]->ship_name) == 'Makruzz')
         <b>Download PNR: <a href="https://makruzz.com/OnlineUserSeatSelection/print_ticket/{{ $single_booking[0]->pnr_id }}">Click here</a></b>
         @endif

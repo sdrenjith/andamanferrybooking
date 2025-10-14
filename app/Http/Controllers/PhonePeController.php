@@ -13,6 +13,7 @@ use PhonePe\Env;
 use PhonePe\payments\v2\standardCheckout\StandardCheckoutClient;
 use PhonePe\payments\v2\models\request\builders\StandardCheckoutPayRequestBuilder;
 use PhonePe\common\exceptions\PhonePeException;
+use App\Helpers\PHPMailerHelper;
 
 class PhonePeController extends Controller
 {
@@ -510,7 +511,19 @@ class PhonePeController extends Controller
         // Send email if available
         if (isset($metadata['user_email'])) {
             try {
-                \Log::info('Boat booking email sent', ['booking_id' => $booking_id]);
+                $emailSent = PHPMailerHelper::sendBookingConfirmationEmail(
+                    $metadata['user_email'],
+                    $booking_id,
+                    null,
+                    null,
+                    ''
+                );
+                
+                if ($emailSent) {
+                    \Log::info('Boat booking email sent successfully', ['booking_id' => $booking_id]);
+                } else {
+                    \Log::error('Failed to send boat booking email', ['booking_id' => $booking_id]);
+                }
             } catch (\Exception $e) {
                 \Log::error('Boat email error', ['error' => $e->getMessage()]);
             }
@@ -613,7 +626,7 @@ class PhonePeController extends Controller
         
         try {
             // Send customer email
-            app('App\Http\Controllers\BookingController')->send_email(
+            $customerEmailSent = PHPMailerHelper::sendBookingConfirmationEmail(
                 $user_email, 
                 $bookingId1, 
                 $bookingId2, 
@@ -622,7 +635,7 @@ class PhonePeController extends Controller
             );
             
             // Send admin email
-            app('App\Http\Controllers\BookingController')->send_email(
+            $adminEmailSent = PHPMailerHelper::sendBookingConfirmationEmail(
                 'andamanferrybookings@gmail.com', 
                 $booking_id, 
                 $trip2_booking_id, 
@@ -630,10 +643,18 @@ class PhonePeController extends Controller
                 'Hello Admin'
             );
             
-            \Log::info('Ferry booking emails sent successfully', [
-                'customer_email' => $user_email,
-                'booking_ids' => [$bookingId1, $bookingId2, $bookingId3]
-            ]);
+            if ($customerEmailSent && $adminEmailSent) {
+                \Log::info('Ferry booking emails sent successfully', [
+                    'customer_email' => $user_email,
+                    'booking_ids' => [$bookingId1, $bookingId2, $bookingId3]
+                ]);
+            } else {
+                \Log::error('Failed to send ferry booking emails', [
+                    'customer_email_sent' => $customerEmailSent,
+                    'admin_email_sent' => $adminEmailSent,
+                    'customer_email' => $user_email
+                ]);
+            }
             
         } catch (\Exception $e) {
             \Log::error('Email sending error', [
