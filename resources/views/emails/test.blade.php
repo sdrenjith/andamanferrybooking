@@ -253,7 +253,7 @@
         <div>
             <h5 style="text-decoration: underline; margin-bottom:5px; font-size:18px"> Contact Details </h5>
             <p style="margin:2px">{{'andamanferrybookings@gmail.com'}}</p>
-            <p style="margin:2px"> {{'9933752444'}}</p>
+            <p style="margin:2px"> {{'+91 9933281206 , +91 9679061419'}}</p>
         </div>
         <div style="text-align: center">
             <h5>Thanks for using www.andamanferrybooking.com</h5>

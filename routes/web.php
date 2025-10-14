@@ -15,10 +15,11 @@ Route::get('/env-test', function () {
 Route::middleware(['web'])->group(function () {
 
     Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/api/google-reviews', [App\Http\Controllers\GoogleReviewsController::class, 'getGoogleReviews']);
+Route::get('/api/proxy-image', [App\Http\Controllers\ImageProxyController::class, 'proxyImage']);
     Route::get('/home_achievements', [App\Http\Controllers\HomeController::class, 'home_achievements']);
     Route::get('/home_banners', [App\Http\Controllers\HomeController::class, 'home_banners']);
     Route::get('/ferry-schedule', [App\Http\Controllers\HomeController::class, 'ferry_schedule']);
-Route::get('/api/google-reviews', [App\Http\Controllers\HomeController::class, 'getGoogleReviews']);
 
 // Chatbot routes
 Route::post('/api/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'chat']);

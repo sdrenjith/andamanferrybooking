@@ -146,34 +146,34 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                                         Departure Journey
                                                     </h4>
                                                 </div>
-                                                <div class="row mb-3">
-                                                    <div class="col-12 col-lg-6 mb-2">
+                                            <div class="row mb-3">
+                                                <div class="col-12 col-lg-6 mb-2">
                                                         <label for="departure_from_location">From</label>
                                                         <select name="departure_from_location" class="form-select p-0" id="departure_from_location">
-                                                            <option value="1" selected>Port Blair</option>
-                                                            <option value="2">Havelock</option>
-                                                            <option value="3">Neil</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-12 col-lg-6 mb-2">
+                                                        <option value="1" selected>Port Blair</option>
+                                                        <option value="2">Havelock</option>
+                                                        <option value="3">Neil</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12 col-lg-6 mb-2">
                                                         <label for="departure_to_location">To</label>
                                                         <select name="departure_to_location" class="form-select p-0" id="departure_to_location">
-                                                            <option value="1">Port Blair</option>
-                                                            <option value="2" selected>Havelock</option>
-                                                            <option value="3">Neil</option>
-                                                        </select>
-                                                    </div>
+                                                        <option value="1">Port Blair</option>
+                                                        <option value="2" selected>Havelock</option>
+                                                        <option value="3">Neil</option>
+                                                    </select>
                                                 </div>
-                                                <div class="row mb-3">
-                                                    <div class="col-12 col-lg-6 mb-2">
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-12 col-lg-6 mb-2">
                                                         <label for="departure_date">Departure Date</label>
                                                         <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Departure Date" id="departure_date" name="departure_date" min="" readonly="readonly">
-                                                    </div>
-                                                    <div class="col-12 col-lg-6 mb-2">
+                                                </div>
+                                                <div class="col-12 col-lg-6 mb-2">
                                                         <label for="departure_passenger">Passengers</label>
                                                         <input type="number" class="form-control" id="departure_passenger" name="departure_passenger" value="1" max="20" min="1" onkeyup="maxpassenger(this)" required>
-                                                    </div>
                                                 </div>
+                                            </div>
                                             </div>
 
                                             <!-- Return Journey Section -->
@@ -183,8 +183,8 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                                         <i class="bi bi-airplane-arrival me-2"></i>
                                                         Return Journey
                                                     </h4>
-                                                </div>
-                                                <div class="row mb-3">
+                                            </div>
+                                            <div class="row mb-3">
                                                     <div class="col-12 col-lg-6 mb-2">
                                                         <label for="return_from_location">From</label>
                                                         <select name="return_from_location" class="form-select p-0" id="return_from_location">
@@ -192,7 +192,7 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                                             <option value="2" selected>Havelock</option>
                                                             <option value="3">Neil</option>
                                                         </select>
-                                                    </div>
+                                                </div>
                                                     <div class="col-12 col-lg-6 mb-2">
                                                         <label for="return_to_location">To</label>
                                                         <select name="return_to_location" class="form-select p-0" id="return_to_location">
@@ -507,14 +507,10 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
         <div class="container position-relative">
             {{-- Header --}}
             <div class="testimonial-header text-center mb-4" data-aos="fade-up">
-                <div class="section-badge mb-3">
-                    <span class="badge-text">Google Reviews</span>
-                </div>
                 <h2 class="testimonial-title mb-2">What Our Customers Say</h2>
                 <p class="testimonial-subtitle">Real reviews from Google - Trusted by thousands of travelers</p>
                 <div class="google-rating-display mb-3">
                     <div class="d-flex align-items-center justify-content-center">
-                        <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png" alt="Google" style="height: 20px; margin-right: 10px;">
                         <div class="rating-info">
                             <span class="rating-number text-white fw-bold fs-3" id="google-rating">4.9</span>
                             <div class="rating-stars d-inline-block ms-2">
@@ -525,175 +521,698 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                             <div class="total-reviews text-white-50 small" id="total-reviews">Based on 1,000+ reviews</div>
                         </div>
                     </div>
+                    {{-- Google Reviews Badge - Moved here and made clickable --}}
+                    <div class="mt-3">
+                        <a href="https://www.google.com/maps/place/Andaman+Ferry+booking/@11.6671885,92.7275732,17z/data=!4m8!3m7!1s0x3088954d2890a32f:0xecd389615c2e80b1!8m2!3d11.6671833!4d92.7301481!9m1!1b1!16s%2Fg%2F11kqjnlf2v?entry=ttu&g_ep=EgoyMDI1MTAwOC4wIKXMDSoASAFQAw%3D%3D" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="google-reviews-badge-link">
+                            <div class="section-badge google-reviews-badge">
+                                <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png" 
+                                     alt="Google" 
+                                     class="google-icon-in-badge">
+                                <span class="badge-text">Reviews</span>
+                                <svg class="read-more-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
             {{-- Testimonials Slider --}}
             <div class="testimonials-slider position-relative mx-auto" style="max-width: 700px;">
-                <div class="testimonial-card-wrapper">
-                    <!-- Dummy Realistic Testimonials -->
-                    <div class="testimonial-card single-slide active" data-index="0">
-                        <div class="card-inner glass-block">
-                            <div class="testimonial-profile">
-                                <div class="customer-avatar">
-                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Priya Sharma" loading="lazy">
+                <!-- Loading State -->
+                <div id="reviews-loading" class="text-center py-5">
+                    <div class="spinner-border text-white" role="status">
+                        <span class="visually-hidden">Loading reviews...</span>
                                 </div>
-                                <h4 class="customer-name">Priya Sharma</h4>
-                                <p class="customer-role">Travel Blogger, Mumbai</p>
-                                <div class="stars-container mb-1">
-                                    <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                                    <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                                    <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                                    <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                                    <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    <p class="mt-3 text-white-50">Loading Google Reviews...</p>
                                 </div>
+                
+                <!-- Error State -->
+                <div id="reviews-error" class="d-none text-center py-5">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Unable to load Google Reviews at this time. Please try again later.
                             </div>
-                            <div class="testimonial-quote-block">
-                                <div class="quote-icon mb-2">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                        <path d="M10 7L8 12H12L10 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M19 7L17 12H21L19 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
                                 </div>
-                                <blockquote class="testimonial-quote text-white">
-                                    "The ferry booking process was seamless and the staff was extremely helpful. We got instant confirmation and the journey was smooth. Highly recommend Andaman Ferry Booking for a hassle-free experience!"
-                                </blockquote>
+                
+                <!-- Dynamic Reviews Container -->
+                <div id="google-reviews-container" class="d-none">
+                    <div class="testimonial-card-wrapper">
+                        <!-- Dynamic reviews will be loaded here -->
                             </div>
+                    <div class="testimonial-slider-nav text-center mt-3">
+                        <button class="slider-arrow prev-arrow" aria-label="Previous">&#8592;</button>
+                        <div class="dots-container">
+                            <!-- Dynamic dots will be loaded here -->
                         </div>
+                        <button class="slider-arrow next-arrow" aria-label="Next">&#8594;</button>
                     </div>
-                    <div class="testimonial-card single-slide" data-index="1">
-                        <div class="card-inner glass-block">
-                            <div class="testimonial-profile">
-                                <div class="customer-avatar">
-                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Rahul Verma" loading="lazy">
                                 </div>
-                                <h4 class="customer-name">Rahul Verma</h4>
-                                <p class="customer-role">Family Traveler, Delhi</p>
-                                <div class="stars-container mb-1">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                                    @endfor
                                 </div>
                             </div>
-                            <div class="testimonial-quote-block">
-                                <div class="quote-icon mb-2">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                        <path d="M10 7L8 12H12L10 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M19 7L17 12H21L19 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                                <blockquote class="testimonial-quote text-white">
-                                    "We visited Havelock and Neil Islands and booked all our ferries online. The website was easy to use and the customer support was available 24/7. Our family had a wonderful time!"
-                                </blockquote>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="testimonial-card single-slide" data-index="2">
-                        <div class="card-inner glass-block">
-                            <div class="testimonial-profile">
-                                <div class="customer-avatar">
-                                    <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="Sandeep Kumar" loading="lazy">
-                                </div>
-                                <h4 class="customer-name">Sandeep Kumar</h4>
-                                <p class="customer-role">Solo Traveler, Bangalore</p>
-                                <div class="stars-container mb-1">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                                    @endfor
-                                </div>
-                            </div>
-                            <div class="testimonial-quote-block">
-                                <div class="quote-icon mb-2">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                        <path d="M10 7L8 12H12L10 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M19 7L17 12H21L19 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                                <blockquote class="testimonial-quote text-white">
-                                    "I was worried about last-minute bookings, but Andaman Ferry Booking made it so easy. Got my tickets instantly and the journey was comfortable. Will use again!"
-                                </blockquote>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="testimonial-card single-slide" data-index="3">
-                        <div class="card-inner glass-block">
-                            <div class="testimonial-profile">
-                                <div class="customer-avatar">
-                                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Meera Nair" loading="lazy">
-                                </div>
-                                <h4 class="customer-name">Meera Nair</h4>
-                                <p class="customer-role">Honeymooner, Kerala</p>
-                                <div class="stars-container mb-1">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                                    @endfor
-                                </div>
-                            </div>
-                            <div class="testimonial-quote-block">
-                                <div class="quote-icon mb-2">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                        <path d="M10 7L8 12H12L10 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M19 7L17 12H21L19 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </div>
-                                <blockquote class="testimonial-quote text-white">
-                                    "Best price guarantee and instant confirmation! The ferries were clean and on time. Booking online saved us so much time. Thank you!"
-                                </blockquote>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-slider-nav text-center mt-3">
-                    <button class="slider-arrow prev-arrow" aria-label="Previous">&#8592;</button>
-                    <button class="dot active" data-slide="0"></button>
-                    <button class="dot" data-slide="1"></button>
-                    <button class="dot" data-slide="2"></button>
-                    <button class="dot" data-slide="3"></button>
-                    <button class="slider-arrow next-arrow" aria-label="Next">&#8594;</button>
-                </div>
-            </div>
-        </div>
     </section>
+    <style>
+    .star.filled {
+        fill: #FFD700 !important;
+        stroke: #FFD700 !important;
+        color: #FFD700 !important;
+    }
+    .star.empty {
+        fill: none !important;
+        stroke: #FFD700 !important;
+        color: #FFD700 !important;
+    }
+    .rating-stars .star {
+        fill: #FFD700 !important;
+        stroke: #FFD700 !important;
+        color: #FFD700 !important;
+    }
+    
+    /* Google Reviews Section Alignment */
+    .google-reviews-section .testimonial-card-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+    }
+    
+    .google-reviews-section .testimonial-card {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .google-reviews-section .card-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .google-reviews-section .testimonial-profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        width: 100%;
+    }
+    
+    .google-reviews-section .customer-avatar {
+        margin-bottom: 1rem;
+    }
+    
+    .google-reviews-section .customer-avatar img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .google-reviews-section .customer-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: white;
+    }
+    
+    .google-reviews-section .customer-role {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+    }
+    
+    .google-reviews-section .stars-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2px;
+    }
+    
+    .google-reviews-section .testimonial-quote-block {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .google-reviews-section .quote-icon {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .google-reviews-section .testimonial-quote {
+        font-size: 1rem;
+        line-height: 1.6;
+        font-style: italic;
+        color: white;
+        margin: 0;
+        padding: 0 1rem;
+    }
+    
+    .google-reviews-section .testimonial-slider-nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .google-reviews-section .slider-arrow {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .google-reviews-section .slider-arrow:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+    
+    .google-reviews-section .dots-container {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .google-reviews-section .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .google-reviews-section .dot.active {
+        background: white;
+        transform: scale(1.2);
+    }
+    
+    /* Google Reviews Badge Link Styling */
+    .google-reviews-badge-link {
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .google-reviews-badge-link:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    
+    .google-reviews-badge-link:hover .section-badge {
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05);
+    }
+    
+    .google-reviews-badge-link:hover .badge-text {
+        color: #008495;
+        font-weight: 700;
+    }
+    
+    .google-reviews-badge-link .section-badge {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    /* Google Reviews Badge with Icon and Read More */
+    .google-reviews-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 25px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .google-icon-in-badge {
+        height: 16px;
+        width: auto;
+        object-fit: contain;
+    }
+    
+    .google-reviews-badge .badge-text {
+        color: #008495;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    .read-more-icon {
+        color: #008495;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+    }
+    
+    .google-reviews-badge-link:hover .read-more-icon {
+        opacity: 1;
+        transform: translateX(2px);
+    }
+    
+    .google-reviews-badge-link:hover .google-reviews-badge {
+        background: rgba(255, 255, 255, 0.77);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transform: scale(1.05);
+    }
+    
+     .google-reviews-badge-link:hover .badge-text {
+         color: #006b7a;
+         font-weight: 700;
+     }
+     
+     /* Profile Picture Styling - Ensure 100% fill */
+     .customer-avatar {
+         position: relative;
+         overflow: hidden;
+         border-radius: 50%;
+         width: 50px;
+         height: 50px;
+         border: 2px solid rgba(255,255,255,0.3);
+     }
+     
+     .customer-avatar img {
+         width: 100% !important;
+         height: 100% !important;
+         object-fit: cover !important;
+         object-position: center !important;
+         border-radius: 50% !important;
+         display: block;
+     }
+     
+     .avatar-initials {
+         width: 100% !important;
+         height: 100% !important;
+         border-radius: 50% !important;
+         display: flex !important;
+         align-items: center !important;
+         justify-content: center !important;
+         font-weight: bold !important;
+         font-size: 18px !important;
+         border: 2px solid rgba(255,255,255,0.3) !important;
+     }
+    </style>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    async function loadGoogleReviews() {
+        try {
+            const response = await fetch('/api/google-reviews');
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                showReviewsError();
+                return;
+            }
+            
+            // Update overall rating display
+            const ratingElement = document.getElementById('google-rating');
+            const totalReviewsElement = document.getElementById('total-reviews');
+            
+            if (ratingElement && data.overall_rating) {
+                ratingElement.textContent = data.overall_rating;
+            }
+            if (totalReviewsElement && data.total_ratings) {
+                totalReviewsElement.textContent = `Based on ${data.total_ratings} reviews`;
+            }
+            
+            // Hide loading, show reviews
+            const loadingElement = document.getElementById('reviews-loading');
+            const containerElement = document.getElementById('google-reviews-container');
+            
+            if (loadingElement) {
+                loadingElement.classList.add('d-none');
+            }
+            if (containerElement) {
+                containerElement.classList.remove('d-none');
+            }
+            
+            // Render reviews
+            if (data.reviews && data.reviews.length > 0) {
+                try {
+                    displayGoogleReviews(data);
+                } catch (renderError) {
+                    showReviewsError();
+                    return;
+                }
+            } else {
+                // Show a message if no reviews
+                const container = document.querySelector('.testimonial-card-wrapper');
+                if (container) {
+                    container.innerHTML = '<div class="text-center text-white-50">No reviews available at this time.</div>';
+                }
+            }
+            
+        } catch (error) {
+            showReviewsError();
+        }
+    }
+
+    function showReviewsError() {
+        document.getElementById('reviews-loading').classList.add('d-none');
+        document.getElementById('reviews-error').classList.remove('d-none');
+    }
+
+
+    function renderReviews(reviews) {
+        
+        try {
+            const container = document.querySelector('.testimonial-card-wrapper');
+            const dotsContainer = document.querySelector('.dots-container');
+            
+            
+            if (!container) {
+                throw new Error('Testimonial card wrapper not found');
+            }
+            
+            if (!dotsContainer) {
+                throw new Error('Dots container not found');
+            }
+            
+            // Clear existing content
+            container.innerHTML = '';
+            dotsContainer.innerHTML = '';
+            
+            if (reviews.length === 0) {
+                container.innerHTML = '<div class="text-center text-white-50">No reviews available at this time.</div>';
+                return;
+            }
+            
+            // Create review cards
+            reviews.forEach((review, index) => {
+                try {
+                    const reviewCard = createReviewCard(review, index);
+                    container.appendChild(reviewCard);
+                    
+                    // Create dot
+                    const dot = document.createElement('button');
+                    dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                    dot.setAttribute('data-slide', index);
+                    dotsContainer.appendChild(dot);
+                } catch (cardError) {
+                    throw cardError;
+                }
+            });
+            
+            // Initialize slider
+            initializeReviewsSlider();
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    function createReviewCard(review, index) {
+        
+        try {
+            const card = document.createElement('div');
+            card.className = `testimonial-card single-slide ${index === 0 ? 'active' : ''}`;
+            card.setAttribute('data-index', index);
+            
+            const stars = generateStars(review.rating);
+            const avatar = review.profile_photo_url || 'https://randomuser.me/api/portraits/men/32.jpg';
+            
+            
+            card.innerHTML = `
+                        <div class="card-inner glass-block">
+                            <div class="testimonial-profile">
+                                <div class="customer-avatar">
+                            <img src="${avatar}" alt="${review.author_name}" loading="lazy">
+                                </div>
+                        <h4 class="customer-name">${review.author_name}</h4>
+                        <p class="customer-role">Google Review</p>
+                                <div class="stars-container mb-1">
+                            ${stars}
+                                </div>
+                            </div>
+                            <div class="testimonial-quote-block">
+                                <div class="quote-icon mb-2">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path d="M10 7L8 12H12L10 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M19 7L17 12H21L19 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <blockquote class="testimonial-quote text-white">
+                            "${review.text}"
+                                </blockquote>
+                            </div>
+                        </div>
+            `;
+            
+            return card;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    function generateStars(rating) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+                stars += '<svg class="star filled" width="16" height="16" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1" style="color: #FFD700;"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>';
+            } else {
+                stars += '<svg class="star empty" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1" style="color: #FFD700;"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>';
+            }
+        }
+        return stars;
+    }
+
+    function initializeReviewsSlider() {
         const slides = document.querySelectorAll('.testimonial-card.single-slide');
         const dots = document.querySelectorAll('.dot');
         const prev = document.querySelector('.prev-arrow');
         const next = document.querySelector('.next-arrow');
-        let current = 0;
-        let autoSlideInterval = null;
-        function showSlide(idx) {
+        let currentSlide = 0;
+        let autoSlideInterval;
+
+        function showSlide(index) {
             slides.forEach((slide, i) => {
-                slide.classList.toggle('active', i === idx);
+                slide.classList.toggle('active', i === index);
             });
             dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === idx);
+                dot.classList.toggle('active', i === index);
             });
-            current = idx;
+            currentSlide = index;
         }
+
         function nextSlide() {
-            showSlide((current + 1) % slides.length);
+            const nextIndex = (currentSlide + 1) % slides.length;
+            showSlide(nextIndex);
         }
+
         function prevSlide() {
-            showSlide((current - 1 + slides.length) % slides.length);
+            const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prevIndex);
         }
-        dots.forEach((dot, i) => {
-            dot.addEventListener('click', () => showSlide(i));
+
+        // Event listeners
+        if (next) next.addEventListener('click', nextSlide);
+        if (prev) prev.addEventListener('click', prevSlide);
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => showSlide(index));
         });
-        if (prev && next) {
-            prev.addEventListener('click', prevSlide);
-            next.addEventListener('click', nextSlide);
-        }
-        // Auto-slide every 4 seconds
-        autoSlideInterval = setInterval(nextSlide, 4000);
+
+        // Auto-slide every 5 seconds
+        autoSlideInterval = setInterval(nextSlide, 5000);
+
         // Pause on hover
         const slider = document.querySelector('.testimonials-slider');
         if (slider) {
             slider.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
-            slider.addEventListener('mouseleave', () => autoSlideInterval = setInterval(nextSlide, 4000));
+            slider.addEventListener('mouseleave', () => autoSlideInterval = setInterval(nextSlide, 5000));
         }
-        // Show the first slide on load
-        showSlide(0);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Test if elements exist
+        const loadingElement = document.getElementById('reviews-loading');
+        const containerElement = document.getElementById('google-reviews-container');
+        const ratingElement = document.getElementById('google-rating');
+        const totalReviewsElement = document.getElementById('total-reviews');
+        
+        
+        
+        // Load Google Reviews immediately
+        loadGoogleReviews();
+        
     });
+
+    function renderReviews(reviews) {
+        
+        try {
+            const container = document.querySelector('.testimonial-card-wrapper');
+            const dotsContainer = document.querySelector('.dots-container');
+            
+            
+            if (!container) {
+                throw new Error('Testimonial card wrapper not found');
+            }
+            
+            if (!dotsContainer) {
+                throw new Error('Dots container not found');
+            }
+            
+            // Clear existing content
+            container.innerHTML = '';
+            dotsContainer.innerHTML = '';
+            
+            if (reviews.length === 0) {
+                container.innerHTML = '<div class="text-center text-white-50">No reviews available at this time.</div>';
+                return;
+            }
+            
+            // Create review cards
+            reviews.forEach((review, index) => {
+                try {
+                    const reviewCard = createReviewCard(review, index);
+                    container.appendChild(reviewCard);
+                    
+                    // Create dot
+                    const dot = document.createElement('button');
+                    dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                    dot.setAttribute('data-slide', index);
+                    dotsContainer.appendChild(dot);
+                } catch (cardError) {
+                    throw cardError;
+                }
+            });
+            
+            // Initialize slider
+            initializeReviewsSlider();
+            
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    function createReviewCard(review, index) {
+        
+        try {
+            const card = document.createElement('div');
+            card.className = `testimonial-card single-slide ${index === 0 ? 'active' : ''}`;
+            card.setAttribute('data-index', index);
+            
+            const stars = generateStars(review.rating);
+            const avatar = review.profile_photo_url || 'https://randomuser.me/api/portraits/men/32.jpg';
+            
+            
+            card.innerHTML = `
+                        <div class="card-inner glass-block">
+                            <div class="testimonial-profile">
+                                <div class="customer-avatar">
+                            <img src="${avatar}" alt="${review.author_name}" loading="lazy">
+                                </div>
+                        <h4 class="customer-name">${review.author_name}</h4>
+                        <p class="customer-role">Google Review</p>
+                                <div class="stars-container mb-1">
+                            ${stars}
+                                </div>
+                            </div>
+                            <div class="testimonial-quote-block">
+                                <div class="quote-icon mb-2">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path d="M10 7L8 12H12L10 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M19 7L17 12H21L19 18V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <blockquote class="testimonial-quote text-white">
+                            "${review.text}"
+                                </blockquote>
+                            </div>
+                        </div>
+            `;
+            
+            return card;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    function generateStars(rating) {
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            if (i <= rating) {
+                stars += '<svg class="star filled" width="16" height="16" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1" style="color: #FFD700;"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>';
+            } else {
+                stars += '<svg class="star empty" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1" style="color: #FFD700;"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>';
+            }
+        }
+        return stars;
+    }
+
+    function showReviewsError() {
+        document.getElementById('reviews-loading').classList.add('d-none');
+        document.getElementById('reviews-error').classList.remove('d-none');
+    }
+
+    function initializeReviewsSlider() {
+        const slides = document.querySelectorAll('.testimonial-card.single-slide');
+        const dots = document.querySelectorAll('.dot');
+        const prev = document.querySelector('.prev-arrow');
+        const next = document.querySelector('.next-arrow');
+        let currentSlide = 0;
+        let autoSlideInterval;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            const nextIndex = (currentSlide + 1) % slides.length;
+            showSlide(nextIndex);
+        }
+
+        function prevSlide() {
+            const prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prevIndex);
+        }
+
+        // Event listeners
+        if (next) next.addEventListener('click', nextSlide);
+        if (prev) prev.addEventListener('click', prevSlide);
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => showSlide(index));
+        });
+
+        // Auto-slide every 5 seconds
+        autoSlideInterval = setInterval(nextSlide, 5000);
+
+        // Pause on hover
+        const slider = document.querySelector('.testimonials-slider');
+        if (slider) {
+            slider.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+            slider.addEventListener('mouseleave', () => autoSlideInterval = setInterval(nextSlide, 5000));
+        }
+    }
     </script>
     <style>
     .ultra-modern-testimonials {
@@ -854,7 +1373,7 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
       max-width: 420px;
       width: 60vw;
       margin: 0 auto 1.2rem auto;
-      background: rgba(255,255,255,0.18);
+      background: white;
       border-radius: 2rem;
       color: #000 !important;
       font-weight: 600;
@@ -1524,7 +2043,10 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
         fetch('/api/google-reviews')
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
+            console.log('API Response:', data);
+            
+            // Check if we have reviews instead of checking for success
+            if (data && data.reviews && data.reviews.length > 0) {
                     displayGoogleReviews(data);
                 } else {
                     showReviewsError();
@@ -1537,17 +2059,29 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
     }
 
     function displayGoogleReviews(data) {
+
+        // Debug: Check if elements exist
+        const loadingEl = document.getElementById('reviews-loading');
+        const ratingEl = document.getElementById('google-rating');
+        const totalReviewsEl = document.getElementById('total-reviews');
+        const reviewsContainer = document.querySelector('.testimonial-card-wrapper');
+        const dotsContainer = document.querySelector('.dots-container');
+        const sliderEl = document.getElementById('google-reviews-container');
+        
+        
+        // Add null checks to prevent errors
+        if (!reviewsContainer || !dotsContainer) {
+            return;
+        }
+
         // Hide loading state
-        document.getElementById('reviews-loading').classList.add('d-none');
+        if (loadingEl) loadingEl.classList.add('d-none');
         
         // Update rating display
-        document.getElementById('google-rating').textContent = data.rating;
-        document.getElementById('total-reviews').textContent = `Based on ${data.total_ratings.toLocaleString()}+ reviews`;
+        if (ratingEl) ratingEl.textContent = data.overall_rating;
+        if (totalReviewsEl) totalReviewsEl.textContent = `Based on ${data.total_ratings.toLocaleString()}+ reviews`;
         
-        // Generate review cards
-        const reviewsContainer = document.getElementById('reviews-container');
-        const dotsContainer = document.getElementById('review-dots');
-        
+        // Clear containers
         reviewsContainer.innerHTML = '';
         dotsContainer.innerHTML = '';
         
@@ -1560,12 +2094,47 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             const stars = generateStars(review.rating);
             const reviewDate = new Date(review.time * 1000).toLocaleDateString();
             
+            // Create a proxy URL for Google profile photos to handle CORS
+            const proxyProfilePhoto = review.profile_photo_url ? 
+                `/api/proxy-image?url=${encodeURIComponent(review.profile_photo_url)}` : 
+                null;
+            
+            // Debug logging
+            console.log('Review data:', {
+                author_name: review.author_name,
+                profile_photo_url: review.profile_photo_url,
+                proxyProfilePhoto: proxyProfilePhoto
+            });
+            
+            // Preload the profile image to ensure it loads with the review
+            if (proxyProfilePhoto) {
+                const img = new Image();
+                img.onload = function() {
+                    console.log('Profile image loaded successfully:', proxyProfilePhoto);
+                };
+                img.onerror = function() {
+                    console.log('Profile image failed to load:', proxyProfilePhoto);
+                };
+                img.src = proxyProfilePhoto;
+            }
+            
+            // Create initials fallback if no profile photo
+            const initials = review.author_name.split(' ').map(name => name.charAt(0)).join('').toUpperCase();
+            const initialsColor = `hsl(${Math.abs(review.author_name.split('').reduce((a, b) => a + b.charCodeAt(0), 0)) % 360}, 70%, 50%)`;
+            
             reviewCard.innerHTML = `
                 <div class="card-inner glass-block">
                     <div class="testimonial-profile">
                         <div class="customer-avatar">
-                            <img src="${review.profile_photo_url || 'https://via.placeholder.com/50x50/008495/ffffff?text=' + review.author_name.charAt(0)}" 
-                                 alt="${review.author_name}" loading="lazy">
+                            ${proxyProfilePhoto ? 
+                                `<img src="${proxyProfilePhoto}" 
+                                     alt="${review.author_name}" 
+                                     loading="eager"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                     style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; object-position: center; border: 2px solid rgba(255,255,255,0.3); overflow: hidden;">
+                                 <div class="avatar-initials" style="display: none; width: 50px; height: 50px; border-radius: 50%; background: ${initialsColor}; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid rgba(255,255,255,0.3);">${initials}</div>` :
+                                `<div class="avatar-initials" style="width: 50px; height: 50px; border-radius: 50%; background: ${initialsColor}; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 2px solid rgba(255,255,255,0.3);">${initials}</div>`
+                            }
                         </div>
                         <h4 class="customer-name">${review.author_name}</h4>
                         <p class="customer-role">Google Review • ${reviewDate}</p>
@@ -1598,19 +2167,20 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
         });
         
         // Show the slider
-        document.getElementById('google-reviews-slider').classList.remove('d-none');
+        if (sliderEl) sliderEl.classList.remove('d-none');
         
         // Initialize slider functionality
+        if (typeof initializeReviewsSlider === 'function') {
         initializeReviewsSlider();
     }
-
+    }
     function generateStars(rating) {
         let stars = '';
         for (let i = 1; i <= 5; i++) {
             if (i <= rating) {
-                stars += '<svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>';
+                stars += '<svg class="star filled" width="16" height="16" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFD700" stroke-width="1" style="color: #FFD700;"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>';
             } else {
-                stars += '<svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>';
+                stars += '<svg class="star empty" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1" style="color: #FFD700;"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>';
             }
         }
         return stars;
