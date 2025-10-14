@@ -153,7 +153,7 @@
         <a href="https://wa.me/919933281206" target="_blank" class="whatsapp-btn" aria-label="WhatsApp">
             <i class="fa-brands fa-whatsapp"></i>
         </a>
-        <a href="tel:+919933281206" class="call-btn" aria-label="Call">
+        <a href="tel:+919679061419" class="call-btn" aria-label="Call">
             <i class="fa-solid fa-phone"></i>
         </a>
     </div>
