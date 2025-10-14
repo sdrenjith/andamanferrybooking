@@ -948,15 +948,15 @@ class FerrybookingController extends Controller
         $date = $bookingScheduleDetails['date'];
         
         if ($request->trip == 2) {
-            $fromLocation = $bookingScheduleDetails['round1_from_location'];
-            $toLocation = $bookingScheduleDetails['round1_to_location'];
-            $date = $bookingScheduleDetails['round1_date'];
+            $fromLocation = $bookingScheduleDetails['departure_from_location'];
+            $toLocation = $bookingScheduleDetails['departure_to_location'];
+            $date = $bookingScheduleDetails['departure_date'];
         }
         
         if ($request->trip == 3) {
-            $fromLocation = $bookingScheduleDetails['round2_from_location'];
-            $toLocation = $bookingScheduleDetails['round2_to_location'];
-            $date = $bookingScheduleDetails['round2_date'];
+            $fromLocation = $bookingScheduleDetails['return_from_location'];
+            $toLocation = $bookingScheduleDetails['return_to_location'];
+            $date = $bookingScheduleDetails['return_date'];
         }
 
         // $no_of_passenger = $bookingScheduleDetails['no_of_passenger'];
@@ -1033,15 +1033,15 @@ class FerrybookingController extends Controller
         // dd($bookingScheduleDetails);
         
         if ($trip == 2) {
-            $fromLocation = $bookingScheduleDetails['round1_from_location'];
-            $toLocation = $bookingScheduleDetails['round1_to_location'];
-            $date = $bookingScheduleDetails['round1_date'];
+            $fromLocation = $bookingScheduleDetails['departure_from_location'];
+            $toLocation = $bookingScheduleDetails['departure_to_location'];
+            $date = $bookingScheduleDetails['departure_date'];
         }
         
         if ($trip == 3) {
-            $fromLocation = $bookingScheduleDetails['round2_from_location'];
-            $toLocation = $bookingScheduleDetails['round2_to_location'];
-            $date = $bookingScheduleDetails['round2_date'];
+            $fromLocation = $bookingScheduleDetails['return_from_location'];
+            $toLocation = $bookingScheduleDetails['return_to_location'];
+            $date = $bookingScheduleDetails['return_date'];
         }
 
 
