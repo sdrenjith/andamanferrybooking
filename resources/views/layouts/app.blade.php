@@ -422,6 +422,13 @@
                     floatingButtons.style.transform = 'translateY(20px)';
                     setTimeout(() => {
                         floatingButtons.style.display = 'none';
+                        // Completely disable pointer events and make buttons non-functional
+                        const buttons = floatingButtons.querySelectorAll('a');
+                        buttons.forEach(button => {
+                            button.style.pointerEvents = 'none';
+                            button.style.opacity = '0';
+                            button.style.visibility = 'hidden';
+                        });
                     }, 300);
                 }
             }
@@ -429,6 +436,14 @@
             function showFloatingButtons() {
                 const floatingButtons = document.querySelector('.floating-buttons');
                 if (floatingButtons) {
+                    // Re-enable pointer events and make buttons functional again
+                    const buttons = floatingButtons.querySelectorAll('a');
+                    buttons.forEach(button => {
+                        button.style.pointerEvents = 'auto';
+                        button.style.opacity = '1';
+                        button.style.visibility = 'visible';
+                    });
+                    
                     floatingButtons.style.display = 'flex';
                     floatingButtons.style.opacity = '0';
                     floatingButtons.style.transform = 'translateY(20px)';
