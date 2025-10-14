@@ -884,6 +884,12 @@
         }
     }
     
+    // Function to close the mobile popup
+    function closePageView() {
+        $(".bookingSumBg").removeClass("show");
+        $("#payment").removeClass("show");
+    }
+    
     $(document).ready(function() {
        
         $("#billMobile").click(function() {

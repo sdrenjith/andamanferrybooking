@@ -460,6 +460,12 @@
 
 
 <script>
+    // Function to close the mobile popup
+    function closePageView() {
+        $(".bookingSumBg").removeClass("show");
+        $("#payment").removeClass("show");
+    }
+    
       $("#billMobile").click(function() {
             $(".bookingSumBg").toggleClass("show");
             $("#payment").toggleClass("show");
