@@ -192,8 +192,6 @@
                         <th style="border: 2px solid #e5e5e5; text-align: center;">Age</th>
                         <th style="border: 2px solid #e5e5e5; text-align: center;">Trip Type</th>
                         <th style="border: 2px solid #e5e5e5; text-align: center;">Country</th>
-                        <th style="border: 2px solid #e5e5e5; text-align: center;">Passport Id</th>
-                        <th style="border: 2px solid #e5e5e5; text-align: center;">Expiry Date</th>
                     </thead>
                     <tbody>
                         @foreach ($single_booking as $key=> $row)
@@ -205,8 +203,6 @@
                                 <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->dob}}</td>
                                 <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->trip_type}}</td>
                                 <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->country}}</td>
-                                <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->passport_id}}</td>
-                                <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->expiry_date}}</td>
                             </tr>
                         @endforeach
 
@@ -223,8 +219,6 @@
                                     <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->dob}}</td>
                                     <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->trip_type}}</td>
                                     <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->country}}</td>
-                                    <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->passport_id}}</td>
-                                    <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->expiry_date}}</td>
                                 </tr>
                             @endforeach
                       @endif
@@ -242,8 +236,6 @@
                                     <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->dob}}</td>
                                     <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->trip_type}}</td>
                                     <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->country}}</td>
-                                    <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->passport_id}}</td>
-                                    <td style="border: 2px solid #e5e5e5; text-align: center;">{{$row->expiry_date}}</td>
                                 </tr>
                             @endforeach
                       @endif
