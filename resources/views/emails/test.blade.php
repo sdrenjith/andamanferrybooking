@@ -36,7 +36,7 @@
         <div style="text-align: center; padding:10px">
             <h2 style="color: #1592eb; font-size:28px; margin:10px">Andaman Ferry Booking</h2>
             <div>
-                <img src="https://andamanferrybookings.com/assets/images/logo.png" style="margin: 5px;" width="40px" alt="">
+                <img src="https://andamanferrybooking.com/assets/images/logo.png" style="margin: 5px;" width="40px" alt="">
             </div>
 
             
@@ -264,7 +264,7 @@
             <p style="margin:2px"> {{'9933752444'}}</p>
         </div>
         <div style="text-align: center">
-            <h5>Thanks for using www.andamanferrybookings.com</h5>
+            <h5>Thanks for using www.andamanferrybooking.com</h5>
         </div>
     </div>
   

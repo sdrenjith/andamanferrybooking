@@ -440,7 +440,28 @@ class PhonePeController extends Controller
                     'session_data' => Session::all()
                 ]);
                 
-                // Try to get the most recent booking and send email anyway
+                // Try to get booking ID from session data first
+                $sessionBookingId = Session::get('booking_id');
+                $sessionTripData = Session::get('trip_data');
+                
+                if ($sessionBookingId && $sessionTripData) {
+                    \Log::info('Using booking ID from session data', [
+                        'booking_id' => $sessionBookingId,
+                        'trip_data' => $sessionTripData
+                    ]);
+                    
+                    // Update booking status
+                    DB::table('booking')
+                        ->where('id', $sessionBookingId)
+                        ->update(['payment_status' => 'success']);
+                    
+                    // Send email
+                    $this->sendEmailForBooking($sessionBookingId);
+                    
+                    return redirect()->route('phonepe.success', ['transaction_id' => $sessionBookingId]);
+                }
+                
+                // Fallback: Try to get the most recent booking and send email anyway
                 $recentBooking = DB::table('booking')
                     ->where('payment_status', 'pending')
                     ->orderBy('id', 'desc')
