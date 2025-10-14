@@ -30,16 +30,27 @@ class PHPMailerHelper
             $subject = 'Andaman Ferry Booking - Payment Successful';
             $message = self::generateEmailContent($booking, $passengerDetails, $trip2_booking_id, $trip3_booking_id, $greet);
             
-            // Email headers
+            // Email headers for production
             $headers = [
                 'MIME-Version: 1.0',
                 'Content-type: text/html; charset=UTF-8',
                 'From: Andaman Ferry Booking <andamanferrybookings@gmail.com>',
                 'Reply-To: andamanferrybookings@gmail.com',
-                'X-Mailer: PHP/' . phpversion()
+                'Return-Path: andamanferrybookings@gmail.com',
+                'X-Mailer: PHP/' . phpversion(),
+                'X-Priority: 3',
+                'X-MSMail-Priority: Normal'
             ];
 
-            // Send email
+            // Log email attempt
+            Log::info('Attempting to send booking confirmation email', [
+                'email' => $user_email,
+                'booking_id' => $booking_id,
+                'subject' => $subject,
+                'message_length' => strlen($message)
+            ]);
+            
+            // Send email using PHP mail function
             $result = mail($user_email, $subject, $message, implode("\r\n", $headers));
             
             if ($result) {
@@ -51,7 +62,16 @@ class PHPMailerHelper
             } else {
                 Log::error('Failed to send booking confirmation email', [
                     'email' => $user_email,
-                    'booking_id' => $booking_id
+                    'booking_id' => $booking_id,
+                    'subject' => $subject,
+                    'headers' => implode("\r\n", $headers),
+                    'php_mail_available' => function_exists('mail'),
+                    'last_error' => error_get_last(),
+                    'server_info' => [
+                        'SERVER_NAME' => $_SERVER['SERVER_NAME'] ?? 'not set',
+                        'HTTP_HOST' => $_SERVER['HTTP_HOST'] ?? 'not set',
+                        'SERVER_ADDR' => $_SERVER['SERVER_ADDR'] ?? 'not set'
+                    ]
                 ]);
                 return false;
             }

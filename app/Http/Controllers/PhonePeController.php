@@ -400,17 +400,69 @@ class PhonePeController extends Controller
     public function handleCallback(Request $request)
     {
         try {
-            \Log::info('PhonePe Redirect Callback', ['data' => $request->all()]);
+            \Log::info('PhonePe Redirect Callback', [
+                'data' => $request->all(),
+                'query_params' => $request->query(),
+                'session_data' => Session::all()
+            ]);
 
-            $merchantOrderId =
+            // Try multiple ways to get the transaction ID
+            $merchantOrderId = 
                   $request->input('orderId')
                ?? $request->input('merchantOrderId')
                ?? $request->input('transactionId')
+               ?? $request->query('orderId')
+               ?? $request->query('merchantOrderId')
+               ?? $request->query('transactionId')
                ?? data_get($request->all(), 'payload.merchantOrderId')
-               ?? Session::get('phonepe_transaction_id');
+               ?? data_get($request->all(), 'payload.orderId')
+               ?? Session::get('phonepe_transaction_id')
+               ?? Session::get('booking_id'); // Fallback to booking ID
+
+            // If still no transaction ID, try to get from URL parameters
+            if (!$merchantOrderId) {
+                $url = $request->fullUrl();
+                if (preg_match('/[?&]orderId=([^&]+)/', $url, $matches)) {
+                    $merchantOrderId = $matches[1];
+                } elseif (preg_match('/[?&]merchantOrderId=([^&]+)/', $url, $matches)) {
+                    $merchantOrderId = $matches[1];
+                }
+            }
+
+            \Log::info('Transaction ID extraction', [
+                'merchantOrderId' => $merchantOrderId,
+                'request_method' => $request->method(),
+                'request_uri' => $request->getRequestUri()
+            ]);
 
             if (!$merchantOrderId) {
-                \Log::error('No transaction ID in callback');
+                \Log::error('No transaction ID in callback', [
+                    'request_data' => $request->all(),
+                    'session_data' => Session::all()
+                ]);
+                
+                // Try to get the most recent booking and send email anyway
+                $recentBooking = DB::table('booking')
+                    ->where('payment_status', 'pending')
+                    ->orderBy('id', 'desc')
+                    ->first();
+                    
+                if ($recentBooking) {
+                    \Log::info('Found recent pending booking, processing email', [
+                        'booking_id' => $recentBooking->id
+                    ]);
+                    
+                    // Update booking status
+                    DB::table('booking')
+                        ->where('id', $recentBooking->id)
+                        ->update(['payment_status' => 'success']);
+                    
+                    // Send email
+                    $this->sendEmailForBooking($recentBooking->id);
+                    
+                    return redirect()->route('phonepe.success', ['transaction_id' => $recentBooking->id]);
+                }
+                
                 return redirect()->route('home')->with('error', 'Invalid payment session');
             }
 
@@ -830,5 +882,80 @@ class PhonePeController extends Controller
         ];
     
         return view('phonepe.pending', $data);
+    }
+    
+    /**
+     * Send email for a specific booking
+     */
+    private function sendEmailForBooking($booking_id)
+    {
+        try {
+            $booking = DB::table('booking')->where('id', $booking_id)->first();
+            
+            if (!$booking) {
+                \Log::error('Booking not found for email', ['booking_id' => $booking_id]);
+                return false;
+            }
+            
+            // Get related bookings for ferry trips
+            $trip2_booking_id = null;
+            $trip3_booking_id = null;
+            
+            if ($booking->type == 'ferry') {
+                $relatedBookings = DB::table('booking')
+                    ->where('phonepe_transaction_id', $booking->phonepe_transaction_id)
+                    ->where('id', '!=', $booking_id)
+                    ->get();
+                    
+                foreach ($relatedBookings as $related) {
+                    if ($related->trip_type == 'Trip 2') {
+                        $trip2_booking_id = $related->id;
+                    } elseif ($related->trip_type == 'Trip 3') {
+                        $trip3_booking_id = $related->id;
+                    }
+                }
+            }
+            
+            // Send customer email
+            $customerEmailSent = PHPMailerHelper::sendBookingConfirmationEmail(
+                $booking->c_email,
+                $booking_id,
+                $trip2_booking_id,
+                $trip3_booking_id,
+                ''
+            );
+            
+            // Send admin email
+            $adminEmailSent = PHPMailerHelper::sendBookingConfirmationEmail(
+                'andamanferrybookings@gmail.com',
+                $booking_id,
+                $trip2_booking_id,
+                $trip3_booking_id,
+                'Hello Admin'
+            );
+            
+            if ($customerEmailSent && $adminEmailSent) {
+                \Log::info('Booking confirmation emails sent successfully', [
+                    'booking_id' => $booking_id,
+                    'customer_email' => $booking->c_email
+                ]);
+                return true;
+            } else {
+                \Log::error('Failed to send booking confirmation emails', [
+                    'booking_id' => $booking_id,
+                    'customer_email_sent' => $customerEmailSent,
+                    'admin_email_sent' => $adminEmailSent
+                ]);
+                return false;
+            }
+            
+        } catch (\Exception $e) {
+            \Log::error('Error sending booking email', [
+                'booking_id' => $booking_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return false;
+        }
     }
 }

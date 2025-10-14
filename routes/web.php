@@ -209,3 +209,288 @@ Route::get('/test-email', function() {
         return 'Error: ' . $e->getMessage();
     }
 });
+
+// Simple email test
+Route::get('/test-simple-email', function() {
+    $test_email = 'your-email@example.com'; // Change this to your email
+    $subject = 'Test Email from Andaman Ferry Booking';
+    $message = 'This is a simple test email to verify PHP mail function is working.';
+    $headers = 'From: andamanferrybookings@gmail.com';
+    
+    $result = mail($test_email, $subject, $message, $headers);
+    
+    return [
+        'email_sent' => $result ? 'Success' : 'Failed',
+        'php_mail_available' => function_exists('mail') ? 'Yes' : 'No',
+        'test_email' => $test_email,
+        'server_info' => [
+            'server_name' => $_SERVER['SERVER_NAME'] ?? 'Unknown',
+            'php_version' => phpversion(),
+            'last_error' => error_get_last()
+        ]
+    ];
+});
+
+// Test server detection
+Route::get('/test-server-detection', function() {
+    $serverName = $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $isLocalhost = in_array($serverName, ['localhost', '127.0.0.1', '::1']) || 
+                  strpos($serverName, 'localhost') !== false ||
+                  strpos($serverName, '127.0.0.1') !== false ||
+                  strpos($serverName, 'xampp') !== false;
+    
+    return [
+        'server_name' => $serverName,
+        'is_localhost' => $isLocalhost,
+        'server_vars' => [
+            'SERVER_NAME' => $_SERVER['SERVER_NAME'] ?? 'not set',
+            'HTTP_HOST' => $_SERVER['HTTP_HOST'] ?? 'not set',
+            'SERVER_ADDR' => $_SERVER['SERVER_ADDR'] ?? 'not set'
+        ],
+        'detection_logic' => [
+            'localhost_check' => in_array($serverName, ['localhost', '127.0.0.1', '::1']),
+            'contains_localhost' => strpos($serverName, 'localhost') !== false,
+            'contains_127' => strpos($serverName, '127.0.0.1') !== false,
+            'contains_xampp' => strpos($serverName, 'xampp') !== false
+        ]
+    ];
+});
+
+// View saved emails (for localhost testing)
+Route::get('/view-emails', function() {
+    $emailDir = storage_path('logs/emails');
+    
+    if (!is_dir($emailDir)) {
+        return 'No emails directory found. Emails will be created when you test the email functionality.';
+    }
+    
+    $files = glob($emailDir . '/*.html');
+    
+    if (empty($files)) {
+        return 'No email files found. Try sending an email first.';
+    }
+    
+    $emailList = [];
+    foreach ($files as $file) {
+        $emailList[] = [
+            'filename' => basename($file),
+            'size' => filesize($file),
+            'modified' => date('Y-m-d H:i:s', filemtime($file)),
+            'url' => '/view-email/' . basename($file)
+        ];
+    }
+    
+    return view('emails.list', ['emails' => $emailList]);
+});
+
+// View specific email file
+Route::get('/view-email/{filename}', function($filename) {
+    $emailFile = storage_path('logs/emails/' . $filename);
+    
+    if (!file_exists($emailFile)) {
+        return 'Email file not found.';
+    }
+    
+    $content = file_get_contents($emailFile);
+    
+    return '<pre>' . htmlspecialchars($content) . '</pre>';
+});
+
+// Manual email sending for specific booking
+Route::get('/send-booking-email/{booking_id}', function($booking_id) {
+    try {
+        $controller = new \App\Http\Controllers\PhonePeController();
+        $reflection = new ReflectionClass($controller);
+        $method = $reflection->getMethod('sendEmailForBooking');
+        $method->setAccessible(true);
+        
+        $result = $method->invoke($controller, $booking_id);
+        
+        if ($result) {
+            return "Email sent successfully for booking ID: {$booking_id}";
+        } else {
+            return "Failed to send email for booking ID: {$booking_id}";
+        }
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
+// Direct email sending for specific booking (production ready)
+Route::get('/send-direct-email/{booking_id}', function($booking_id) {
+    try {
+        // Get booking details
+        $booking = DB::table('booking')->where('id', $booking_id)->first();
+        
+        if (!$booking) {
+            return "Booking ID {$booking_id} not found.";
+        }
+        
+        // Get passenger details
+        $passengerDetails = DB::table('booking_passenger_details')
+            ->where('booking_id', $booking_id)
+            ->get();
+        
+        // Send email directly
+        $result = \App\Helpers\PHPMailerHelper::sendBookingConfirmationEmail(
+            $booking->c_email,
+            $booking_id,
+            null,
+            null,
+            ''
+        );
+        
+        if ($result) {
+            return "Email sent successfully to {$booking->c_email} for booking ID: {$booking_id}";
+        } else {
+            return "Failed to send email to {$booking->c_email} for booking ID: {$booking_id}";
+        }
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
+// Send email for most recent booking
+Route::get('/send-latest-booking-email', function() {
+    try {
+        $latestBooking = DB::table('booking')
+            ->where('payment_status', 'success')
+            ->orderBy('id', 'desc')
+            ->first();
+            
+        if (!$latestBooking) {
+            return 'No successful bookings found.';
+        }
+        
+        $controller = new \App\Http\Controllers\PhonePeController();
+        $reflection = new ReflectionClass($controller);
+        $method = $reflection->getMethod('sendEmailForBooking');
+        $method->setAccessible(true);
+        
+        $result = $method->invoke($controller, $latestBooking->id);
+        
+        if ($result) {
+            return "Email sent successfully for latest booking ID: {$latestBooking->id} (Customer: {$latestBooking->c_email})";
+        } else {
+            return "Failed to send email for latest booking ID: {$latestBooking->id}";
+        }
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
+// Force localhost mode for testing
+Route::get('/force-localhost-email/{booking_id}', function($booking_id) {
+    try {
+        // Set environment variable to force localhost mode
+        putenv('FORCE_LOCALHOST_EMAIL=true');
+        
+        $result = \App\Helpers\PHPMailerHelper::sendBookingConfirmationEmail(
+            'test@example.com', // Change this to your email
+            $booking_id,
+            null,
+            null,
+            ''
+        );
+        
+        if ($result) {
+            return "Email saved to file successfully for booking ID: {$booking_id}";
+        } else {
+            return "Failed to save email for booking ID: {$booking_id}";
+        }
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
+// Production email test
+Route::get('/test-production-email', function() {
+    try {
+        $test_email = 'your-email@example.com'; // Change this to your email
+        $subject = 'Test Production Email - Andaman Ferry Booking';
+        $message = '
+        <html>
+        <body>
+            <h2>Test Email from Andaman Ferry Booking</h2>
+            <p>This is a test email to verify PHP mail function is working on production server.</p>
+            <p><strong>Server Info:</strong></p>
+            <ul>
+                <li>Server: ' . ($_SERVER['SERVER_NAME'] ?? 'Unknown') . '</li>
+                <li>PHP Version: ' . phpversion() . '</li>
+                <li>Time: ' . date('Y-m-d H:i:s') . '</li>
+            </ul>
+        </body>
+        </html>';
+        
+        $headers = [
+            'MIME-Version: 1.0',
+            'Content-type: text/html; charset=UTF-8',
+            'From: Andaman Ferry Booking <andamanferrybookings@gmail.com>',
+            'Reply-To: andamanferrybookings@gmail.com',
+            'Return-Path: andamanferrybookings@gmail.com',
+            'X-Mailer: PHP/' . phpversion()
+        ];
+        
+        $result = mail($test_email, $subject, $message, implode("\r\n", $headers));
+        
+        return [
+            'email_sent' => $result ? 'Success' : 'Failed',
+            'test_email' => $test_email,
+            'server_info' => [
+                'server_name' => $_SERVER['SERVER_NAME'] ?? 'Unknown',
+                'http_host' => $_SERVER['HTTP_HOST'] ?? 'Unknown',
+                'server_addr' => $_SERVER['SERVER_ADDR'] ?? 'Unknown',
+                'php_version' => phpversion(),
+                'mail_function' => function_exists('mail') ? 'Available' : 'Not available',
+                'last_error' => error_get_last()
+            ]
+        ];
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
+});
+
+// Debug email sending for specific booking
+Route::get('/debug-email/{booking_id}', function($booking_id) {
+    try {
+        // Get booking details
+        $booking = DB::table('booking')->where('id', $booking_id)->first();
+        
+        if (!$booking) {
+            return "Booking ID {$booking_id} not found.";
+        }
+        
+        // Get passenger details
+        $passengerDetails = DB::table('booking_passenger_details')
+            ->where('booking_id', $booking_id)
+            ->get();
+            
+        $debug_info = [
+            'booking_id' => $booking_id,
+            'booking_found' => $booking ? 'Yes' : 'No',
+            'customer_email' => $booking->c_email ?? 'Not set',
+            'customer_name' => $booking->c_name ?? 'Not set',
+            'passenger_count' => $passengerDetails->count(),
+            'booking_type' => $booking->type ?? 'Not set',
+            'payment_status' => $booking->payment_status ?? 'Not set',
+            'amount' => $booking->amount ?? 'Not set'
+        ];
+        
+        // Test simple email first
+        $test_email = 'test@example.com'; // Change this to your email
+        $simple_subject = 'Test Email from Andaman Ferry Booking';
+        $simple_message = 'This is a test email to verify PHP mailer is working.';
+        $simple_headers = 'From: andamanferrybookings@gmail.com';
+        
+        $simple_result = mail($test_email, $simple_subject, $simple_message, $simple_headers);
+        
+        $debug_info['simple_email_test'] = $simple_result ? 'Success' : 'Failed';
+        $debug_info['php_mail_function'] = function_exists('mail') ? 'Available' : 'Not available';
+        $debug_info['server_name'] = $_SERVER['SERVER_NAME'] ?? 'Unknown';
+        
+        return '<pre>' . print_r($debug_info, true) . '</pre>';
+        
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage() . '<br>Trace: ' . $e->getTraceAsString();
+    }
+});
