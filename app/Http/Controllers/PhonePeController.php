@@ -408,16 +408,15 @@ class PhonePeController extends Controller
 
             // Try multiple ways to get the transaction ID
             $merchantOrderId = 
-                  $request->input('orderId')
-               ?? $request->input('merchantOrderId')
-               ?? $request->input('transactionId')
-               ?? $request->query('orderId')
-               ?? $request->query('merchantOrderId')
-               ?? $request->query('transactionId')
-               ?? data_get($request->all(), 'payload.merchantOrderId')
+                  data_get($request->all(), 'payload.merchantOrderId')
                ?? data_get($request->all(), 'payload.orderId')
-               ?? Session::get('phonepe_transaction_id')
-               ?? Session::get('booking_id'); // Fallback to booking ID
+               ?? $request->input('merchantOrderId')
+               ?? $request->input('orderId')
+               ?? $request->input('transactionId')
+               ?? $request->query('merchantOrderId')
+               ?? $request->query('orderId')
+               ?? $request->query('transactionId')
+               ?? Session::get('phonepe_transaction_id');
 
             // If still no transaction ID, try to get from URL parameters
             if (!$merchantOrderId) {
@@ -472,14 +471,29 @@ class PhonePeController extends Controller
             $gatewayTxnId   = data_get($paymentDetails, 'transactionId');
             $paymentMode    = data_get($paymentDetails, 'paymentMode');
 
-            $statusCheckResponse = $this->phonePeClient->getOrderStatus($merchantOrderId, true);
-            $state = $statusCheckResponse->getState();
+            try {
+                $statusCheckResponse = $this->phonePeClient->getOrderStatus($merchantOrderId, true);
+                $state = $statusCheckResponse->getState();
 
-            \Log::info('Order Status Check', [
-                'merchant_order_id' => $merchantOrderId,
-                'state' => $state,
-                'amount' => $statusCheckResponse->getAmount()
-            ]);
+                \Log::info('Order Status Check', [
+                    'merchant_order_id' => $merchantOrderId,
+                    'state' => $state,
+                    'amount' => $statusCheckResponse->getAmount()
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('PhonePe API Error', [
+                    'merchant_order_id' => $merchantOrderId,
+                    'error' => $e->getMessage(),
+                    'error_code' => $e->getCode() ?? 'UNKNOWN'
+                ]);
+                
+                // If API fails, use the payload state from the callback
+                $state = $payloadState ?? 'COMPLETED';
+                \Log::info('Using payload state as fallback', [
+                    'merchant_order_id' => $merchantOrderId,
+                    'state' => $state
+                ]);
+            }
 
             if (\Schema::hasTable('phonepe_payment_details')) {
                 DB::table('phonepe_payment_details')

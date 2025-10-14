@@ -764,7 +764,7 @@ class BookingController extends Controller
                 'booking_id' => $booking_id,
                 'pnr_id' => NULL,
                 'booking_status' => 'Confirmed',
-                'razorpay_payment_id' => NULL,
+                'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                 'seat_status' => 1,
                 'booking_vendor' => 'Admin',
             ];
@@ -805,7 +805,7 @@ class BookingController extends Controller
                 'booking_id' => $booking_id,
                 'pnr_id' => NULL,
                 'booking_status' => 'Pending Confirmation',
-                'razorpay_payment_id' => NULL,
+                'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                 'seat_status' => 0,
                 'booking_vendor' => 'Nautika',
             ];
@@ -842,9 +842,9 @@ class BookingController extends Controller
             // Insert pending confirmation record
             $booking_response = [
                 'booking_id' => $booking_id,
-                'pnr_id' => NULL,
+                'pnr_id' => 'PENDING_' . $booking_id,
                 'booking_status' => 'Pending Confirmation',
-                'razorpay_payment_id' => NULL,
+                'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                 'seat_status' => 0,
                 'booking_vendor' => 'Makruzz',
             ];
@@ -871,7 +871,7 @@ class BookingController extends Controller
                 'booking_id' => $booking_id,
                 'pnr_id' => NULL,
                 'booking_status' => 'Pending Confirmation',
-                'razorpay_payment_id' => NULL,
+                'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                 'seat_status' => 0,
                 'booking_vendor' => $results->ship_name,
             ];
@@ -883,7 +883,7 @@ class BookingController extends Controller
                 'booking_id' => $booking_id,
                 'pnr_id' => NULL,
                 'booking_status' => 'Confirmed',
-                'razorpay_payment_id' => NULL,
+                'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                 'seat_status' => 1,
                 'booking_vendor' => $results->ship_name,
             ];
@@ -900,7 +900,7 @@ class BookingController extends Controller
                     'booking_id' => $trip2_booking_id,
                     'pnr_id' => NULL,
                     'booking_status' => 'Confirmed',
-                    'razorpay_payment_id' => NULL,
+                    'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                     'seat_status' => 1,
                     'booking_vendor' => 'Admin',
                 ];
@@ -912,7 +912,7 @@ class BookingController extends Controller
                     'booking_id' => $trip2_booking_id,
                     'pnr_id' => NULL,
                     'booking_status' => 'Pending Confirmation',
-                    'razorpay_payment_id' => NULL,
+                    'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                     'seat_status' => 0,
                     'booking_vendor' => 'Nautika',
                 ];
@@ -924,7 +924,7 @@ class BookingController extends Controller
                     'booking_id' => $trip2_booking_id,
                     'pnr_id' => NULL,
                     'booking_status' => 'Pending Confirmation',
-                    'razorpay_payment_id' => NULL,
+                    'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                     'seat_status' => 0,
                     'booking_vendor' => 'Makruzz',
                 ];
@@ -936,7 +936,7 @@ class BookingController extends Controller
                     'booking_id' => $trip2_booking_id,
                     'pnr_id' => NULL,
                     'booking_status' => 'Pending Confirmation',
-                    'razorpay_payment_id' => NULL,
+                    'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                     'seat_status' => 0,
                     'booking_vendor' => $results2->ship_name,
                 ];
@@ -947,7 +947,7 @@ class BookingController extends Controller
                     'booking_id' => $trip2_booking_id,
                     'pnr_id' => NULL,
                     'booking_status' => 'Confirmed',
-                    'razorpay_payment_id' => NULL,
+                    'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                     'seat_status' => 1,
                     'booking_vendor' => $results2->ship_name,
                 ];
@@ -965,7 +965,7 @@ class BookingController extends Controller
                     'booking_id' => $trip3_booking_id,
                     'pnr_id' => NULL,
                     'booking_status' => 'Confirmed',
-                    'razorpay_payment_id' => NULL,
+                    'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                     'seat_status' => 1,
                     'booking_vendor' => 'Admin',
                 ];
@@ -977,7 +977,7 @@ class BookingController extends Controller
                     'booking_id' => $trip3_booking_id,
                     'pnr_id' => NULL,
                     'booking_status' => 'Pending Confirmation',
-                    'razorpay_payment_id' => NULL,
+                    'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                     'seat_status' => 0,
                     'booking_vendor' => 'Nautika',
                 ];
@@ -989,7 +989,7 @@ class BookingController extends Controller
                     'booking_id' => $trip3_booking_id,
                     'pnr_id' => NULL,
                     'booking_status' => 'Pending Confirmation',
-                    'razorpay_payment_id' => NULL,
+                    'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                     'seat_status' => 0,
                     'booking_vendor' => 'Makruzz',
                 ];
@@ -1001,7 +1001,7 @@ class BookingController extends Controller
                     'booking_id' => $trip3_booking_id,
                     'pnr_id' => NULL,
                     'booking_status' => 'Pending Confirmation',
-                    'razorpay_payment_id' => NULL,
+                    'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                     'seat_status' => 0,
                     'booking_vendor' => $results3->ship_name,
                 ];
@@ -1012,7 +1012,7 @@ class BookingController extends Controller
                     'booking_id' => $trip3_booking_id,
                     'pnr_id' => NULL,
                     'booking_status' => 'Confirmed',
-                    'razorpay_payment_id' => NULL,
+                    'razorpay_payment_id' => 'PHONEPE_' . $booking_id,
                     'seat_status' => 1,
                     'booking_vendor' => $results3->ship_name,
                 ];
