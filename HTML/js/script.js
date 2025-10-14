@@ -302,11 +302,30 @@ $(document).ready(function() {
     
     const dateOptions = {
         dateFormat: 'Y-m-d',
-        minDate: "today",
+        minDate: "today", // Prevent selection of past dates
+        maxDate: new Date().getFullYear() + 1 + "-12-31", // Allow up to next year
         animate: false, // Disable animation to prevent jitter
         changeMonth: true,
         changeYear: true,
         showAnim: '', // Disable show animation
+        onReady: function(selectedDates, dateStr, instance) {
+            // Disable past months and years in the calendar
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            // Disable past months in current year
+            const monthElements = instance.calendarContainer.querySelectorAll('.flatpickr-monthDropdown-months');
+            if (monthElements.length > 0) {
+                const monthDropdown = monthElements[0];
+                const options = monthDropdown.querySelectorAll('option');
+                options.forEach((option, index) => {
+                    if (index < currentMonth) {
+                        option.disabled = true;
+                    }
+                });
+            }
+        },
         onSelect: function() {
             // Force reflow to prevent layout issues
             this.blur();
@@ -322,10 +341,25 @@ $(document).ready(function() {
             
             if (isBoatBookingPage) {
                 // On boat booking page, only initialize other date fields, not #date
-                $('#round_date, #round1_date, #round2_date').flatpickr(dateOptions);
+                $('#round_date, #round1_date, #round2_date').each(function() {
+                    if (!$(this).data('flatpickr')) {
+                        $(this).flatpickr(dateOptions);
+                    }
+                });
             } else {
-                // On other pages, initialize all date fields including #date
-                $('#date, #round_date, #round1_date, #round2_date').flatpickr(dateOptions);
+                // Check if we're on the homepage - if so, skip initialization to let homepage handle it
+                const isHomepage = window.location.pathname === '/' || 
+                                  window.location.pathname.includes('home') ||
+                                  window.location.pathname.includes('index');
+                
+                if (!isHomepage) {
+                    // On other pages, initialize all date fields including #date
+                    $('#date, #round_date, #round1_date, #round2_date').each(function() {
+                        if (!$(this).data('flatpickr')) {
+                            $(this).flatpickr(dateOptions);
+                        }
+                    });
+                }
             }
         } else if ($.fn.datepicker) {
             $('.my_date_picker').datepicker({

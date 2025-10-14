@@ -1227,6 +1227,14 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             $(".tabs2").children(".row").removeClass("hide");
         });
 
+        // Hide jQuery UI Datepicker to prevent duplicate calendars
+        $('#ui-datepicker-div').hide();
+        
+        // Continuously hide jQuery UI Datepicker if it appears
+        setInterval(function() {
+            $('#ui-datepicker-div').hide();
+        }, 100);
+
         // Initialize flatpickr only on desktop for better performance
         if (!isMobile) {
             const dateOptions = {
@@ -1234,6 +1242,21 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                 minDate: "today"
             };
 
+            // Destroy existing flatpickr instances to prevent duplicates
+            if ($('#date').data('flatpickr')) {
+                $('#date').data('flatpickr').destroy();
+            }
+            if ($('#round_date').data('flatpickr')) {
+                $('#round_date').data('flatpickr').destroy();
+            }
+            if ($('#round1_date').data('flatpickr')) {
+                $('#round1_date').data('flatpickr').destroy();
+            }
+            if ($('#round2_date').data('flatpickr')) {
+                $('#round2_date').data('flatpickr').destroy();
+            }
+
+            // Initialize flatpickr
             $('#date').flatpickr(dateOptions);
             $('#round_date').flatpickr(dateOptions);
             $('#round1_date').flatpickr(dateOptions);
