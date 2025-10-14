@@ -46,6 +46,63 @@ class FerrybookingController extends Controller
 
     public function ferry_booking_search(Request $request)
     {
+        // Validate required fields
+        $fromLocation = $request->form_location;
+        $toLocation = $request->to_location;
+        $trip_type = $request->input('trip_type');
+        $date = $request->input('date');
+        
+        // Check if required fields are present
+        if (!$fromLocation || !$toLocation || !$date) {
+            return redirect()->back()->with('error', 'Please fill in all required fields including date selection.');
+        }
+        
+        // Validate date format and check if it's not empty
+        if (empty($date) || $date === 'Select Date' || $date === '') {
+            return redirect()->back()->with('error', 'Please select a valid date for your journey.');
+        }
+        
+        // For round trips, validate departure and return journey details
+        if ($trip_type == 2) {
+            $departure_from_location = $request->input('departure_from_location');
+            $departure_to_location = $request->input('departure_to_location');
+            $departure_date = $request->input('departure_date');
+            $return_from_location = $request->input('return_from_location');
+            $return_to_location = $request->input('return_to_location');
+            $return_date = $request->input('return_date');
+            
+            // Validate departure journey
+            if (empty($departure_from_location) || empty($departure_to_location)) {
+                return redirect()->back()->with('error', 'Please select departure journey locations.');
+            }
+            
+            if (empty($departure_date) || $departure_date === 'Select Departure Date' || $departure_date === '') {
+                return redirect()->back()->with('error', 'Please select a departure date for your round trip.');
+            }
+            
+            // Validate return journey
+            if (empty($return_from_location) || empty($return_to_location)) {
+                return redirect()->back()->with('error', 'Please select return journey locations.');
+            }
+            
+            if (empty($return_date) || $return_date === 'Select Return Date' || $return_date === '') {
+                return redirect()->back()->with('error', 'Please select a return date for your round trip.');
+            }
+            
+            // Validate that return date is after departure date
+            $depDate = strtotime($departure_date);
+            $retDate = strtotime($return_date);
+            
+            if ($retDate <= $depDate) {
+                return redirect()->back()->with('error', 'Return date must be after departure date. Please select a return date that is later than your departure date.');
+            }
+            
+            // Additional validation: Check if return date is at least 1 day after departure
+            $oneDayAfter = strtotime('+1 day', $depDate);
+            if ($retDate < $oneDayAfter) {
+                return redirect()->back()->with('error', 'Return date must be at least 1 day after departure date. Please select a valid return date.');
+            }
+        }
 
         // // Agent wallet balance check for Green Ocean
         // $hash_sequence = "today_date|public_key";
@@ -68,10 +125,7 @@ class FerrybookingController extends Controller
 
         $data['ferry_locations'] = DB::table('ferry_locations')->where('status', 'Y')->get();
 
-        $fromLocation = $request->form_location;
-        $toLocation = $request->to_location;
-        $trip_type = $request->input('trip_type');
-        $date = date('Y-m-d', strtotime(str_replace('/', '-',  $request->input('date'))));
+        $date = date('Y-m-d', strtotime(str_replace('/', '-',  $date)));
         $dateCarbon = date('Y-m-d', strtotime($date));
 
         $no_of_passenger = $request->input('passenger');
@@ -110,6 +164,11 @@ class FerrybookingController extends Controller
 
         $fromLocationTitle = FerryLocation::where('id',  $fromLocation)->first();
         $toLocationTitle = FerryLocation::where('id', $toLocation)->first();
+
+        // Add null checks to prevent "Attempt to read property 'title' on null" error
+        if (!$fromLocationTitle || !$toLocationTitle) {
+            return redirect()->back()->with('error', 'Invalid location selected. Please try again.');
+        }
 
         $data['route_titles'] = [
             'from_location' => $fromLocationTitle->title,
@@ -252,9 +311,9 @@ class FerrybookingController extends Controller
 
         // ********************************** for round 2 Trip ********************************************
         if ($trip_type >= 2) {
-            $round1_from_location = $request->round1_from_location;
-            $round1_to_location = $request->input('round1_to_location');
-            $date = date('Y-m-d', strtotime($request->input('round1_date')));
+            $round1_from_location = $request->departure_from_location;
+            $round1_to_location = $request->input('departure_to_location');
+            $date = date('Y-m-d', strtotime($request->input('departure_date')));
 
             $oneHourAgo = Carbon::now()->subHour();
             $adminShipSchedules2 = FerrySchedul::with([
@@ -288,6 +347,11 @@ class FerrybookingController extends Controller
 
             $round_1_from_location_title = FerryLocation::where('id',  $round1_from_location)->first();
             $round_1_to_location_title = FerryLocation::where('id', $round1_to_location)->first();
+
+            // Add null checks to prevent "Attempt to read property 'title' on null" error
+            if (!$round_1_from_location_title || !$round_1_to_location_title) {
+                return redirect()->back()->with('error', 'Invalid location selected. Please try again.');
+            }
 
             $data['round1_route_titles'] = [
                 'from_location' => $round_1_from_location_title->title,
@@ -408,6 +472,160 @@ class FerrybookingController extends Controller
 
             $data['apiScheduleData2'] = $sortedArray;
             // print_r($data['apiScheduleData2']);die;
+            
+            // Process return journey for round trip
+            $return_from_location = $request->return_from_location;
+            $return_to_location = $request->input('return_to_location');
+            $return_date = date('Y-m-d', strtotime($request->input('return_date')));
+
+            $oneHourAgo = Carbon::now()->subHour();
+            $adminShipSchedules3 = FerrySchedul::with([
+                'ferryPrices' => function ($query) {
+                    $query->orderBy('price', 'asc');
+                },
+                'fromLocation',
+                'toLocation',
+                'ship',
+                'ship.images',
+                'ferryPrices.class'
+            ])
+                ->where('from_location', $return_from_location)
+                ->where('to_location', $return_to_location)
+                ->where('status', 'Y')
+                ->where('from_date', '<=', $return_date)
+                ->where('to_date', '>=', $return_date)
+                ->when($return_date && $return_date == now()->format('Y-m-d'), function ($query) use ($oneHourAgo) {
+                    return $query->where('departure_time', '>=', $oneHourAgo);
+                })
+                ->orderBy('departure_time')
+                ->get()->toArray();
+
+            if ($adminShipSchedules3) {
+                foreach ($adminShipSchedules3 as $key => $val) {
+                    $adminShipSchedules3[$key]['ship_name'] = 'Admin';
+                }
+            }
+
+            $return_from_location_title = FerryLocation::where('id', $return_from_location)->first();
+            $return_to_location_title = FerryLocation::where('id', $return_to_location)->first();
+
+            // Add null checks to prevent "Attempt to read property 'title' on null" error
+            if (!$return_from_location_title || !$return_to_location_title) {
+                return redirect()->back()->with('error', 'Invalid location selected for return journey. Please try again.');
+            }
+
+            $data['return_route_titles'] = [
+                'from_location' => $return_from_location_title->title,
+                'to_location' => $return_to_location_title->title,
+            ];
+
+            // Process return journey API calls similar to departure journey
+            $return_from_location_title = '';
+            $return_to_location_title = '';
+
+            if ($return_from_location == 1) {
+                $return_from_location_title = 'Port Blair';
+            } elseif ($return_from_location == 2) {
+                $return_from_location_title = 'Swaraj Dweep';
+            } elseif ($return_from_location == 3) {
+                $return_from_location_title = 'Shaheed Dweep';
+            }
+
+            if ($return_to_location == 1) {
+                $return_to_location_title = 'Port Blair';
+            } elseif ($return_to_location == 2) {
+                $return_to_location_title = 'Swaraj Dweep';
+            } elseif ($return_to_location == 3) {
+                $return_to_location_title = 'Shaheed Dweep';
+            }
+
+            $return_data = array(
+                'date' => date('d-m-Y', strtotime($return_date)),
+                'from' => $return_from_location_title,
+                'to' => $return_to_location_title
+            );
+
+            $ship = ShipMaster::with('images')->where('id', 2)->get();
+            $ship_image = $ship[0]['image'];
+
+            $nautika_return_result = $this->nautikaApiCall('getTripData', $return_data);
+            if(!empty($nautika_return_result->data)){
+                $nautikaReturnData = $nautika_return_result->data;
+            }
+            
+            if (!empty($nautikaReturnData)) {
+                foreach ($nautikaReturnData as $key => $val) {
+                    $nautikaReturnData[$key] = (array) $val;
+                    $nautikaReturnData[$key]['ship_name'] = 'Nautika';
+                    $nautikaReturnData[$key]['ship_image'] = $ship_image;
+                    $nautikaReturnData[$key]['ship'] = $ship;
+                    $nautikaReturnData[$key]['departure_time'] = str_pad($val->dTime->hour, 2, '0', STR_PAD_LEFT)  . ':' . $val->dTime->minute . ':00';
+                    $nautikaReturnData[$key]['arrival_time'] = str_pad($val->aTime->hour, 2, '0', STR_PAD_LEFT)  . ':' . $val->aTime->minute . ':00';
+                    $nautikaReturnData[$key]['b_class_seat_availibility'] = 0;
+                    $nautikaReturnData[$key]['p_class_seat_availibility'] = 0;
+                    foreach ($val->bClass as $key1 => $val1) {
+                        if ($val1->isBooked == 0 && $val1->isBlocked == 0) {
+                            $nautikaReturnData[$key]['b_class_seat_availibility']++;
+                        }
+                    }
+                    foreach ($val->pClass as $key1 => $val1) {
+                        if ($val1->isBooked == 0 && $val1->isBlocked == 0) {
+                            $nautikaReturnData[$key]['p_class_seat_availibility']++;
+                        }
+                    }
+                }
+            }
+
+            $return_mak_data = array("data" => array(
+                "trip_type" => "single_trip",
+                "from_location" => $return_from_location,
+                "travel_date" => date('Y-m-d', strtotime($return_date)),
+                "no_of_passenger" => $no_of_passenger,
+                "to_location" => $return_to_location,
+            ));
+
+            $makruzz_return_result = $this->makApiCall('schedule_search', $return_mak_data);
+
+            $ship = ShipMaster::with('images')->where('id', 1)->get();
+            $ship_image = $ship[0]['image'];
+
+            $makReturnData = [];
+            if (!empty($makruzz_return_result) && !empty($makruzz_return_result->data)) {
+                $makFerry = $makruzz_return_result->data;
+                foreach ($makFerry as $key => $val) {
+                    $makReturnData[$val->id]['id'] =  $val->id;
+                    $makReturnData[$val->id]['departure_time'] =  $val->departure_time;
+                    $makReturnData[$val->id]['ship_name'] =  'Makruzz';
+                    $makReturnData[$val->id]['ship_image'] = $ship_image;
+                    $makReturnData[$val->id]['ship'] = $ship;
+                    $makReturnData[$val->id]['ship_class'][] =  $val;
+                }
+            }
+
+            // Green Ocean call for return journey
+            $greenOceanReturnData = $this->green_ocean_call($return_from_location, $return_to_location, $no_of_passenger, $infant, $return_date);
+
+            if (!empty($nautikaReturnData)) {
+                $allReturnSchedule = array_merge($makReturnData, $nautikaReturnData);
+            } else {
+                $allReturnSchedule = $makReturnData;
+            }
+
+            $allReturnSchedule3 = array_merge($allReturnSchedule, $greenOceanReturnData);
+
+            if(!empty($adminShipSchedules3)){
+                $allReturnSchedule3 = array_merge($allReturnSchedule3, $adminShipSchedules3);
+            }
+
+            $collection = collect($allReturnSchedule3);
+            // Sort the collection by 'time' column
+            $sorted = $collection->sortBy(function ($item) {
+                return strtotime($item['departure_time']);
+            });
+
+            $sortedReturnArray = $sorted->values()->all();
+
+            $data['apiScheduleData3'] = $sortedReturnArray;
         }
 
 
@@ -461,6 +679,11 @@ class FerrybookingController extends Controller
 
             $round_2_from_location_title = FerryLocation::where('id',  $round2_from_location)->first();
             $round_2_to_location_title = FerryLocation::where('id', $round2_to_location)->first();
+            
+            // Add null checks to prevent "Attempt to read property 'title' on null" error
+            if (!$round_2_from_location_title || !$round_2_to_location_title) {
+                return redirect()->back()->with('error', 'Invalid location selected for return journey. Please try again.');
+            }
             
             $data['round2_route_titles'] = [
                 'from_location' => $round_2_from_location_title->title,
@@ -587,12 +810,12 @@ class FerrybookingController extends Controller
             'form_location' => $request->form_location,
             'to_location' => $request->to_location,
             'date' => date('Y-m-d', strtotime($request->date)),
-            'round1_from_location' => $request->round1_from_location,
-            'round1_to_location' => $request->round1_to_location,
-            'round1_date' => date('Y-m-d', strtotime($request->round1_date)),
-            'round2_from_location' => $request->round2_from_location,
-            'round2_to_location' => $request->round2_to_location,
-            'round2_date' => date('Y-m-d', strtotime($request->round2_date)),
+            'departure_from_location' => $request->departure_from_location,
+            'departure_to_location' => $request->departure_to_location,
+            'departure_date' => date('Y-m-d', strtotime($request->departure_date)),
+            'return_from_location' => $request->return_from_location,
+            'return_to_location' => $request->return_to_location,
+            'return_date' => date('Y-m-d', strtotime($request->return_date)),
             'no_of_passenger' => $request->input('passenger'),
             'no_of_infant' => $request->input('infant')
         );

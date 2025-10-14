@@ -912,69 +912,12 @@
                             <input type="hidden" name="trip_type" id="trip_type" value="1">
 
                             <div class="position-relative tabContainer">
-                                <div class="tabs tabs1 mx-0 ferry-search-bar" {{ request('trip_type') == 1 ? 'active' : '' }}>
-                                <div class="row mb-3">
-                                    <div class="col-12 col-lg-3 mb-2">
-                                        <label for="form_location">From</label>
-                                        <select name="form_location" class="form-select border-0 p-0" id="form_location">
-                                            @foreach ($ferry_locations as $ferry_location)
-                                                <option value="{{ $ferry_location->id }}"
-                                                    {{ old('form_location', request('form_location')) == $ferry_location->id ? 'selected' : '' }}>
-                                                    {{ $ferry_location->title }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-12 col-lg-3 mb-2">
-                                        <label for="to_location">To</label>
-                                        <select name="to_location" class="form-select border-0 p-0" id="to_location">
-                                            @foreach ($ferry_locations as $ferry_location)
-                                                <option value="{{ $ferry_location->id }}"
-                                                    {{ old('to_location', request('to_location')) == $ferry_location->id ? 'selected' : '' }}>
-                                                    {{ $ferry_location->title }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-12 col-lg-2 mb-2">
-                                        <label for="date">Date</label>
-                                        <input type="date" placeholder="Select Date" id="date" name="date"
-                                            min="<?php echo date('d-m-Y'); ?>" value="{{ old('date', request('date')) }}">
-                                    </div>
-                                    <div class="col-12 col-lg-2 mb-2">
-                                        <label for="passenger">Passengers</label>
-                                        <input type="number" class="form-control" id="passenger" name="passenger"
-                                            value="{{ old('passenger', request('passenger')) }}"
-                                            onkeyup="maxpassenger(this)" required>
-                                    </div>
-                                    <div class="col-12 col-lg-2">
-                                        <label for="infant">Infants</label>
-                                        <input type="number" class="form-control" id="infant" name="infant"
-                                            value="{{ old('infant', request('infant')) }}"
-                                            oninput="this.value = this.value.replace(/[^0-8]/g, '').slice(0, 1);" required>
-                                    </div>
-                                    </div>
-
-                                    <div class="row search-bar-btn">
-                                    <div class="col-12 col-lg-2">
-                                        <button class="btn button w-100" id="search"><i class="bi bi-search"></i>
-                                            Search</button>
-                                    </div>
-                                    </div>
-                                </div>
-
-                                <div class="tabs tabs2 row mx-0 {{ request('trip_type') > 1 ? 'active' : '' }}">
-                                    <div class="row trop-relative p-0">
-                                    <div class="mb-visible">
-                                <div class="row trip-section my-3">
-                                <div class="col-12 trip-name p-0">Trip 1</div>
-                                </div>
-                            </div>
-                                        <div class="col-12 col-lg-3 mb-2 mb-lg-0">
-                                            <label for="location">From</label>
-                                            <select name="form_location" class="form-select border-0 p-0"
-                                                id="form_location">
-                                                @foreach ($ferry_locations as $index => $ferry_location)
+                                <div class="tabs tabs1 mx-0 ferry-search-bar one-way-section" style="opacity: 1; height: auto;">
+                                    <div class="row mb-3">
+                                        <div class="col-12 col-lg-3 mb-2">
+                                            <label for="form_location">From</label>
+                                            <select name="form_location" class="form-select border-0 p-0" id="form_location">
+                                                @foreach ($ferry_locations as $ferry_location)
                                                     <option value="{{ $ferry_location->id }}"
                                                         {{ old('form_location', request('form_location')) == $ferry_location->id ? 'selected' : '' }}>
                                                         {{ $ferry_location->title }}
@@ -982,11 +925,10 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="col-12 col-lg-3 mb-2 mb-lg-0">
+                                        <div class="col-12 col-lg-3 mb-2">
                                             <label for="to_location">To</label>
                                             <select name="to_location" class="form-select border-0 p-0" id="to_location">
-
-                                                @foreach ($ferry_locations as $index => $ferry_location)
+                                                @foreach ($ferry_locations as $ferry_location)
                                                     <option value="{{ $ferry_location->id }}"
                                                         {{ old('to_location', request('to_location')) == $ferry_location->id ? 'selected' : '' }}>
                                                         {{ $ferry_location->title }}
@@ -994,45 +936,48 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="col-12 col-lg-3 mb-2 mb-lg-0">
+                                        <div class="col-12 col-lg-2 mb-2">
                                             <label for="date">Date</label>
-                                            <input type="date" class="my_date_picker" placeholder="Select Date"
-                                                id="round_date" name="date" min="<?php echo date('Y-m-d'); ?>"
-                                                value="{{ old('date', request('date')) }}">
+                                            <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Date" id="date" name="date" min="" readonly="readonly" value="{{ old('date', request('date')) }}" required>
                                         </div>
-
-                                        <div class="col-12 col-lg-1 mb-2 mb-lg-0">
+                                        <div class="col-12 col-lg-2 mb-2">
                                             <label for="passenger">Passengers</label>
-                                            <input type="number" class="form-control" id="passenger" name="passenger"
+                                            <input type="number" class="form-control bg-secondary" id="passenger" name="passenger"
                                                 value="{{ old('passenger', request('passenger')) }}"
-                                                onkeyup="maxpassenger(this)" required>
+                                                max="20" min="1" onkeyup="maxpassenger(this)" readonly>
                                         </div>
-
-                                        <div class="col-12 col-lg-1 mb-2 mb-lg-0">
+                                        <div class="col-12 col-lg-2">
                                             <label for="infant">Infants</label>
-                                            <input type="number" class="form-control" id="infant" name="infant"
+                                            <input type="number" class="form-control bg-secondary" id="infant" name="infant"
                                                 value="{{ old('infant', request('infant')) }}"
-                                                oninput="this.value = this.value.replace(/[^1-8]/g, '').slice(0, 1);"
-                                                required>
+                                                oninput="this.value = this.value.replace(/[^1-8]/g, '').slice(0, 1);" readonly>
                                         </div>
-                                        {{-- <input type="hidden" name="trip_type" value="single_trip"> --}}
-
-
                                     </div>
 
-                                    <div class="row py-lg-3 py-0 trop-relative p-0">
-                                    <div class="mb-visible">
-                                <div class="row trip-section my-3">
-                                <div class="col-12 trip-name p-0">Trip 2</div>
+                                    <div class="row search-bar-btn">
+                                        <div class="col-12 col-lg-2">
+                                            <button class="btn button w-100" id="search"><i class="bi bi-search"></i>
+                                                Search</button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+
+
+                                <div class="tabs tabs2 mx-0 ferry-search-bar round-trip-section" style="overflow: hidden; opacity: 0; height: 0;">
+                                    {{-- Departure Journey Section --}}
+                                    <div class="row py-lg-3 py-0 trop-relative p-0">
+                                        <div class="mb-visible">
+                                            <div class="row trip-section my-3">
+                                                <div class="col-12 trip-name p-0">Departure Journey</div>
+                                            </div>
+                                        </div>
                                         <div class="col-12 col-lg-3 mb-2 mb-lg-0">
                                             <label for="location">From</label>
-                                            <select name="round1_from_location" class="form-select border-0 p-0"
-                                                id="round1_from_location">
+                                            <select name="departure_from_location" class="form-select border-0 p-0"
+                                                id="departure_from_location">
                                                 @foreach ($ferry_locations as $index => $ferry_location)
                                                     <option value="{{ $ferry_location->id }}"
-                                                        {{ old('round1_from_location', request('round1_from_location')) == $ferry_location->id ? 'selected' : '' }}>
+                                                        {{ old('departure_from_location', request('departure_from_location')) == $ferry_location->id ? 'selected' : '' }}>
                                                         {{ $ferry_location->title }}
                                                     </option>
                                                 @endforeach
@@ -1040,30 +985,27 @@
                                         </div>
                                         <div class="col-12 col-lg-3 mb-2 mb-lg-0">
                                             <label for="location">To</label>
-                                            <select name="round1_to_location" class="form-select border-0 p-0"
-                                                id="round1_to_location">
-
+                                            <select name="departure_to_location" class="form-select border-0 p-0"
+                                                id="departure_to_location">
                                                 @foreach ($ferry_locations as $index => $ferry_location)
                                                     <option value="{{ $ferry_location->id }}"
-                                                        {{ old('round1_to_location', request('round1_to_location')) == $ferry_location->id ? 'selected' : '' }}>
+                                                        {{ old('departure_to_location', request('departure_to_location')) == $ferry_location->id ? 'selected' : '' }}>
                                                         {{ $ferry_location->title }}
                                                     </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                         <div class="col-12 col-lg-3 mb-2 mb-lg-0">
-                                            <label for="date">Date</label>
-                                            <input type="date" class="my_date_picker" placeholder="Select Date"
-                                                id="round1_date" name="round1_date" min="<?php echo date('Y-m-d'); ?>"
-                                                value="{{ old('round1_date', request('round1_date')) }}" required>
+                                            <label for="departure_date">Date</label>
+                                            <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Date"
+                                                id="departure_date" name="departure_date" min="" readonly="readonly"
+                                                value="{{ old('departure_date', request('departure_date')) }}" required>
                                         </div>
-
                                         <div class="col-12 col-lg-1 mb-2 mb-lg-0">
                                             <label for="location">Passengers</label>
                                             <input type="number" class="form-control bg-secondary" id="round1_pasanger"
                                                 value="{{ old('passenger', request('passenger')) }}" readonly>
                                         </div>
-
                                         <div class="col-12 col-lg-1 mb-2 mb-lg-0">
                                             <label for="location">Infants</label>
                                             <input type="number" class="form-control bg-secondary" id="round1_infant"
@@ -1071,23 +1013,73 @@
                                                 oninput="this.value = this.value.replace(/[^1-8]/g, '').slice(0, 1);"
                                                 readonly>
                                         </div>
-
-                                        {{-- <input type="hidden" name="trip_type" value="round1_trip"> --}}
-
                                         <div class="col-12 col-lg-1 mb-2 mb-lg-0 table-delet-btn">
                                             <button type="button" class="btn btn-outline-danger trip-delete delete"><i
                                                     class="bi bi-trash3-fill"></i></button>
                                         </div>
                                     </div>
 
-                                    {{-- Trip 3 section removed as it was non-functional and causing confusion on mobile --}}
-
+                                    {{-- Return Journey Section --}}
+                                    <div class="row py-lg-3 py-0 trop-relative p-0">
+                                        <div class="mb-visible">
+                                            <div class="row trip-section my-3">
+                                                <div class="col-12 trip-name p-0">Return Journey</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-lg-3 mb-2 mb-lg-0">
+                                            <label for="location">From</label>
+                                            <select name="return_from_location" class="form-select border-0 p-0"
+                                                id="return_from_location">
+                                                @foreach ($ferry_locations as $index => $ferry_location)
+                                                    <option value="{{ $ferry_location->id }}"
+                                                        {{ old('return_from_location', request('return_from_location')) == $ferry_location->id ? 'selected' : '' }}>
+                                                        {{ $ferry_location->title }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-12 col-lg-3 mb-2 mb-lg-0">
+                                            <label for="location">To</label>
+                                            <select name="return_to_location" class="form-select border-0 p-0"
+                                                id="return_to_location">
+                                                @foreach ($ferry_locations as $index => $ferry_location)
+                                                    <option value="{{ $ferry_location->id }}"
+                                                        {{ old('return_to_location', request('return_to_location')) == $ferry_location->id ? 'selected' : '' }}>
+                                                        {{ $ferry_location->title }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-12 col-lg-3 mb-2 mb-lg-0">
+                                            <label for="return_date">Date</label>
+                                            <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Date"
+                                                id="return_date" name="return_date" min="" readonly="readonly"
+                                                value="{{ old('return_date', request('return_date')) }}" required>
+                                        </div>
+                                        <div class="col-12 col-lg-1 mb-2 mb-lg-0">
+                                            <label for="location">Passengers</label>
+                                            <input type="number" class="form-control bg-secondary" id="return_passenger"
+                                                value="{{ old('passenger', request('passenger')) }}" readonly>
+                                        </div>
+                                        <div class="col-12 col-lg-1 mb-2 mb-lg-0">
+                                            <label for="location">Infants</label>
+                                            <input type="number" class="form-control bg-secondary" id="return_infant"
+                                                value="{{ old('infant', request('infant')) }}" readonly>
+                                        </div>
+                                        <div class="col-12 col-lg-1 mb-2 mb-lg-0 table-delet-btn">
+                                            <button type="button" class="btn btn-outline-danger trip-delete delete"><i
+                                                    class="bi bi-trash3-fill"></i></button>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="row search-bar-btn pt-0 pt-lg-4">
-                                    <div class="col-12 col-lg-2">
+                                        <div class="col-12 col-lg-2">
                                             <button class="btn button w-100" id="search"><i class="bi bi-search"></i>
                                                 Search</button>
                                         </div>
                                     </div>
+                                </div>
+
 
                                 </div>
                             </div>
@@ -1135,29 +1127,31 @@
                             <div class="col-12">
                                 <nav class=" mb-3 tabNav ">
                                     <div class="row w-100 m-0 nav nav-tabs  justify-content-center border-0" id="nav-tab" role="tablist">
-                                        <button class="nav-link  active col-4 border-0 " id="nav-profile-tab"
-                                            data-bs-toggle="tab" data-bs-target="#nav-profile" type="button"
-                                            role="tab" aria-controls="nav-profile" aria-selected="false"
-                                            tabindex="-1">{{ $route_titles['from_location'] }} -
-                                            {{ $route_titles['to_location'] }}
-                                        </button>
-
-                                        @if (!empty($round1_route_titles))
-                                            <button class="nav-link  col-4 border-0 " id="nav-contact-tab"
-                                                data-bs-toggle="tab" data-bs-target="#nav-contact" type="button"
-                                                role="tab" aria-controls="nav-contact"
-                                                aria-selected="true" disabled >{{ $round1_route_titles['from_location'] }} -
-                                                {{ $round1_route_titles['to_location'] }}
+                                        @if(request('trip_type') == 1)
+                                            {{-- One way trip - single step --}}
+                                            <button class="nav-link active col-12 border-0" id="nav-profile-tab"
+                                                data-bs-toggle="tab" data-bs-target="#nav-profile" type="button"
+                                                role="tab" aria-controls="nav-profile" aria-selected="true"
+                                                tabindex="0">{{ $route_titles['from_location'] }} -
+                                                {{ $route_titles['to_location'] }}
                                             </button>
-                                        @endif
-
-                                        @if (!empty($round2_route_titles))
-                                            <button class="nav-link  col-4 border-0 " id="nav-extra-tab"
-                                                data-bs-toggle="tab" data-bs-target="#nav-extra" type="button"
-                                                role="tab" aria-controls="nav-extra"
-                                                aria-selected="true" disabled>{{ $round2_route_titles['from_location'] }} -
-                                                {{ $round2_route_titles['to_location'] }}
+                                        @else
+                                            {{-- Round trip - two steps --}}
+                                            <button class="nav-link active col-6 border-0" id="nav-profile-tab"
+                                                data-bs-toggle="tab" data-bs-target="#nav-profile" type="button"
+                                                role="tab" aria-controls="nav-profile" aria-selected="true"
+                                                tabindex="0">{{ $route_titles['from_location'] }} -
+                                                {{ $route_titles['to_location'] }}
                                             </button>
+
+                                            @if (!empty($return_route_titles))
+                                                <button class="nav-link col-6 border-0" id="nav-extra-tab"
+                                                    data-bs-toggle="tab" data-bs-target="#nav-extra" type="button"
+                                                    role="tab" aria-controls="nav-extra"
+                                                    aria-selected="false" disabled>{{ $return_route_titles['from_location'] }} -
+                                                    {{ $return_route_titles['to_location'] }}
+                                                </button>
+                                            @endif
                                         @endif
                                     </div>
                                 </nav>
@@ -1548,8 +1542,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="tab-pane societyList fade next_return_tab " id="nav-contact"
-                                        role="tabpanel" aria-labelledby="nav-contact-tab">
+                                    <div class="tab-pane societyList fade next_return_tab " id="nav-extra"
+                                        role="tabpanel" aria-labelledby="nav-extra-tab">
 
                                         <div class="row">
                                             <div class="row">
@@ -2568,7 +2562,7 @@
                         @else
                             
                             if ((shipName != 'Nautika') && (shipName.indexOf(gShipName) == -1)) {
-                                $(document).find("#nav-contact-tab").removeClass('disabled').prop('disabled', false)
+                                $(document).find("#nav-extra-tab").removeClass('disabled').prop('disabled', false)
                                     .trigger("click");
                             }
 
@@ -3040,19 +3034,77 @@
                 $(".tabs2").children(".row").removeClass("hide");
             });
 
+            // Hide jQuery UI Datepicker for main date field
+            $('#date').off('focus.datepicker click.datepicker');
+            $('#date').removeClass('hasDatepicker');
+            if ($.fn.datepicker) {
+                $('#date').datepicker('destroy');
+            }
+            
             $('#date').flatpickr({
                 dateFormat: 'Y-m-d',
                 minDate: "today"
             });
+            // Hide jQuery UI Datepicker for round_date field
+            $('#round_date').off('focus.datepicker click.datepicker');
+            $('#round_date').removeClass('hasDatepicker');
+            if ($.fn.datepicker) {
+                $('#round_date').datepicker('destroy');
+            }
+            
             $('#round_date').flatpickr({
                 dateFormat: 'Y-m-d',
                 minDate: "today"
             });
 
+            // Hide jQuery UI Datepicker for round1_date field
+            $('#round1_date').off('focus.datepicker click.datepicker');
+            $('#round1_date').removeClass('hasDatepicker');
+            if ($.fn.datepicker) {
+                $('#round1_date').datepicker('destroy');
+            }
+            
             $('#round1_date').flatpickr({
                 dateFormat: 'Y-m-d',
                 minDate: "today"
             });
+            // Hide jQuery UI Datepicker to prevent duplicate calendars
+            $('#ui-datepicker-div').hide();
+            
+            // Continuously hide jQuery UI Datepicker if it appears
+            setInterval(function() {
+                $('#ui-datepicker-div').hide();
+            }, 100);
+            
+            // Completely disable jQuery UI Datepicker for Round 2 field
+            $('#round2_date').off('focus.datepicker click.datepicker');
+            $('#round2_date').removeClass('hasDatepicker');
+            
+            // Override any jQuery UI Datepicker initialization for Round 2
+            if ($.fn.datepicker) {
+                $('#round2_date').datepicker('destroy');
+            }
+            
+            // Add CSS to completely hide jQuery UI Datepicker for Round 2 field
+            $('<style>')
+                .prop('type', 'text/css')
+                .html('#round2_date + #ui-datepicker-div { display: none !important; }')
+                .appendTo('head');
+            
+            // Additional hiding for Round 2 date field specifically
+            $('#round2_date').on('focus', function() {
+                setTimeout(function() {
+                    $('#ui-datepicker-div').hide();
+                }, 50);
+            });
+            
+            // Hide any jQuery UI Datepicker that might appear on Round 2 field
+            $(document).on('click', '#round2_date', function() {
+                setTimeout(function() {
+                    $('#ui-datepicker-div').hide();
+                }, 50);
+            });
+
             $('#round2_date').flatpickr({
                 dateFormat: 'Y-m-d',
                 minDate: "today"
@@ -3638,6 +3690,199 @@
                 // $(document).find("#nav-contact-tab").removeClass('disabled').trigger("click");
             });
 
+        });
+
+        // Initialize Flatpickr for date pickers
+        $(document).ready(function() {
+            // Mobile detection
+            const isMobile = window.innerWidth <= 767;
+            
+            // Initialize flatpickr only on desktop for better performance
+            if (!isMobile) {
+                const dateOptions = {
+                    dateFormat: 'Y-m-d',
+                    minDate: "today"
+                };
+
+                // Destroy existing flatpickr instances to prevent duplicates
+                if ($('#departure_date').data('flatpickr')) {
+                    $('#departure_date').data('flatpickr').destroy();
+                }
+                if ($('#return_date').data('flatpickr')) {
+                    $('#return_date').data('flatpickr').destroy();
+                }
+
+                // Initialize flatpickr for existing date fields
+                $('#date').flatpickr(dateOptions);
+                $('#departure_date').flatpickr(dateOptions);
+                
+                // Initialize return date picker with conditional minimum date
+                const returnDateOptions = {
+                    dateFormat: 'Y-m-d',
+                    minDate: "today"
+                };
+                $('#return_date').flatpickr(returnDateOptions);
+            }
+
+            // Real-time validation for return date based on departure date
+            $("#departure_date").on("change", function() {
+                const departureDate = $(this).val();
+                if (departureDate) {
+                    const depDate = new Date(departureDate);
+                    const minReturnDate = new Date(depDate);
+                    minReturnDate.setDate(minReturnDate.getDate() + 1);
+                    
+                    // Update return date picker minimum date
+                    const returnDatePicker = $("#return_date")[0]._flatpickr;
+                    if (returnDatePicker) {
+                        returnDatePicker.set('minDate', minReturnDate);
+                    }
+                    
+                    // If return date is already selected and is before the new minimum, clear it
+                    const currentReturnDate = $("#return_date").val();
+                    if (currentReturnDate) {
+                        const retDate = new Date(currentReturnDate);
+                        if (retDate <= depDate) {
+                            $("#return_date").val('');
+                            alert('Return date has been cleared as it must be after the departure date.');
+                        }
+                    }
+                }
+            });
+
+            // Initialize return date picker with proper minimum date
+            $("#return_date").on("focus", function() {
+                const departureDate = $("#departure_date").val();
+                if (departureDate) {
+                    const depDate = new Date(departureDate);
+                    const minReturnDate = new Date(depDate);
+                    minReturnDate.setDate(minReturnDate.getDate() + 1);
+                    
+                    const returnDatePicker = $("#return_date")[0]._flatpickr;
+                    if (returnDatePicker) {
+                        returnDatePicker.set('minDate', minReturnDate);
+                    }
+                }
+            });
+
+            // Check existing dates on page load and validate
+            $(document).ready(function() {
+                const departureDate = $("#departure_date").val();
+                const returnDate = $("#return_date").val();
+                
+                if (departureDate && returnDate) {
+                    const depDate = new Date(departureDate);
+                    const retDate = new Date(returnDate);
+                    
+                    if (retDate <= depDate) {
+                        $("#return_date").val('');
+                        console.log('Return date cleared: must be after departure date');
+                    } else {
+                        // Set minimum date for return date picker
+                        const minReturnDate = new Date(depDate);
+                        minReturnDate.setDate(minReturnDate.getDate() + 1);
+                        
+                        const returnDatePicker = $("#return_date")[0]._flatpickr;
+                        if (returnDatePicker) {
+                            returnDatePicker.set('minDate', minReturnDate);
+                        }
+                    }
+                }
+            });
+        });
+
+        // Handle tab button clicks for trip type switching
+        $('.tabBtn1').on('click', function() {
+            $('#trip_type').val('1');
+            $('.one-way-section').show();
+            $('.round-trip-section').hide();
+        });
+        
+        $('.tabBtn2').on('click', function() {
+            $('#trip_type').val('2');
+            $('.one-way-section').hide();
+            $('.round-trip-section').show();
+            
+            // Initialize flatpickr for round trip fields if not already done
+            if (!isMobile && $('#departure_date').length > 0 && !$('#departure_date').data('flatpickr')) {
+                const dateOptions = {
+                    dateFormat: 'Y-m-d',
+                    minDate: "today"
+                };
+                $('#departure_date').flatpickr(dateOptions);
+                $('#return_date').flatpickr(dateOptions);
+                
+                // Add validation for round trip fields
+                $("#departure_date").on("change", function() {
+                    const departureDate = $(this).val();
+                    if (departureDate) {
+                        const depDate = new Date(departureDate);
+                        const minReturnDate = new Date(depDate);
+                        minReturnDate.setDate(minReturnDate.getDate() + 1);
+                        
+                        const returnDatePicker = $("#return_date")[0]._flatpickr;
+                        if (returnDatePicker) {
+                            returnDatePicker.set('minDate', minReturnDate);
+                        }
+                        
+                        const currentReturnDate = $("#return_date").val();
+                        if (currentReturnDate) {
+                            const retDate = new Date(currentReturnDate);
+                            if (retDate <= depDate) {
+                                $("#return_date").val('');
+                                alert('Return date has been cleared as it must be after the departure date.');
+                            }
+                        }
+                    }
+                });
+                
+                $("#return_date").on("focus", function() {
+                    const departureDate = $("#departure_date").val();
+                    if (departureDate) {
+                        const depDate = new Date(departureDate);
+                        const minReturnDate = new Date(depDate);
+                        minReturnDate.setDate(minReturnDate.getDate() + 1);
+                        
+                        const returnDatePicker = $("#return_date")[0]._flatpickr;
+                        if (returnDatePicker) {
+                            returnDatePicker.set('minDate', minReturnDate);
+                        }
+                    }
+                });
+            }
+            
+            // Round trip sections are already available, just show them
+        });
+
+        // Handle tab button clicks for trip type switching
+        $('.tabBtn1').on('click', function() {
+            $('#trip_type').val('1');
+            $('.one-way-section').css({'opacity': '1', 'height': 'auto', 'overflow': 'visible'});
+            $('.round-trip-section').css({'opacity': '0', 'height': '0', 'overflow': 'hidden'});
+        });
+        
+        $('.tabBtn2').on('click', function() {
+            $('#trip_type').val('2');
+            $('.one-way-section').css({'opacity': '0', 'height': '0', 'overflow': 'hidden'});
+            $('.round-trip-section').css({'opacity': '1', 'height': 'auto', 'overflow': 'visible'});
+        });
+
+        // Handle trip type switching on search page
+        $('input[name="trip_type"]').on('change', function() {
+            const tripType = $(this).val();
+            
+            // Update the hidden trip_type input
+            $('#trip_type').val(tripType);
+            
+            if (tripType == 2) {
+                // Show round trip sections and hide one-way
+                $('.one-way-section').css({'opacity': '0', 'height': '0', 'overflow': 'hidden'});
+                $('.round-trip-section').css({'opacity': '1', 'height': 'auto', 'overflow': 'visible'});
+            } else {
+                // Show one-way section and hide round trip
+                $('.one-way-section').css({'opacity': '1', 'height': 'auto', 'overflow': 'visible'});
+                $('.round-trip-section').css({'opacity': '0', 'height': '0', 'overflow': 'hidden'});
+            }
         });
     </script>
 @endpush

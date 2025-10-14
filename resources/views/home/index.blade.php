@@ -138,44 +138,89 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                             </div>
                                         </div>
                                         <div class="tabs tabs2 tab-round-trip mx-0 ferry-search-bar" style="overflow: hidden; opacity: 0; height: 0;">
-                                            <div class="row mb-3">
-                                                <div class="col-12 col-lg-6 mb-2">
-                                                    <label for="return_form_location">From</label>
-                                                    <select name="form_location" class="form-select p-0" id="return_form_location">
-                                                        <option value="1" selected>Port Blair</option>
-                                                        <option value="2">Havelock</option>
-                                                        <option value="3">Neil</option>
-                                                    </select>
+                                            <!-- Departure Journey Section -->
+                                            <div class="journey-section mb-4">
+                                                <div class="section-header mb-3">
+                                                    <h4 class="section-title departure-title">
+                                                        <i class="bi bi-airplane-departure me-2"></i>
+                                                        Departure Journey
+                                                    </h4>
                                                 </div>
-                                                <div class="col-12 col-lg-6 mb-2">
-                                                    <label for="return_to_location">To</label>
-                                                    <select name="to_location" class="form-select p-0" id="return_to_location">
-                                                        <option value="1">Port Blair</option>
-                                                        <option value="2" selected>Havelock</option>
-                                                        <option value="3">Neil</option>
-                                                    </select>
+                                                <div class="row mb-3">
+                                                    <div class="col-12 col-lg-6 mb-2">
+                                                        <label for="departure_from_location">From</label>
+                                                        <select name="departure_from_location" class="form-select p-0" id="departure_from_location">
+                                                            <option value="1" selected>Port Blair</option>
+                                                            <option value="2">Havelock</option>
+                                                            <option value="3">Neil</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-12 col-lg-6 mb-2">
+                                                        <label for="departure_to_location">To</label>
+                                                        <select name="departure_to_location" class="form-select p-0" id="departure_to_location">
+                                                            <option value="1">Port Blair</option>
+                                                            <option value="2" selected>Havelock</option>
+                                                            <option value="3">Neil</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-12 col-lg-6 mb-2">
+                                                        <label for="departure_date">Departure Date</label>
+                                                        <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Departure Date" id="departure_date" name="departure_date" min="" readonly="readonly">
+                                                    </div>
+                                                    <div class="col-12 col-lg-6 mb-2">
+                                                        <label for="departure_passenger">Passengers</label>
+                                                        <input type="number" class="form-control" id="departure_passenger" name="departure_passenger" value="1" max="20" min="1" onkeyup="maxpassenger(this)" required>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="row mb-3">
-                                                <div class="col-12 col-lg-6 mb-2">
-                                                    <label for="round1_date">Departure Date</label>
-                                                    <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Date" id="round1_date" name="departure_date" min="" readonly="readonly">
+
+                                            <!-- Return Journey Section -->
+                                            <div class="journey-section mb-4">
+                                                <div class="section-header mb-3">
+                                                    <h4 class="section-title return-title">
+                                                        <i class="bi bi-airplane-arrival me-2"></i>
+                                                        Return Journey
+                                                    </h4>
                                                 </div>
-                                                <div class="col-12 col-lg-6 mb-2">
-                                                    <label for="round2_date">Return Date</label>
-                                                    <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Date" id="round2_date" name="return_date" min="" readonly="readonly">
+                                                <div class="row mb-3">
+                                                    <div class="col-12 col-lg-6 mb-2">
+                                                        <label for="return_from_location">From</label>
+                                                        <select name="return_from_location" class="form-select p-0" id="return_from_location">
+                                                            <option value="1">Port Blair</option>
+                                                            <option value="2" selected>Havelock</option>
+                                                            <option value="3">Neil</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-12 col-lg-6 mb-2">
+                                                        <label for="return_to_location">To</label>
+                                                        <select name="return_to_location" class="form-select p-0" id="return_to_location">
+                                                            <option value="1" selected>Port Blair</option>
+                                                            <option value="2">Havelock</option>
+                                                            <option value="3">Neil</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-12 col-lg-6 mb-2">
+                                                        <label for="return_date">Return Date</label>
+                                                        <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Return Date" id="return_date" name="return_date" min="" readonly="readonly">
+                                                    </div>
+                                                    <div class="col-12 col-lg-6 mb-2">
+                                                        <label for="return_passenger">Passengers</label>
+                                                        <input type="number" class="form-control" id="return_passenger" name="return_passenger" value="1" max="20" min="1" onkeyup="maxpassenger(this)" required>
+                                                    </div>
                                                 </div>
                                             </div>
+
+                                            <!-- Common Fields -->
                                             <div class="row mb-3">
-                                                <div class="col-12 col-lg-4 mb-2">
-                                                    <label for="round_passenger">Passengers</label>
-                                                    <input type="number" class="form-control" id="round_passenger" name="passenger" value="1" max="20" min="1" onkeyup="maxpassenger(this)" required>
-                                                </div>
-                                                <div class="col-12 col-lg-4 mb-2">
+                                                <div class="col-12 col-lg-6 mb-2">
                                                     <label for="round_infant">Infants</label>
                                                     <input type="number" class="form-control" id="round_infant" name="infant" value="0" oninput="this.value = this.value.replace(/[^1-8]/g, '').slice(0, 1);" required>
                                                 </div>
-                                                <div class="col-12 col-lg-4 mb-2 d-flex flex-column">
+                                                <div class="col-12 col-lg-6 mb-2 d-flex flex-column">
                                                     <label for="round-search-btn" class="invisible">Search</label>
                                                     <button type="submit" class="btn button w-100 mt-auto" id="round_search"><i class="bi bi-search"></i> Search</button>
                                                 </div>
@@ -1081,6 +1126,59 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
 </main>
 @endsection
 
+@push('css')
+<style>
+    .journey-section {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: 2px solid rgba(0, 132, 149, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .journey-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #008495, #00a0b7);
+    }
+    
+    .section-header {
+        margin-bottom: 15px;
+        padding: 0;
+    }
+    
+    .section-title {
+        font-size: 1.5rem !important;
+        font-weight: 700;
+        color: #008495 !important;
+        margin-bottom: 1rem;
+    }
+    
+    .section-title i {
+        font-size: 1.3rem;
+        margin-right: 8px;
+    }
+    
+    
+    .tab-round-trip {
+        transition: all 0.3s ease;
+    }
+    
+    .tab-round-trip.show {
+        opacity: 1 !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+</style>
+@endpush
+
 @push('js')
 <script type="text/javascript">
     // Mobile detection
@@ -1261,14 +1359,121 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             $('#round_date').flatpickr(dateOptions);
             $('#round1_date').flatpickr(dateOptions);
             $('#round2_date').flatpickr(dateOptions);
+            $('#departure_date').flatpickr(dateOptions);
+            $('#return_date').flatpickr(dateOptions);
         }
 
         $("#round-trip").on("click", function() {
-            $("#trip_type").val('3');
+            $("#trip_type").val('2');
         });
 
         $("#one-way").on("click", function() {
             $("#trip_type").val('1');
+        });
+
+        // Round trip form validation
+        $("#round_search").on("click", function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const departureFrom = $("#departure_from_location").val();
+            const departureTo = $("#departure_to_location").val();
+            const departureDate = $("#departure_date").val();
+            const returnFrom = $("#return_from_location").val();
+            const returnTo = $("#return_to_location").val();
+            const returnDate = $("#return_date").val();
+            const departurePassenger = $("#departure_passenger").val();
+            const returnPassenger = $("#return_passenger").val();
+            
+            // Validate departure journey
+            if (!departureFrom || !departureTo || !departureDate) {
+                alert('Please fill in all departure journey details (From, To, and Date).');
+                return false;
+            }
+            
+            // Validate return journey
+            if (!returnFrom || !returnTo || !returnDate) {
+                alert('Please fill in all return journey details (From, To, and Date).');
+                return false;
+            }
+            
+            // Validate dates
+            if (departureDate === 'Select Departure Date' || departureDate === '') {
+                alert('Please select a valid departure date.');
+                return false;
+            }
+            
+            if (returnDate === 'Select Return Date' || returnDate === '') {
+                alert('Please select a valid return date.');
+                return false;
+            }
+            
+            // Check if return date is after departure date
+            const depDate = new Date(departureDate);
+            const retDate = new Date(returnDate);
+            
+            if (retDate <= depDate) {
+                alert('Return date must be after departure date. Please select a return date that is later than your departure date.');
+                return false;
+            }
+            
+            // Additional validation: Check if return date is at least 1 day after departure
+            const oneDayAfter = new Date(depDate);
+            oneDayAfter.setDate(oneDayAfter.getDate() + 1);
+            
+            if (retDate < oneDayAfter) {
+                alert('Return date must be at least 1 day after departure date. Please select a valid return date.');
+                return false;
+            }
+            
+            // Validate passenger counts
+            if (!departurePassenger || departurePassenger < 1 || departurePassenger > 20) {
+                alert('Please enter a valid number of passengers for departure (1-20).');
+                return false;
+            }
+            
+            if (!returnPassenger || returnPassenger < 1 || returnPassenger > 20) {
+                alert('Please enter a valid number of passengers for return (1-20).');
+                return false;
+            }
+            
+            // If all validations pass, submit the form
+            $("form").submit();
+        });
+
+        // Sync passenger counts between departure and return journeys
+        $("#departure_passenger").on("change", function() {
+            $("#return_passenger").val($(this).val());
+        });
+
+        $("#return_passenger").on("change", function() {
+            $("#departure_passenger").val($(this).val());
+        });
+
+        // Real-time validation for return date based on departure date
+        $("#departure_date").on("change", function() {
+            const departureDate = $(this).val();
+            if (departureDate) {
+                const depDate = new Date(departureDate);
+                const minReturnDate = new Date(depDate);
+                minReturnDate.setDate(minReturnDate.getDate() + 1);
+                
+                // Update return date picker minimum date
+                const returnDatePicker = $("#return_date")[0]._flatpickr;
+                if (returnDatePicker) {
+                    returnDatePicker.set('minDate', minReturnDate);
+                }
+                
+                // If return date is already selected and is before the new minimum, clear it
+                const currentReturnDate = $("#return_date").val();
+                if (currentReturnDate) {
+                    const retDate = new Date(currentReturnDate);
+                    if (retDate <= depDate) {
+                        $("#return_date").val('');
+                        alert('Return date has been cleared as it must be after the departure date.');
+                    }
+                }
+            }
         });
 
         $(".trip-delete").on("click", function() {

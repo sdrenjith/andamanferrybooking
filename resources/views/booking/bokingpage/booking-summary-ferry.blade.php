@@ -534,7 +534,7 @@
 
                             <div class="row w-100 p-0 m-0 bg-white">
                                 <div class="px-2 col-12 py-1 tripDirection d-flex align-items-center" style="justify-content: space-between;">
-                                    <p class=" mb-0 ">Trip 2 : <span class="departing-txt-date d-inline-block">{{ $booking_data['round1_date'] }}</span>
+                                    <p class=" mb-0 ">Trip 2 : <span class="departing-txt-date d-inline-block">{{ $booking_data['departure_date'] }}</span>
                                     </p>
                                     <p class="mb-0"> {{ $trip2['ship_name'] }}</p>
                                 </div>
@@ -544,11 +544,11 @@
                                             <span class="departing-txt-date"></span>
                                         </div>
                                         <div class="row w-100 p-0 m-0 departing-destination">
-                                            <?php $form_location = $booking_data['round1_from_location']; ?>
-                                            <?php $to_location = $booking_data['round1_to_location']; ?>
-                                            <div class="col-sm-6 destination-time px-0">{{ $booking_data['round1_from_location'] == 1 ? 'Port Blair' : ($booking_data['round1_from_location'] == 2 ? 'Havelock' : 'Neil'  ) }}
+                                            <?php $form_location = $booking_data['departure_from_location']; ?>
+                                            <?php $to_location = $booking_data['departure_to_location']; ?>
+                                            <div class="col-sm-6 destination-time px-0">{{ $booking_data['departure_from_location'] == 1 ? 'Port Blair' : ($booking_data['departure_from_location'] == 2 ? 'Havelock' : 'Neil'  ) }}
                                             </div>
-                                            <div class="col-sm-6 destination-time px-0">{{ $booking_data['round1_to_location'] == 1 ? 'Port Blair' : ($booking_data['round1_to_location'] == 2 ? 'Havelock' : 'Neil'  ) }}
+                                            <div class="col-sm-6 destination-time px-0">{{ $booking_data['departure_to_location'] == 1 ? 'Port Blair' : ($booking_data['departure_to_location'] == 2 ? 'Havelock' : 'Neil'  ) }}
                                             </div>
                                         </div>
 
@@ -605,18 +605,21 @@
                                                 </p>
                                             </div>
                                         </div>
-                                        @if ($trip2['ship_name'] == 'Nautika')
+                                        
+                                        <?php 
+                                        $trip2_infants = $booking_data['no_of_infant'] ?? 0;
+                                        $trip2_infant_price = (($trip2['infantFare'] ?? 200) + $trip2['psf']) * $trip2_infants;
+                                        ?>
+                                        
+                                        @if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz' || str_contains($trip2['ship_name'], 'Green Ocean'))
                                         <div class="row w-100 p-0 m-0 mt-2">
                                             <div class="departing-txt m-0 col-6 p-0">
                                                 <p class="departing-txt-date m-0">No of Infant</p>
                                             </div>
                                             <div class="col-6 p-0 departing-txt">
-                                                <?php $trip2_infants = $booking_data['no_of_infant']; ?>
-                                                <?php $trip2_infant_price = (($trip2['infantFare'] ?? 200) + $trip2['psf']) * $trip2_infants; ?>
                                                 <p class="departing-txt-date d-inline-block m-0">
                                                     {{ $trip2_infants }}
                                                 </p>
-
                                             </div>
                                         </div>
                                         @endif

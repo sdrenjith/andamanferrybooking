@@ -362,7 +362,8 @@ $(document).ready(function() {
                 }
             }
         } else if ($.fn.datepicker) {
-            $('.my_date_picker').datepicker({
+            // Exclude Round 2 field from jQuery UI Datepicker to prevent conflicts with Flatpickr
+            $('.my_date_picker').not('#round2_date').datepicker({
                 dateFormat: 'dd-mm-yy',
                 defaultDate: "today",
                 minDate: 0,
