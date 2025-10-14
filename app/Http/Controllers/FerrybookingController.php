@@ -152,9 +152,6 @@ class FerrybookingController extends Controller
         
         if(!empty($result2->data)){
             $nautikaData = $result2->data;
-        } else {
-            // Add mock Nautika data for testing if API is not available
-            $nautikaData = $this->getMockNautikaData($data2, $ship_image, $ship);
         }
         
         if (!empty($nautikaData)) {
@@ -219,10 +216,7 @@ class FerrybookingController extends Controller
         // print_r($greenOceanData);
         // die;
 
-        // Add mock Green Ocean data if API call fails
-        if (empty($greenOceanData)) {
-            $greenOceanData = $this->getMockGreenOceanData($fromLocation, $toLocation);
-        }
+        // $greenOceanData = [];
         // ================================== GREEN OCEAN END ===========================================
 
         if (!empty($nautikaData)) {
@@ -331,9 +325,6 @@ class FerrybookingController extends Controller
             $nautika_result = $this->nautikaApiCall('getTripData', $data4);
             if(!empty($nautika_result->data)){
                 $nautikaData2 = $nautika_result->data;
-            } else {
-                // Add mock Nautika data for testing if API is not available
-                $nautikaData2 = $this->getMockNautikaData($data4, $ship_image, $ship);
             }
             
             if (!empty($nautikaData2)) {
@@ -394,11 +385,8 @@ class FerrybookingController extends Controller
             // echo "duble <br>";
             // print_r($greenOceanData);
             // die;
-            
-            // Add mock Green Ocean data if API call fails
-            if (empty($greenOceanData)) {
-                $greenOceanData = $this->getMockGreenOceanData($round1_from_location, $round1_to_location);
-            }
+            // $greenOceanData = [];
+            // dd($greenOceanData);
 
             if (!empty($nautikaData2)) {
                 $allSchedule = array_merge($makData2, $nautikaData2);
@@ -511,9 +499,6 @@ class FerrybookingController extends Controller
 
             if(!empty($nautika_result2)){
                 $nautikaData3 = $nautika_result2->data;
-            } else {
-                // Add mock Nautika data for testing if API is not available
-                $nautikaData3 = $this->getMockNautikaData($data6, $ship_image, $ship);
             }
             
             if (!empty($nautikaData3)) {
@@ -580,11 +565,7 @@ class FerrybookingController extends Controller
             // echo "tripple <br>";
             // print_r($greenOceanData);
             // die;
-            
-            // Add mock Green Ocean data if API call fails
-            if (empty($greenOceanData)) {
-                $greenOceanData = $this->getMockGreenOceanData($round2_from_location, $round2_to_location);
-            }
+            // $greenOceanData = [];
             // $allSchedule4 = array_merge($allSchedule2, $adminShipSchedules3);
             $allSchedule4 = array_merge($allSchedule2, $greenOceanData);
 
@@ -625,24 +606,18 @@ class FerrybookingController extends Controller
 
     public function bookingDataStoreSession(Request $request)
     {
-        try {
-            $bookingScheduleDetails = Session::get('booking_data');
-            $bookingScheduleDetails['schedule'][$request->trip] = array(
-                'ship' => $request->ship,
-                'scheduleId' => $request->scheduleId,
-                'shipClass' => $request->shipClass
-            );
+        $bookingScheduleDetails = Session::get('booking_data');
+        $bookingScheduleDetails['schedule'][$request->trip] = array(
+            'ship' => $request->ship,
+            'scheduleId' => $request->scheduleId,
+            'shipClass' => $request->shipClass
+        );
 
-            Session::put('booking_data', $bookingScheduleDetails);
+        Session::put('booking_data', $bookingScheduleDetails);
 
-            // print_r($bookingScheduleDetails);
-            if ($request->shipClass == 'pClass' || $request->shipClass == 'bClass') {
-                $schedules = Session::get('ferry_list');
-                
-                // Check if ferry_list session exists
-                if (!$schedules) {
-                    return response()->json(['error' => 'Ferry list not found in session'], 500);
-                }
+        // print_r($bookingScheduleDetails);
+        if ($request->shipClass == 'pClass' || $request->shipClass == 'bClass') {
+            $schedules = Session::get('ferry_list');
 
             if ($request->trip == 1) {
                 $schedule = $schedules['apiScheduleData'];
@@ -656,55 +631,22 @@ class FerrybookingController extends Controller
             if ($request->shipClass == 'pClass') {
                 foreach ($schedule as $row) {
                     if ($row['id'] == $request->scheduleId) {
-                        // Check if data has pClass property (mock data) or ship_class array (real API data)
-                        if (isset($row['pClass'])) {
-                            $scheduleSeats = $row['pClass'];
-                        } else if (isset($row['ship_class'])) {
-                            // Transform ship_class array to seat format
-                            $scheduleSeats = [];
-                            foreach ($row['ship_class'] as $class) {
-                                if ($class->ship_class_id == 'pClass') {
-                                    $scheduleSeats[] = (object) [
-                                        'number' => 'A' . rand(1, 10),
-                                        'isBooked' => 0,
-                                        'isBlocked' => 0
-                                    ];
-                                }
-                            }
-                        }
+                        $scheduleSeats = $row['pClass'];
                     }
                 }
                 $shipClass = 'luxury';
             } else if ($request->shipClass == 'bClass') {
                 foreach ($schedule as $row) {
                     if ($row['id'] == $request->scheduleId) {
-                        // Check if data has bClass property (mock data) or ship_class array (real API data)
-                        if (isset($row['bClass'])) {
-                            $scheduleSeats = $row['bClass'];
-                        } else if (isset($row['ship_class'])) {
-                            // Transform ship_class array to seat format
-                            $scheduleSeats = [];
-                            foreach ($row['ship_class'] as $class) {
-                                if ($class->ship_class_id == 'bClass') {
-                                    $scheduleSeats[] = (object) [
-                                        'number' => 'B' . rand(1, 10),
-                                        'isBooked' => 0,
-                                        'isBlocked' => 0
-                                    ];
-                                }
-                            }
-                        }
+                        $scheduleSeats = $row['bClass'];
                     }
                 }
                 $shipClass = 'royal';
             }
 
-                echo json_encode(array('seats' => $scheduleSeats, 'ship_class' => $shipClass));
-            } else {
-                echo json_encode(array('status' => 'success'));
-            }
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+            echo json_encode(array('seats' => $scheduleSeats, 'ship_class' => $shipClass));
+        } else {
+            echo json_encode(array('status' => 'success'));
         }
     }
 
@@ -906,105 +848,5 @@ class FerrybookingController extends Controller
         
         $json = json_encode($godata);
 
-    }
-
-    private function getMockNautikaData($data2, $ship_image, $ship)
-    {
-        // Create mock Nautika data for testing - only one entry to avoid duplicates
-        $mockData = [
-            (object) [
-                'id' => 'nautika_001',
-                'tripId' => 1,
-                'vesselID' => 1,
-                'dTime' => (object) ['hour' => 8, 'minute' => 0],
-                'aTime' => (object) ['hour' => 10, 'minute' => 30],
-                'from' => $data2['from'],
-                'to' => $data2['to'],
-                'fares' => (object) [
-                    'pBaseFare' => 200,
-                    'bBaseFare' => 200,
-                    'infantFare' => 200
-                ],
-                'bClass' => [
-                    (object) ['number' => 'B1', 'isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['number' => 'B2', 'isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['number' => 'B3', 'isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['number' => 'B4', 'isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['number' => 'B5', 'isBooked' => 0, 'isBlocked' => 0]
-                ],
-                'pClass' => [
-                    (object) ['number' => 'A1', 'isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['number' => 'A2', 'isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['number' => 'A3', 'isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['number' => 'A4', 'isBooked' => 0, 'isBlocked' => 0],
-                    (object) ['number' => 'A5', 'isBooked' => 0, 'isBlocked' => 0]
-                ]
-            ]
-        ];
-
-        return $mockData;
-    }
-
-    private function getMockGreenOceanData($fromLocation, $toLocation)
-    {
-        // Create mock Green Ocean data for testing
-        $mockData = [
-            [
-                'id' => 'green_ocean_001',
-                'tripId' => 2,
-                'vesselID' => 2,
-                'departure_time' => '08:00:00',
-                'arrival_time' => '10:30:00',
-                'ship_name' => 'Green Ocean 1',
-                'ship_image' => 'uploads/ship/1722411651.jpg',
-                'from' => 'Port Blair',
-                'to' => 'Swaraj Dweep (Havelock)',
-                'ship' => [
-                    'image' => 'uploads/ship/1722411651.jpg',
-                    'title' => 'Green Ocean 1',
-                    'images' => [
-                        [
-                            'image_path' => 'uploads/ship/1722411651.jpg'
-                        ]
-                    ]
-                ],
-                'pClass' => [
-                    (object) [
-                        'number' => 'A1',
-                        'isBooked' => 0,
-                        'isBlocked' => 0
-                    ],
-                    (object) [
-                        'number' => 'A2',
-                        'isBooked' => 0,
-                        'isBlocked' => 0
-                    ],
-                    (object) [
-                        'number' => 'A3',
-                        'isBooked' => 0,
-                        'isBlocked' => 0
-                    ]
-                ],
-                'bClass' => [
-                    (object) [
-                        'number' => 'B1',
-                        'isBooked' => 0,
-                        'isBlocked' => 0
-                    ],
-                    (object) [
-                        'number' => 'B2',
-                        'isBooked' => 0,
-                        'isBlocked' => 0
-                    ],
-                    (object) [
-                        'number' => 'B3',
-                        'isBooked' => 0,
-                        'isBlocked' => 0
-                    ]
-                ]
-            ],
-        ];
-
-        return $mockData;
     }
 }
