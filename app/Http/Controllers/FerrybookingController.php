@@ -290,27 +290,31 @@ class FerrybookingController extends Controller
             $round1_to_location = $request->input('departure_to_location');
             $date = date('Y-m-d', strtotime($request->input('departure_date')));
 
-            $oneHourAgo = Carbon::now()->subHour();
-            $adminShipSchedules2 = FerrySchedul::with([
-                'ferryPrices' => function ($query) {
-                    $query->orderBy('price', 'asc');
-                },
-                'fromLocation',
-                'toLocation',
-                'ship',
-                'ship.images',
-                'ferryPrices.class'
-            ])
-                ->where('from_location', $round1_from_location)
-                ->where('to_location', $round1_to_location)
-                ->where('status', 'Y')
-                ->where('from_date', '<=', $date)
-                ->where('to_date', '>=', $date)
-                ->when($date && $date == now()->format('Y-m-d'), function ($query) use ($oneHourAgo) {
-                    return $query->where('departure_time', '>=', $oneHourAgo);
-                })
-                ->orderBy('departure_time')
-                ->get()->toArray();
+            // Cache round trip departure schedules
+            $cacheKey2 = "admin_schedules_{$round1_from_location}_{$round1_to_location}_{$date}";
+            $adminShipSchedules2 = \Cache::remember($cacheKey2, 300, function () use ($round1_from_location, $round1_to_location, $date) {
+                $oneHourAgo = Carbon::now()->subHour();
+                return FerrySchedul::with([
+                    'ferryPrices' => function ($query) {
+                        $query->orderBy('price', 'asc');
+                    },
+                    'fromLocation',
+                    'toLocation',
+                    'ship',
+                    'ship.images',
+                    'ferryPrices.class'
+                ])
+                    ->where('from_location', $round1_from_location)
+                    ->where('to_location', $round1_to_location)
+                    ->where('status', 'Y')
+                    ->where('from_date', '<=', $date)
+                    ->where('to_date', '>=', $date)
+                    ->when($date && $date == now()->format('Y-m-d'), function ($query) use ($oneHourAgo) {
+                        return $query->where('departure_time', '>=', $oneHourAgo);
+                    })
+                    ->orderBy('departure_time')
+                    ->get()->toArray();
+            });
 
 
 
@@ -320,8 +324,12 @@ class FerrybookingController extends Controller
                 }
             }
 
-            $round_1_from_location_title = FerryLocation::where('id',  $round1_from_location)->first();
-            $round_1_to_location_title = FerryLocation::where('id', $round1_to_location)->first();
+            $round_1_from_location_title = \Cache::remember("location_{$round1_from_location}", 3600, function () use ($round1_from_location) {
+                return FerryLocation::where('id', $round1_from_location)->first();
+            });
+            $round_1_to_location_title = \Cache::remember("location_{$round1_to_location}", 3600, function () use ($round1_to_location) {
+                return FerryLocation::where('id', $round1_to_location)->first();
+            });
 
             // Add null checks to prevent "Attempt to read property 'title' on null" error
             if (!$round_1_from_location_title || !$round_1_to_location_title) {
@@ -358,10 +366,12 @@ class FerrybookingController extends Controller
                 'to' => $round1_to_location_title
             );
 
-            $ship = ShipMaster::with('images')->where('id', 2)->get();
-            $ship_image = $ship[0]['image'];
+            $ship = \Cache::remember('ship_2_data', 3600, function () {
+                return ShipMaster::with('images')->where('id', 2)->first();
+            });
+            $ship_image = $ship ? $ship->image : '';
 
-            $nautika_result = $this->nautikaApiCall('getTripData', $data4);
+            $nautika_result = $this->nautikaApiCallUltraFast('getTripData', $data4);
             $nautikaData2 = [];
             if(!empty($nautika_result) && !empty($nautika_result->data)){
                 $nautikaData2 = $nautika_result->data;
@@ -398,13 +408,15 @@ class FerrybookingController extends Controller
                 "to_location" => $round1_to_location,
             ));
 
-            $makruzz_result = $this->makApiCall('schedule_search', $data5);
+            $makruzz_result = $this->makApiCallUltraFast('schedule_search', $data5);
 
             // $ship=DB::table('ship_master')->select('image')->where('id', 1)->first();
             // $ship_image= $ship->image;
 
-            $ship = ShipMaster::with('images')->where('id', 1)->get();
-            $ship_image = $ship[0]['image'];
+            $ship = \Cache::remember('ship_1_data', 3600, function () {
+                return ShipMaster::with('images')->where('id', 1)->first();
+            });
+            $ship_image = $ship ? $ship->image : '';
 
             $makData2 = [];
             if (!empty($makruzz_result) && !empty($makruzz_result->data)) {
@@ -420,7 +432,7 @@ class FerrybookingController extends Controller
             }
 
             // ======================= GREEN OCEAN CALL ==================================
-            $greenOceanData = $this->green_ocean_call($round1_from_location, $round1_to_location, $no_of_passenger, $infant, $date);
+            $greenOceanData = $this->green_ocean_call_ultra_fast($round1_from_location, $round1_to_location, $no_of_passenger, $infant, $date);
             // echo '<pre>';
             // echo "duble <br>";
             // print_r($greenOceanData);
@@ -454,27 +466,31 @@ class FerrybookingController extends Controller
             $return_to_location = $request->input('return_to_location');
             $return_date = date('Y-m-d', strtotime($request->input('return_date')));
 
-            $oneHourAgo = Carbon::now()->subHour();
-            $adminShipSchedules3 = FerrySchedul::with([
-                'ferryPrices' => function ($query) {
-                    $query->orderBy('price', 'asc');
-                },
-                'fromLocation',
-                'toLocation',
-                'ship',
-                'ship.images',
-                'ferryPrices.class'
-            ])
-                ->where('from_location', $return_from_location)
-                ->where('to_location', $return_to_location)
-                ->where('status', 'Y')
-                ->where('from_date', '<=', $return_date)
-                ->where('to_date', '>=', $return_date)
-                ->when($return_date && $return_date == now()->format('Y-m-d'), function ($query) use ($oneHourAgo) {
-                    return $query->where('departure_time', '>=', $oneHourAgo);
-                })
-                ->orderBy('departure_time')
-                ->get()->toArray();
+            // Cache return journey schedules
+            $cacheKey3 = "admin_schedules_{$return_from_location}_{$return_to_location}_{$return_date}";
+            $adminShipSchedules3 = \Cache::remember($cacheKey3, 300, function () use ($return_from_location, $return_to_location, $return_date) {
+                $oneHourAgo = Carbon::now()->subHour();
+                return FerrySchedul::with([
+                    'ferryPrices' => function ($query) {
+                        $query->orderBy('price', 'asc');
+                    },
+                    'fromLocation',
+                    'toLocation',
+                    'ship',
+                    'ship.images',
+                    'ferryPrices.class'
+                ])
+                    ->where('from_location', $return_from_location)
+                    ->where('to_location', $return_to_location)
+                    ->where('status', 'Y')
+                    ->where('from_date', '<=', $return_date)
+                    ->where('to_date', '>=', $return_date)
+                    ->when($return_date && $return_date == now()->format('Y-m-d'), function ($query) use ($oneHourAgo) {
+                        return $query->where('departure_time', '>=', $oneHourAgo);
+                    })
+                    ->orderBy('departure_time')
+                    ->get()->toArray();
+            });
 
             if ($adminShipSchedules3) {
                 foreach ($adminShipSchedules3 as $key => $val) {
@@ -482,8 +498,12 @@ class FerrybookingController extends Controller
                 }
             }
 
-            $return_from_location_title = FerryLocation::where('id', $return_from_location)->first();
-            $return_to_location_title = FerryLocation::where('id', $return_to_location)->first();
+            $return_from_location_title = \Cache::remember("location_{$return_from_location}", 3600, function () use ($return_from_location) {
+                return FerryLocation::where('id', $return_from_location)->first();
+            });
+            $return_to_location_title = \Cache::remember("location_{$return_to_location}", 3600, function () use ($return_to_location) {
+                return FerryLocation::where('id', $return_to_location)->first();
+            });
 
             // Add null checks to prevent "Attempt to read property 'title' on null" error
             if (!$return_from_location_title || !$return_to_location_title) {
@@ -521,10 +541,12 @@ class FerrybookingController extends Controller
                 'to' => $return_to_location_title
             );
 
-            $ship = ShipMaster::with('images')->where('id', 2)->get();
-            $ship_image = $ship[0]['image'];
+            $ship = \Cache::remember('ship_2_data', 3600, function () {
+                return ShipMaster::with('images')->where('id', 2)->first();
+            });
+            $ship_image = $ship ? $ship->image : '';
 
-            $nautika_return_result = $this->nautikaApiCall('getTripData', $return_data);
+            $nautika_return_result = $this->nautikaApiCallUltraFast('getTripData', $return_data);
             $nautikaReturnData = [];
             if(!empty($nautika_return_result) && !empty($nautika_return_result->data)){
                 $nautikaReturnData = $nautika_return_result->data;
@@ -561,10 +583,12 @@ class FerrybookingController extends Controller
                 "to_location" => $return_to_location,
             ));
 
-            $makruzz_return_result = $this->makApiCall('schedule_search', $return_mak_data);
+            $makruzz_return_result = $this->makApiCallUltraFast('schedule_search', $return_mak_data);
 
-            $ship = ShipMaster::with('images')->where('id', 1)->get();
-            $ship_image = $ship[0]['image'];
+            $ship = \Cache::remember('ship_1_data', 3600, function () {
+                return ShipMaster::with('images')->where('id', 1)->first();
+            });
+            $ship_image = $ship ? $ship->image : '';
 
             $makReturnData = [];
             if (!empty($makruzz_return_result) && !empty($makruzz_return_result->data)) {
@@ -580,7 +604,7 @@ class FerrybookingController extends Controller
             }
 
             // Green Ocean call for return journey
-            $greenOceanReturnData = $this->green_ocean_call($return_from_location, $return_to_location, $no_of_passenger, $infant, $return_date);
+            $greenOceanReturnData = $this->green_ocean_call_ultra_fast($return_from_location, $return_to_location, $no_of_passenger, $infant, $return_date);
 
             if (!empty($nautikaReturnData)) {
                 $allReturnSchedule = array_merge($makReturnData, $nautikaReturnData);
@@ -692,8 +716,10 @@ class FerrybookingController extends Controller
                 'to' => $round2_to_location_title
             );
 
-            $ship = ShipMaster::with('images')->where('id', 2)->get();
-            $ship_image = $ship[0]['image'];
+            $ship = \Cache::remember('ship_2_data', 3600, function () {
+                return ShipMaster::with('images')->where('id', 2)->first();
+            });
+            $ship_image = $ship ? $ship->image : '';
 
             $nautika_result2 = $this->nautikaApiCall('getTripData', $data6);
 
@@ -737,8 +763,10 @@ class FerrybookingController extends Controller
             // $ship=DB::table('ship_master')->select('image')->where('id', 1)->first();
             // $ship_image= $ship->image;
 
-            $ship = ShipMaster::with('images')->where('id', 1)->get();
-            $ship_image = $ship[0]['image'];
+            $ship = \Cache::remember('ship_1_data', 3600, function () {
+                return ShipMaster::with('images')->where('id', 1)->first();
+            });
+            $ship_image = $ship ? $ship->image : '';
 
             $makData3 = [];
             if (!empty($makruzz_result2) && !empty($makruzz_result2->data)) {
