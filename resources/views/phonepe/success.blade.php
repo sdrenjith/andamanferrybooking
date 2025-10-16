@@ -118,7 +118,6 @@
             setTimeout(function() {
                 var ticketForm = document.querySelector('form[action*="ticket_generate"]');
                 if (ticketForm) {
-                    console.log('Auto-downloading ticket...');
                     // Uncomment the line below to enable auto-download
                     // ticketForm.submit();
                 }

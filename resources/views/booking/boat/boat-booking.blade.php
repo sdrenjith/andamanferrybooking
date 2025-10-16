@@ -266,8 +266,6 @@ $(document).ready(function() {
 
     // Add click handler for debugging
     $('#boat_date').on('click', function() {
-        console.log('Date input clicked');
-        console.log('Current value:', $(this).val());
     });
 
     $('#bookNowBtn').on('click', function(e) {

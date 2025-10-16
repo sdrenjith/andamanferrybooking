@@ -122,6 +122,8 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                                 <div class="col-12 col-lg-2 mb-2">
                                                     <label for="date">Date</label>
                                                     <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Date" id="date" name="date" min="" readonly="readonly" fdprocessedid="w8od0e">
+                                                    <!-- Mobile fallback date input -->
+                                                    <input type="date" class="mobile-date-input" id="date_mobile" name="date" style="display: none;" min="{{ date('Y-m-d') }}" placeholder="Select Date">
                                                 </div>
                                                 <div class="col-12 col-lg-2 mb-2">
                                                     <label for="location">Passengers</label>
@@ -168,6 +170,8 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                                 <div class="col-12 col-lg-6 mb-2">
                                                         <label for="departure_date">Departure Date</label>
                                                         <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Departure Date" id="departure_date" name="departure_date" min="" readonly="readonly">
+                                                        <!-- Mobile fallback date input -->
+                                                        <input type="date" class="mobile-date-input" id="departure_date_mobile" name="departure_date" style="display: none;" min="{{ date('Y-m-d') }}">
                                                 </div>
                                                 <div class="col-12 col-lg-6 mb-2">
                                                         <label for="departure_passenger">Passengers</label>
@@ -206,6 +210,8 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                                     <div class="col-12 col-lg-6 mb-2">
                                                         <label for="return_date">Return Date</label>
                                                         <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Return Date" id="return_date" name="return_date" min="" readonly="readonly">
+                                                        <!-- Mobile fallback date input -->
+                                                        <input type="date" class="mobile-date-input" id="return_date_mobile" name="return_date" style="display: none;" min="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col-12 col-lg-6 mb-2">
                                                         <label for="return_passenger">Passengers</label>
@@ -1700,8 +1706,12 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
 
 @push('js')
 <script type="text/javascript">
-    // Mobile detection
-    const isMobile = window.innerWidth <= 767;
+    // Enhanced mobile detection
+    const isMobile = window.innerWidth <= 767 || 
+                     /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                     ('ontouchstart' in window) ||
+                     (navigator.maxTouchPoints > 0) ||
+                     window.matchMedia("(max-width: 768px)").matches;
     
     function maxpassenger(element) {
         if (element.value < 1 || element.value > 20) {
@@ -1852,35 +1862,159 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             $('#ui-datepicker-div').hide();
         }, 100);
 
-        // Initialize flatpickr only on desktop for better performance
-        if (!isMobile) {
-            const dateOptions = {
-                dateFormat: 'Y-m-d',
-                minDate: "today"
-            };
+        // Initialize date picker for both desktop and mobile
+        const dateOptions = {
+            dateFormat: 'Y-m-d',
+            minDate: "today",
+            // Mobile-specific options
+            allowInput: true,
+            clickOpens: true,
+            // Ensure it works on mobile Safari
+            disableMobile: false,
+            // Add mobile-friendly styling
+            static: true,
+            // Prevent keyboard issues on mobile
+            onReady: function(selectedDates, dateStr, instance) {
+                // Ensure proper mobile behavior
+                if (isMobile) {
+                    instance.element.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        instance.open();
+                    });
+                }
+            }
+        };
 
-            // Destroy existing flatpickr instances to prevent duplicates
-            if ($('#date').data('flatpickr')) {
-                $('#date').data('flatpickr').destroy();
-            }
-            if ($('#round_date').data('flatpickr')) {
-                $('#round_date').data('flatpickr').destroy();
-            }
-            if ($('#round1_date').data('flatpickr')) {
-                $('#round1_date').data('flatpickr').destroy();
-            }
-            if ($('#round2_date').data('flatpickr')) {
-                $('#round2_date').data('flatpickr').destroy();
-            }
-
-            // Initialize flatpickr
-            $('#date').flatpickr(dateOptions);
-            $('#round_date').flatpickr(dateOptions);
-            $('#round1_date').flatpickr(dateOptions);
-            $('#round2_date').flatpickr(dateOptions);
-            $('#departure_date').flatpickr(dateOptions);
-            $('#return_date').flatpickr(dateOptions);
+        // Destroy existing flatpickr instances to prevent duplicates
+        if ($('#date').data('flatpickr')) {
+            $('#date').data('flatpickr').destroy();
         }
+        if ($('#round_date').data('flatpickr')) {
+            $('#round_date').data('flatpickr').destroy();
+        }
+        if ($('#round1_date').data('flatpickr')) {
+            $('#round1_date').data('flatpickr').destroy();
+        }
+        if ($('#round2_date').data('flatpickr')) {
+            $('#round2_date').data('flatpickr').destroy();
+        }
+        if ($('#departure_date').data('flatpickr')) {
+            $('#departure_date').data('flatpickr').destroy();
+        }
+        if ($('#return_date').data('flatpickr')) {
+            $('#return_date').data('flatpickr').destroy();
+        }
+
+        // Initialize flatpickr for all devices
+        $('#date').flatpickr(dateOptions);
+        $('#round_date').flatpickr(dateOptions);
+        $('#round1_date').flatpickr(dateOptions);
+        $('#round2_date').flatpickr(dateOptions);
+        $('#departure_date').flatpickr(dateOptions);
+        $('#return_date').flatpickr(dateOptions);
+
+        // Enhanced mobile detection and fallback system
+        function initializeMobileDatePickers() {
+            // Check if we should use mobile date inputs
+            const shouldUseMobile = isMobile || 
+                                   window.innerWidth <= 768 || 
+                                   $('.flatpickr-input').length === 0 ||
+                                   !$('#date').data('flatpickr');
+
+            if (shouldUseMobile) {
+                // Show mobile date inputs and hide flatpickr inputs
+                $('.flatpickr-input').hide();
+                $('.mobile-date-input').show();
+
+                // Sync values between mobile date inputs and flatpickr inputs
+                $('.mobile-date-input').on('change', function() {
+                    const mobileInput = $(this);
+                    const flatpickrInput = mobileInput.prev('.flatpickr-input');
+                    flatpickrInput.val(mobileInput.val());
+                });
+
+                // Add mobile-specific styling
+                $('<style>')
+                    .prop('type', 'text/css')
+                    .html(`
+                        .mobile-date-input {
+                            width: 100% !important;
+                            padding: 8px 12px !important;
+                            border: 1px solid #ced4da !important;
+                            border-radius: 4px !important;
+                            font-size: 16px !important;
+                            background: white !important;
+                            display: block !important;
+                        }
+                        .flatpickr-input {
+                            display: none !important;
+                        }
+                        /* Media query fallback for mobile view */
+                        @media (max-width: 768px) {
+                            .flatpickr-input {
+                                display: none !important;
+                            }
+                            .mobile-date-input {
+                                display: block !important;
+                            }
+                        }
+                        /* Force mobile inputs in mobile view mode */
+                        @media (max-width: 1024px) and (orientation: portrait) {
+                            .flatpickr-input {
+                                display: none !important;
+                            }
+                            .mobile-date-input {
+                                display: block !important;
+                            }
+                        }
+                    `)
+                    .appendTo('head');
+            } else {
+                // Hide mobile date inputs on desktop
+                $('.mobile-date-input').hide();
+            }
+        }
+
+        // Initialize mobile date pickers
+        initializeMobileDatePickers();
+
+        // Re-check on window resize
+        $(window).on('resize', function() {
+            setTimeout(initializeMobileDatePickers, 100);
+        });
+
+        // Fallback: If flatpickr fails to initialize, use mobile inputs
+        setTimeout(function() {
+            if (!$('#date').data('flatpickr')) {
+                $('.flatpickr-input').hide();
+                $('.mobile-date-input').show();
+            }
+        }, 1000);
+
+        // Force mobile inputs in mobile view mode (Firefox mobile view)
+        function forceMobileInputs() {
+            const isMobileView = window.innerWidth <= 768 || 
+                                window.matchMedia("(max-width: 768px)").matches ||
+                                /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent);
+            
+            if (isMobileView) {
+                $('.flatpickr-input').hide();
+                $('.mobile-date-input').show();
+                
+                // Add CSS to force mobile inputs
+                $('<style>')
+                    .prop('type', 'text/css')
+                    .html(`
+                        .flatpickr-input { display: none !important; }
+                        .mobile-date-input { display: block !important; }
+                    `)
+                    .appendTo('head');
+            }
+        }
+
+        // Run immediately and on resize
+        forceMobileInputs();
+        $(window).on('resize', forceMobileInputs);
 
         $("#round-trip").on("click", function() {
             $("#trip_type").val('2');
@@ -2043,7 +2177,6 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
         fetch('/api/google-reviews')
             .then(response => response.json())
             .then(data => {
-            console.log('API Response:', data);
             
             // Check if we have reviews instead of checking for success
             if (data && data.reviews && data.reviews.length > 0) {
@@ -2099,21 +2232,13 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                 `/api/proxy-image?url=${encodeURIComponent(review.profile_photo_url)}` : 
                 null;
             
-            // Debug logging
-            console.log('Review data:', {
-                author_name: review.author_name,
-                profile_photo_url: review.profile_photo_url,
-                proxyProfilePhoto: proxyProfilePhoto
-            });
             
             // Preload the profile image to ensure it loads with the review
             if (proxyProfilePhoto) {
                 const img = new Image();
                 img.onload = function() {
-                    console.log('Profile image loaded successfully:', proxyProfilePhoto);
                 };
                 img.onerror = function() {
-                    console.log('Profile image failed to load:', proxyProfilePhoto);
                 };
                 img.src = proxyProfilePhoto;
             }

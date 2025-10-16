@@ -2400,7 +2400,6 @@
                                 window.location.href = newUrl;
                                 // $(document).find("#nav-contact-tab").removeClass('disabled')
                                 //     .trigger("click");
-                                console.log(1234);
                                 
                             }
                         @else
@@ -2474,7 +2473,6 @@
                         }
                     },
                     error: function(xhr) {
-                        console.log(xhr.responseText);
                     }
                 });
             });
@@ -2598,7 +2596,6 @@
                         
                     },
                     error: function(xhr) {
-                        console.log(xhr.responseText);
                     }
                 });
 
@@ -2623,7 +2620,6 @@
                 var shipClass = $(this).data('class_id');
                 var shipName = $(this).data('ship_name');
 
-                console.log("shipName == " + shipName);
                 
 
                 
@@ -2719,7 +2715,6 @@
                         // window.location.href = newUrl;
                     },
                     error: function(xhr) {
-                        console.log(xhr.responseText);
                     }
                 });
             });
@@ -2882,12 +2877,10 @@
                                 seat_nos.push(seat);
                             }
                         });
-                        console.log('Selected seats:', seat_nos);
 
                         var seatsString = JSON.stringify(seat_nos);
                         $("#trip2seatNo").val(seatsString);
 
-                        console.log("curTripNo == " + curTripNo + " || seatsString" + seatsString);
 
                         // $('#nautika-proceed').click(function() {});
                         
@@ -2974,7 +2967,6 @@
                     }
 
                 }
-                console.log(seats);
                 
                 // console.log($("#trip1seatNo").val());
 
@@ -3018,7 +3010,6 @@
                         seatsSl.push(seat_nos);
 
                         var seatsString = JSON.stringify(seat_nos);
-                        console.log(seatsString);
                         $("#trip1seatNo").val(seatsString);
                     } else {
                         // alert('not selected')
@@ -3219,7 +3210,6 @@
                         method: 'POST',
                         data: ajaxDataSet,
                         success: function(response) {
-                            console.log(response);
                             // return false;
 
                             $('#exampleModal').modal('hide');
@@ -3227,17 +3217,14 @@
 
                             if (trip_type == 1 && modalTripNo == 1) {
                                 var newUrl = "{{ route('booking-ferry') }}";
-                                console.log(newUrl);
                                 window.location.href = newUrl;
                             }
                             if (trip_type == 2 && modalTripNo == 2) {
                                 var newUrl = "{{ route('booking-ferry') }}";
-                                console.log(newUrl);
                                 window.location.href = newUrl;
                             }
                             if (trip_type == 3 && modalTripNo == 3) {
                                 var newUrl = "{{ route('booking-ferry') }}";
-                                console.log(newUrl);
                                 window.location.href = newUrl;
                             }
                         }

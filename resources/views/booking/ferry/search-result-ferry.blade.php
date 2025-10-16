@@ -2470,7 +2470,6 @@
             }
 
             $("#modalGreenOceanSeat .seat-layout").find('.col-xs-12 .col-xs-5 .col-xs-12 .col-xs-2').each(function(){
-                console.log($(this).find('.class_selection.onewaysel').length);
 
                 if ($(this).find('.class_selection.onewaysel').length == 0) {
                     $(this).addClass('xs-hidden');
@@ -2653,7 +2652,6 @@
                         }
                     },
                     error: function(xhr) {
-                        console.log(xhr.responseText);
                     }
                 });
             });
@@ -2832,7 +2830,6 @@
                         
                     },
                     error: function(xhr) {
-                        console.log(xhr.responseText);
                     }
                 });
             });
@@ -2874,8 +2871,6 @@
                         var shipName = element.data('ship_name');
                         var results = JSON.parse(response);
 
-                        console.log(results.seats);
-                        console.log(shipName.indexOf(gShipName));
                         // return false;
 
                         if (results.seats) {
@@ -2945,7 +2940,6 @@
                             $("#trip3details").val(trip3Detailsstr);
 
                         } else if (shipName.indexOf(gShipName) == 0) {
-                            console.log(shipName);
                             
                             // var shipName = element.data('ship_name');
 
@@ -3034,7 +3028,6 @@
                         } else {
                             var newUrl = "{{ route('booking-ferry') }}";
 
-                            console.log("else part");
                             return false;
                             window.location.href = newUrl;
                         }
@@ -3043,7 +3036,6 @@
                         // window.location.href = newUrl;
                     },
                     error: function(xhr) {
-                        console.log(xhr.responseText);
                     }
                 });
             });
@@ -3798,7 +3790,6 @@
                     
                     if (retDate <= depDate) {
                         $("#return_date").val('');
-                        console.log('Return date cleared: must be after departure date');
                     } else {
                         // Set minimum date for return date picker
                         const minReturnDate = new Date(depDate);
