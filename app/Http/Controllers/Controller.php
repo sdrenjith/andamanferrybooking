@@ -14,7 +14,7 @@ class Controller extends BaseController
     public function makApiCall($endPoint=NULL, $param=NULL)
     {
         try {
-            $response = Http::timeout(50)->withHeaders([
+            $response = Http::timeout(30)->connectTimeout(10)->withHeaders([
                 'Mak_Authorization' => env('MAK_TOKEN'),
                 'Accept' => 'application/json'
             ])
@@ -24,8 +24,32 @@ class Controller extends BaseController
             $data = json_decode($response);
             return $data;
 
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            // Log the connection error for debugging
+            \Log::warning('Makruzz API Connection Error: ' . $e->getMessage(), [
+                'endpoint' => $endPoint,
+                'url' => env('MAK_API_URL') . $endPoint
+            ]);
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
         } catch (\Illuminate\Http\Client\RequestException $e) {
-            $data = [];
+            // Log the request error for debugging
+            \Log::warning('Makruzz API Request Error: ' . $e->getMessage(), [
+                'endpoint' => $endPoint,
+                'url' => env('MAK_API_URL') . $endPoint
+            ]);
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
+        } catch (\Exception $e) {
+            // Log any other errors
+            \Log::error('Makruzz API General Error: ' . $e->getMessage(), [
+                'endpoint' => $endPoint,
+                'url' => env('MAK_API_URL') . $endPoint
+            ]);
+            $data = new \stdClass();
+            $data->data = [];
             return $data;
         }
 
@@ -42,7 +66,7 @@ class Controller extends BaseController
             $response = Http::withHeaders([
                 'debug' => true, // Custom header to trigger debugging
                 'Accept' => 'application/json'
-            ])->timeout(20)->withoutVerifying()->post(env('NAUTIKA_API_URL') . $endPoint, $paramAll);
+            ])->timeout(30)->connectTimeout(10)->withoutVerifying()->post(env('NAUTIKA_API_URL') . $endPoint, $paramAll);
 
             if (request()->ip() == "103.170.183.151") {
                 dd($response);
@@ -50,8 +74,32 @@ class Controller extends BaseController
             $data = json_decode($response);
             return $data;
 
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            // Log the connection error for debugging
+            \Log::warning('Nautika API Connection Error: ' . $e->getMessage(), [
+                'endpoint' => $endPoint,
+                'url' => env('NAUTIKA_API_URL') . $endPoint
+            ]);
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
         } catch (\Illuminate\Http\Client\RequestException $e) {
-            $data = [];
+            // Log the request error for debugging
+            \Log::warning('Nautika API Request Error: ' . $e->getMessage(), [
+                'endpoint' => $endPoint,
+                'url' => env('NAUTIKA_API_URL') . $endPoint
+            ]);
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
+        } catch (\Exception $e) {
+            // Log any other errors
+            \Log::error('Nautika API General Error: ' . $e->getMessage(), [
+                'endpoint' => $endPoint,
+                'url' => env('NAUTIKA_API_URL') . $endPoint
+            ]);
+            $data = new \stdClass();
+            $data->data = [];
             return $data;
         }
     }
@@ -59,7 +107,7 @@ class Controller extends BaseController
     public function greenOceanApiCall($endPoint=NULL, $param=NULL)
     {
         try {
-            $response = Http::timeout(50)->withHeaders([
+            $response = Http::timeout(30)->connectTimeout(10)->withHeaders([
                 'Accept' => 'application/json'
             ])
             ->withoutVerifying()
@@ -68,8 +116,32 @@ class Controller extends BaseController
             $data = json_decode($response);
             return $data;
 
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            // Log the connection error for debugging
+            \Log::warning('Green Ocean API Connection Error: ' . $e->getMessage(), [
+                'endpoint' => $endPoint,
+                'url' => env('GREEN_OCEAN_API_URL') . $endPoint
+            ]);
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
         } catch (\Illuminate\Http\Client\RequestException $e) {
-            $data = [];
+            // Log the request error for debugging
+            \Log::warning('Green Ocean API Request Error: ' . $e->getMessage(), [
+                'endpoint' => $endPoint,
+                'url' => env('GREEN_OCEAN_API_URL') . $endPoint
+            ]);
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
+        } catch (\Exception $e) {
+            // Log any other errors
+            \Log::error('Green Ocean API General Error: ' . $e->getMessage(), [
+                'endpoint' => $endPoint,
+                'url' => env('GREEN_OCEAN_API_URL') . $endPoint
+            ]);
+            $data = new \stdClass();
+            $data->data = [];
             return $data;
         }
     }
@@ -95,5 +167,125 @@ class Controller extends BaseController
         }
         $hash .= $private_key;
         return strtolower(hash('sha512', $hash));
+    }
+
+    // Fast API call methods with shorter timeouts for better performance
+    public function nautikaApiCallFast($endPoint=NULL, $param=NULL)
+    {
+        $authParam = array('userName' => env('NAUTIKA_API_USERNAME'), 'token' => env('NAUTIKA_TOKEN'));
+        $paramAll = array_merge($param, $authParam);
+
+        try {
+            $response = Http::withHeaders([
+                'Accept' => 'application/json'
+            ])->timeout(10)->connectTimeout(5)->withoutVerifying()->post(env('NAUTIKA_API_URL') . $endPoint, $paramAll);
+
+            $data = json_decode($response);
+            return $data;
+
+        } catch (\Exception $e) {
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
+        }
+    }
+
+    public function makApiCallFast($endPoint=NULL, $param=NULL)
+    {
+        try {
+            $response = Http::timeout(10)->connectTimeout(5)->withHeaders([
+                'Mak_Authorization' => env('MAK_TOKEN'),
+                'Accept' => 'application/json'
+            ])
+            ->withoutVerifying()
+            ->post(env('MAK_API_URL') . $endPoint, $param);
+            
+            $data = json_decode($response);
+            return $data;
+
+        } catch (\Exception $e) {
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
+        }
+    }
+
+    public function greenOceanApiCallFast($endPoint=NULL, $param=NULL)
+    {
+        try {
+            $response = Http::timeout(10)->connectTimeout(5)->withHeaders([
+                'Accept' => 'application/json'
+            ])
+            ->withoutVerifying()
+            ->post(env('GREEN_OCEAN_API_URL') . $endPoint, $param);
+            
+            $data = json_decode($response);
+            return $data;
+
+        } catch (\Exception $e) {
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
+        }
+    }
+
+    // Ultra-fast API call methods with 5-second timeouts for immediate response
+    public function nautikaApiCallUltraFast($endPoint=NULL, $param=NULL)
+    {
+        $authParam = array('userName' => env('NAUTIKA_API_USERNAME'), 'token' => env('NAUTIKA_TOKEN'));
+        $paramAll = array_merge($param, $authParam);
+
+        try {
+            $response = Http::withHeaders([
+                'Accept' => 'application/json'
+            ])->timeout(5)->connectTimeout(3)->withoutVerifying()->post(env('NAUTIKA_API_URL') . $endPoint, $paramAll);
+
+            $data = json_decode($response);
+            return $data;
+
+        } catch (\Exception $e) {
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
+        }
+    }
+
+    public function makApiCallUltraFast($endPoint=NULL, $param=NULL)
+    {
+        try {
+            $response = Http::timeout(5)->connectTimeout(3)->withHeaders([
+                'Mak_Authorization' => env('MAK_TOKEN'),
+                'Accept' => 'application/json'
+            ])
+            ->withoutVerifying()
+            ->post(env('MAK_API_URL') . $endPoint, $param);
+            
+            $data = json_decode($response);
+            return $data;
+
+        } catch (\Exception $e) {
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
+        }
+    }
+
+    public function greenOceanApiCallUltraFast($endPoint=NULL, $param=NULL)
+    {
+        try {
+            $response = Http::timeout(5)->connectTimeout(3)->withHeaders([
+                'Accept' => 'application/json'
+            ])
+            ->withoutVerifying()
+            ->post(env('GREEN_OCEAN_API_URL') . $endPoint, $param);
+            
+            $data = json_decode($response);
+            return $data;
+
+        } catch (\Exception $e) {
+            $data = new \stdClass();
+            $data->data = [];
+            return $data;
+        }
     }
 }

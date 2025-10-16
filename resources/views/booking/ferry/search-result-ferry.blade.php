@@ -5,6 +5,28 @@
 
 @section('content')
     <main>
+        <!-- Loading indicator -->
+        <div id="loadingIndicator" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+            <div style="border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;"></div>
+            <p style="margin-top: 20px; font-size: 18px; color: #333;">Loading ferry schedules...</p>
+            <p style="margin-top: 10px; font-size: 14px; color: #666;">This may take a few seconds</p>
+        </div>
+        
+        <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        </style>
+        
+        <script>
+        // Hide loading indicator after page loads
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }, 1000);
+        });
+        </script>
 
         <style>
         .seat {

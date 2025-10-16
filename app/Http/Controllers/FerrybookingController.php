@@ -123,7 +123,10 @@ class FerrybookingController extends Controller
         Session::forget('trip2_booking_id');
         Session::forget('trip_type');
 
-        $data['ferry_locations'] = DB::table('ferry_locations')->where('status', 'Y')->get();
+        // Cache ferry locations for better performance
+        $data['ferry_locations'] = \Cache::remember('ferry_locations', 3600, function () {
+            return DB::table('ferry_locations')->where('status', 'Y')->get();
+        });
 
         $date = date('Y-m-d', strtotime(str_replace('/', '-',  $date)));
         $dateCarbon = date('Y-m-d', strtotime($date));
@@ -131,27 +134,31 @@ class FerrybookingController extends Controller
         $no_of_passenger = $request->input('passenger');
         $infant = $request->input('infant');
 
-        $oneHourAgo = Carbon::now()->subHour();
-        $adminShipSchedules = FerrySchedul::with([
-            'ferryPrices' => function ($query) {
-                $query->orderBy('price', 'asc');
-            },
-            'fromLocation',
-            'toLocation',
-            'ship',
-            'ship.images',
-            'ferryPrices.class'
-        ])
-            ->where('from_location', $fromLocation)
-            ->where('to_location', $toLocation)
-            ->where('status', 'Y')
-            ->where('from_date', '<=', $date)
-            ->where('to_date', '>=', $date)
-            ->when($date && $date == now()->format('Y-m-d'), function ($query) use ($oneHourAgo) {
-                return $query->where('departure_time', '>=', $oneHourAgo);
-            })
-            ->orderBy('departure_time')
-            ->get()->toArray();
+        // Optimize database query - use simpler query with caching
+        $cacheKey = "admin_schedules_{$fromLocation}_{$toLocation}_{$date}";
+        $adminShipSchedules = \Cache::remember($cacheKey, 300, function () use ($fromLocation, $toLocation, $date) {
+            $oneHourAgo = Carbon::now()->subHour();
+            return FerrySchedul::with([
+                'ferryPrices' => function ($query) {
+                    $query->orderBy('price', 'asc');
+                },
+                'fromLocation',
+                'toLocation',
+                'ship',
+                'ship.images',
+                'ferryPrices.class'
+            ])
+                ->where('from_location', $fromLocation)
+                ->where('to_location', $toLocation)
+                ->where('status', 'Y')
+                ->where('from_date', '<=', $date)
+                ->where('to_date', '>=', $date)
+                ->when($date && $date == now()->format('Y-m-d'), function ($query) use ($oneHourAgo) {
+                    return $query->where('departure_time', '>=', $oneHourAgo);
+                })
+                ->orderBy('departure_time')
+                ->get()->toArray();
+        });
 
         // print_r($adminShipSchedules);die;
 
@@ -162,8 +169,13 @@ class FerrybookingController extends Controller
             }
         }
 
-        $fromLocationTitle = FerryLocation::where('id',  $fromLocation)->first();
-        $toLocationTitle = FerryLocation::where('id', $toLocation)->first();
+        // Cache location data to avoid multiple database queries
+        $fromLocationTitle = \Cache::remember("location_{$fromLocation}", 3600, function () use ($fromLocation) {
+            return FerryLocation::where('id', $fromLocation)->first();
+        });
+        $toLocationTitle = \Cache::remember("location_{$toLocation}", 3600, function () use ($toLocation) {
+            return FerryLocation::where('id', $toLocation)->first();
+        });
 
         // Add null checks to prevent "Attempt to read property 'title' on null" error
         if (!$fromLocationTitle || !$toLocationTitle) {
@@ -196,45 +208,22 @@ class FerrybookingController extends Controller
             $toN = 'Shaheed Dweep';
         }
 
+        // Cache ship data to avoid multiple database queries
+        $ship1 = \Cache::remember('ship_1_data', 3600, function () {
+            return ShipMaster::with('images')->where('id', 1)->first();
+        });
+        $ship2 = \Cache::remember('ship_2_data', 3600, function () {
+            return ShipMaster::with('images')->where('id', 2)->first();
+        });
+        $ship_image1 = $ship1 ? $ship1->image : '';
+        $ship_image2 = $ship2 ? $ship2->image : '';
+
+        // Prepare API calls data
         $data2 = array(
             'date' => date('d-m-Y', strtotime($date)),
             'from' => $fromN,
             'to' =>  $toN,
         );
-
-        $ship = ShipMaster::with('images')->where('id', 2)->get();
-        $ship_image = $ship[0]['image'];
-
-        $result2 = $this->nautikaApiCall('getTripData', $data2);
-
-        // dd($result2);
-        
-        if(!empty($result2->data)){
-            $nautikaData = $result2->data;
-        }
-        
-        if (!empty($nautikaData)) {
-            foreach ($nautikaData as $key => $val) {
-                $nautikaData[$key] = (array) $val;
-                $nautikaData[$key]['ship_name'] = 'Nautika';
-                $nautikaData[$key]['ship_image'] = $ship_image;
-                $nautikaData[$key]['ship'] = $ship;
-                $nautikaData[$key]['departure_time'] = str_pad($val->dTime->hour, 2, '0', STR_PAD_LEFT)  . ':' . $val->dTime->minute . ':00';
-                $nautikaData[$key]['arrival_time'] = str_pad($val->aTime->hour, 2, '0', STR_PAD_LEFT)  . ':' . $val->aTime->minute . ':00';
-                $nautikaData[$key]['b_class_seat_availibility'] = 0;
-                $nautikaData[$key]['p_class_seat_availibility'] = 0;
-                foreach ($val->bClass as $key1 => $val1) {
-                    if ($val1->isBooked == 0 && $val1->isBlocked == 0) {
-                        $nautikaData[$key]['b_class_seat_availibility']++;
-                    }
-                }
-                foreach ($val->pClass as $key1 => $val1) {
-                    if ($val1->isBooked == 0 && $val1->isBlocked == 0) {
-                        $nautikaData[$key]['p_class_seat_availibility']++;
-                    }
-                }
-            }
-        }
 
         $data3 = array("data" => array(
             "trip_type" => "single_trip",
@@ -244,65 +233,51 @@ class FerrybookingController extends Controller
             "to_location" => $toLocation,
         ));
 
-        $result = $this->makApiCall('schedule_search', $data3);
-
-        
-        // $ship=DB::table('ship_master')->select('image')->where('id', 1)->first();
-        // $ship_image= $ship->image;
-
-        $ship = ShipMaster::with('images')->where('id', 1)->get();
-        $ship_image = $ship[0]['image'];
-
+        // Make API calls with reduced timeout for faster response
+        $nautikaData = [];
         $makData = [];
-        if (!empty($result) && !empty($result->data)) {
-            $makFerry = $result->data;
-            foreach ($makFerry as $key => $val) {
-                $makData[$val->id]['id'] =  $val->id;
-                $makData[$val->id]['departure_time'] =  $val->departure_time;
-                $makData[$val->id]['ship_name'] =  'Makruzz';
-                $makData[$val->id]['ship_image'] = $ship_image;
-                $makData[$val->id]['ship'] = $ship;
-                $makData[$val->id]['ship_class'][] =  $val;
+        $greenOceanData = [];
+
+        // Implement early return strategy - show admin schedules immediately
+
+        // Merge all available data immediately (admin schedules are already loaded)
+        $allSchedule = $adminShipSchedules;
+        
+        // Try to get API data with very short timeouts (5 seconds max)
+        try {
+            $nautikaData = $this->getNautikaDataFast($data2, $ship_image2, $ship2);
+            if (!empty($nautikaData)) {
+                $allSchedule = array_merge($allSchedule, $nautikaData);
             }
-        }
-        // print_r($makData);die;
-        // ================================== GREEN OCEAN START ===========================================
-
-        $greenOceanData = $this->green_ocean_call($fromLocation, $toLocation, $no_of_passenger, $infant, $date);
-
-        // echo '<pre>';
-        // echo "single <br>";
-        // print_r($greenOceanData);
-        // die;
-
-        // $greenOceanData = [];
-        // ================================== GREEN OCEAN END ===========================================
-
-        if (!empty($nautikaData)) {
-            $allSchedule = array_merge($makData, $nautikaData);
-        } else {
-            $allSchedule = $makData;
+        } catch (\Exception $e) {
+            \Log::info('Nautika API timeout - continuing with admin data only');
         }
 
-        if (!empty($greenOceanData)) {
-            $allSchedule = array_merge($allSchedule, $greenOceanData);
+        try {
+            $makData = $this->getMakruzzDataFast($data3, $ship_image1, $ship1);
+            if (!empty($makData)) {
+                $allSchedule = array_merge($allSchedule, $makData);
+            }
+        } catch (\Exception $e) {
+            \Log::info('Makruzz API timeout - continuing with available data');
         }
 
-        $allSchedule3 = $allSchedule;
-
-        if(!empty($adminShipSchedules)){
-            $allSchedule3 = array_merge($allSchedule3, $adminShipSchedules);
+        try {
+            $greenOceanData = $this->getGreenOceanDataFast($fromLocation, $toLocation, $no_of_passenger, $infant, $date);
+            if (!empty($greenOceanData)) {
+                $allSchedule = array_merge($allSchedule, $greenOceanData);
+            }
+        } catch (\Exception $e) {
+            \Log::info('Green Ocean API timeout - continuing with available data');
         }
 
-        $collection = collect($allSchedule3);
-        // Sort the collection by 'time' column
+        // Sort the final schedule
+        $collection = collect($allSchedule);
         $sorted = $collection->sortBy(function ($item) {
-            return strtotime($item['departure_time']);
+            return strtotime($item['departure_time'] ?? '23:59:59');
         });
 
-        $sortedArray = $sorted->values()->all();
-
-        $data['apiScheduleData'] = $sortedArray;
+        $data['apiScheduleData'] = $sorted->values()->all();
 
         // print_r($data['apiScheduleData']);die('test');
 
@@ -387,7 +362,8 @@ class FerrybookingController extends Controller
             $ship_image = $ship[0]['image'];
 
             $nautika_result = $this->nautikaApiCall('getTripData', $data4);
-            if(!empty($nautika_result->data)){
+            $nautikaData2 = [];
+            if(!empty($nautika_result) && !empty($nautika_result->data)){
                 $nautikaData2 = $nautika_result->data;
             }
             
@@ -549,7 +525,8 @@ class FerrybookingController extends Controller
             $ship_image = $ship[0]['image'];
 
             $nautika_return_result = $this->nautikaApiCall('getTripData', $return_data);
-            if(!empty($nautika_return_result->data)){
+            $nautikaReturnData = [];
+            if(!empty($nautika_return_result) && !empty($nautika_return_result->data)){
                 $nautikaReturnData = $nautika_return_result->data;
             }
             
@@ -938,6 +915,208 @@ class FerrybookingController extends Controller
         }
 
         return $greenOceanData;
+    }
+
+    public function green_ocean_call_fast($fromLocation, $toLocation, $no_of_passenger, $infant, $date)
+    {
+        $hash_sequence = "from_id|dest_to|number_of_adults|number_of_infants|travel_date|public_key";
+        $godata['from_id'] = $fromLocation;
+        $godata['dest_to'] = $toLocation;
+        $godata['number_of_adults'] = $no_of_passenger; // No of Adults
+        $godata['number_of_infants'] = $infant; // No. of Infant
+        $godata['travel_date'] = date('Y-m-d', strtotime($date)); // Travel Date as DD-MM-YYYY 
+        $godata['public_key'] = env('GREEN_OCEAN_PUBLIC_KEY'); // Public Key Shared by Green Ocean
+        $godata['hash_string'] = $this->getHashKey($godata, env('GREEN_OCEAN_PRIVATE_KEY'), $hash_sequence); // Hash value of sequenced string 
+
+        $result = $this->greenOceanApiCallFast('route-details', $godata);
+
+        $greenOceanData = [];
+        if (!empty($result->status) && ($result->status == 'success')) {
+            // Cache ship data to avoid multiple queries
+            $ship1 = \Cache::remember('ship_3_data', 3600, function () {
+                return ShipMaster::with('images')->where('id', 3)->first();
+            });
+            $ship2 = \Cache::remember('ship_4_data', 3600, function () {
+                return ShipMaster::with('images')->where('id', 4)->first();
+            });
+            $ship_image1 = $ship1 ? $ship1->image : '';
+            $ship_image2 = $ship2 ? $ship2->image : '';
+
+            if (!empty($result->data)) {
+                foreach ($result->data as $key => $val) {
+                    $greenOceanData[$key]['id'] =  $key;
+                    $greenOceanData[$key]['departure_time'] = date('H:i:s', strtotime($val[0]->departure));
+                    $greenOceanData[$key]['arraival_time'] = date('H:i:s', strtotime($val[0]->arraival));
+                    $greenOceanData[$key]['ship_name'] =  $val[0]->ferry_name;
+                    $greenOceanData[$key]['ship_image'] = ($val[0]->ferry_name == 'Green Ocean 1' ?  $ship_image1 : $ship_image2);
+                    $greenOceanData[$key]['ship'] = ($val[0]->ferry_name == 'Green Ocean 1' ?  $ship1 : $ship2);
+                    $greenOceanData[$key]['ship_class'] =  $val;
+                }
+            }
+        }
+
+        return $greenOceanData;
+    }
+
+    public function green_ocean_call_ultra_fast($fromLocation, $toLocation, $no_of_passenger, $infant, $date)
+    {
+        $hash_sequence = "from_id|dest_to|number_of_adults|number_of_infants|travel_date|public_key";
+        $godata['from_id'] = $fromLocation;
+        $godata['dest_to'] = $toLocation;
+        $godata['number_of_adults'] = $no_of_passenger; // No of Adults
+        $godata['number_of_infants'] = $infant; // No. of Infant
+        $godata['travel_date'] = date('Y-m-d', strtotime($date)); // Travel Date as DD-MM-YYYY 
+        $godata['public_key'] = env('GREEN_OCEAN_PUBLIC_KEY'); // Public Key Shared by Green Ocean
+        $godata['hash_string'] = $this->getHashKey($godata, env('GREEN_OCEAN_PRIVATE_KEY'), $hash_sequence); // Hash value of sequenced string 
+
+        $result = $this->greenOceanApiCallUltraFast('route-details', $godata);
+
+        $greenOceanData = [];
+        if (!empty($result->status) && ($result->status == 'success')) {
+            // Cache ship data to avoid multiple queries
+            $ship1 = \Cache::remember('ship_3_data', 3600, function () {
+                return ShipMaster::with('images')->where('id', 3)->first();
+            });
+            $ship2 = \Cache::remember('ship_4_data', 3600, function () {
+                return ShipMaster::with('images')->where('id', 4)->first();
+            });
+            $ship_image1 = $ship1 ? $ship1->image : '';
+            $ship_image2 = $ship2 ? $ship2->image : '';
+
+            if (!empty($result->data)) {
+                foreach ($result->data as $key => $val) {
+                    $greenOceanData[$key]['id'] =  $key;
+                    $greenOceanData[$key]['departure_time'] = date('H:i:s', strtotime($val[0]->departure));
+                    $greenOceanData[$key]['arraival_time'] = date('H:i:s', strtotime($val[0]->arraival));
+                    $greenOceanData[$key]['ship_name'] =  $val[0]->ferry_name;
+                    $greenOceanData[$key]['ship_image'] = ($val[0]->ferry_name == 'Green Ocean 1' ?  $ship_image1 : $ship_image2);
+                    $greenOceanData[$key]['ship'] = ($val[0]->ferry_name == 'Green Ocean 1' ?  $ship1 : $ship2);
+                    $greenOceanData[$key]['ship_class'] =  $val;
+                }
+            }
+        }
+
+        return $greenOceanData;
+    }
+
+    // Helper methods for optimized API processing
+    private function processNautikaApiCall($data2, &$nautikaData, $ship_image2, $ship2)
+    {
+        try {
+            $result2 = $this->nautikaApiCallFast('getTripData', $data2);
+            if(!empty($result2) && !empty($result2->data)){
+                $nautikaData = $result2->data;
+                foreach ($nautikaData as $key => $val) {
+                    $nautikaData[$key] = (array) $val;
+                    $nautikaData[$key]['ship_name'] = 'Nautika';
+                    $nautikaData[$key]['ship_image'] = $ship_image2;
+                    $nautikaData[$key]['ship'] = $ship2;
+                    $nautikaData[$key]['departure_time'] = str_pad($val->dTime->hour, 2, '0', STR_PAD_LEFT)  . ':' . $val->dTime->minute . ':00';
+                    $nautikaData[$key]['arrival_time'] = str_pad($val->aTime->hour, 2, '0', STR_PAD_LEFT)  . ':' . $val->aTime->minute . ':00';
+                    $nautikaData[$key]['b_class_seat_availibility'] = 0;
+                    $nautikaData[$key]['p_class_seat_availibility'] = 0;
+                    foreach ($val->bClass as $key1 => $val1) {
+                        if ($val1->isBooked == 0 && $val1->isBlocked == 0) {
+                            $nautikaData[$key]['b_class_seat_availibility']++;
+                        }
+                    }
+                    foreach ($val->pClass as $key1 => $val1) {
+                        if ($val1->isBooked == 0 && $val1->isBlocked == 0) {
+                            $nautikaData[$key]['p_class_seat_availibility']++;
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Nautika API call failed: ' . $e->getMessage());
+        }
+    }
+
+    private function processMakruzzApiCall($data3, &$makData, $ship_image1, $ship1)
+    {
+        try {
+            $result = $this->makApiCallFast('schedule_search', $data3);
+            if (!empty($result) && !empty($result->data)) {
+                $makFerry = $result->data;
+                foreach ($makFerry as $key => $val) {
+                    $makData[$val->id]['id'] =  $val->id;
+                    $makData[$val->id]['departure_time'] =  $val->departure_time;
+                    $makData[$val->id]['ship_name'] =  'Makruzz';
+                    $makData[$val->id]['ship_image'] = $ship_image1;
+                    $makData[$val->id]['ship'] = $ship1;
+                    $makData[$val->id]['ship_class'][] =  $val;
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Makruzz API call failed: ' . $e->getMessage());
+        }
+    }
+
+    private function processGreenOceanApiCall($fromLocation, $toLocation, $no_of_passenger, $infant, $date, &$greenOceanData)
+    {
+        try {
+            $greenOceanData = $this->green_ocean_call_fast($fromLocation, $toLocation, $no_of_passenger, $infant, $date);
+        } catch (\Exception $e) {
+            \Log::warning('Green Ocean API call failed: ' . $e->getMessage());
+        }
+    }
+
+    // Ultra-fast data retrieval methods with 5-second timeouts
+    private function getNautikaDataFast($data2, $ship_image2, $ship2)
+    {
+        $result2 = $this->nautikaApiCallUltraFast('getTripData', $data2);
+        $nautikaData = [];
+        
+        if(!empty($result2) && !empty($result2->data)){
+            $nautikaData = $result2->data;
+            foreach ($nautikaData as $key => $val) {
+                $nautikaData[$key] = (array) $val;
+                $nautikaData[$key]['ship_name'] = 'Nautika';
+                $nautikaData[$key]['ship_image'] = $ship_image2;
+                $nautikaData[$key]['ship'] = $ship2;
+                $nautikaData[$key]['departure_time'] = str_pad($val->dTime->hour, 2, '0', STR_PAD_LEFT)  . ':' . $val->dTime->minute . ':00';
+                $nautikaData[$key]['arrival_time'] = str_pad($val->aTime->hour, 2, '0', STR_PAD_LEFT)  . ':' . $val->aTime->minute . ':00';
+                $nautikaData[$key]['b_class_seat_availibility'] = 0;
+                $nautikaData[$key]['p_class_seat_availibility'] = 0;
+                foreach ($val->bClass as $key1 => $val1) {
+                    if ($val1->isBooked == 0 && $val1->isBlocked == 0) {
+                        $nautikaData[$key]['b_class_seat_availibility']++;
+                    }
+                }
+                foreach ($val->pClass as $key1 => $val1) {
+                    if ($val1->isBooked == 0 && $val1->isBlocked == 0) {
+                        $nautikaData[$key]['p_class_seat_availibility']++;
+                    }
+                }
+            }
+        }
+        
+        return $nautikaData;
+    }
+
+    private function getMakruzzDataFast($data3, $ship_image1, $ship1)
+    {
+        $result = $this->makApiCallUltraFast('schedule_search', $data3);
+        $makData = [];
+        
+        if (!empty($result) && !empty($result->data)) {
+            $makFerry = $result->data;
+            foreach ($makFerry as $key => $val) {
+                $makData[$val->id]['id'] =  $val->id;
+                $makData[$val->id]['departure_time'] =  $val->departure_time;
+                $makData[$val->id]['ship_name'] =  'Makruzz';
+                $makData[$val->id]['ship_image'] = $ship_image1;
+                $makData[$val->id]['ship'] = $ship1;
+                $makData[$val->id]['ship_class'][] =  $val;
+            }
+        }
+        
+        return $makData;
+    }
+
+    private function getGreenOceanDataFast($fromLocation, $toLocation, $no_of_passenger, $infant, $date)
+    {
+        return $this->green_ocean_call_ultra_fast($fromLocation, $toLocation, $no_of_passenger, $infant, $date);
     }
 
     public function getGreenShipLayout(Request $request)
