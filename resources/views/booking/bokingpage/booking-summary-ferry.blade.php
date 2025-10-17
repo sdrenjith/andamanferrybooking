@@ -843,6 +843,12 @@
                 <div class="text-center p-4 pb-2">
                     <input class="btn proceedBtn" style="background: ##0076ae; color:#FFF; width:100%" type="submit" value="Proceed to Payment">
                 </div>
+                <!-- Mobile Payment Button -->
+                <div class="text-center p-4 pb-2 d-md-none">
+                    <button class="btn mobile-proceed-payment" style="background: #0076ae; color:#FFF; width:100%; padding: 10px 15px; border-radius: 5px; border: none; font-size: 16px; font-weight: 500;">
+                        Proceed to Payment
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -895,6 +901,32 @@
         $("#billMobile").click(function() {
             $(".bookingSumBg").toggleClass("show");
             $("#payment").toggleClass("show");
+        });
+        
+        // Add mobile payment button functionality
+        $(document).on('click', '.mobile-proceed-payment', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Close mobile popup first
+            $(".bookingSumBg").removeClass("show");
+            $("#payment").removeClass("show");
+            
+            // Small delay to ensure popup closes before form submission
+            setTimeout(function() {
+                // Trigger form submission
+                $('#booking_details_id').submit();
+            }, 300);
+        });
+        
+        // Add touch event support for mobile
+        $(document).on('touchstart', '.mobile-proceed-payment', function(e) {
+            e.preventDefault();
+        });
+        
+        $(document).on('touchend', '.mobile-proceed-payment', function(e) {
+            e.preventDefault();
+            $(this).trigger('click');
         });
     });
 

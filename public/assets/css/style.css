@@ -3102,6 +3102,35 @@ footer.mobile ul li a:hover {
     border: none !important;
     font-size: 1.2em;
   }
+  
+  /* Mobile payment button styles */
+  .mobile-proceed-payment {
+    background: #0076ae !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 12px 20px !important;
+    border-radius: 5px !important;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    width: 100% !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation !important;
+  }
+  
+  .mobile-proceed-payment:hover,
+  .mobile-proceed-payment:active,
+  .mobile-proceed-payment:focus {
+    background: #005a8b !important;
+    color: #fff !important;
+    transform: none !important;
+    box-shadow: 0 2px 8px rgba(0, 118, 174, 0.3) !important;
+  }
+  
+  .mobile-proceed-payment:active {
+    transform: scale(0.98) !important;
+  }
 
   .summery-btn {
     padding: 0 10px;
