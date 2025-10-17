@@ -7460,9 +7460,7 @@ header .nav-link.menuBtn::after {
 
 /* Small Screen Specific Media Queries */
 @media (max-width: 480px) {
-    /* .hero-section {
-        padding-right: clamp(4rem, 15vw, 6rem) !important;
-    } */
+    
     
     .hero-content p {
         padding: 0 clamp(0.25rem, 1vw, 0.5rem) !important;
