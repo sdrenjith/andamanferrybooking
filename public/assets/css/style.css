@@ -2598,6 +2598,28 @@ footer.mobile ul li a:hover {
     min-height: -webkit-fill-available;
   }
   
+  /* Fix text rendering issues on mobile */
+  .hero-section * {
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    text-rendering: optimizeLegibility !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  
+  /* Specific text fixes */
+  .hero-section h1,
+  .hero-section .lead,
+  .hero-section p,
+  .hero-section span,
+  .hero-section div {
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    hyphens: auto !important;
+    white-space: normal !important;
+    text-overflow: unset !important;
+  }
+  
   /* Ensure content fills viewport properly */
   html {
     height: -webkit-fill-available;
@@ -2616,6 +2638,27 @@ footer.mobile ul li a:hover {
   .col-12 {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
+  }
+  
+  /* Fix rating text and other elements */
+  .rated,
+  .rating-text,
+  .hero-features span {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
+    text-overflow: unset !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+  }
+  
+  /* Fix partner logos text */
+  .hero-partners-section,
+  .partner-logo,
+  .partners-title {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
   }
 
   p {
@@ -3199,9 +3242,7 @@ footer.mobile ul li a:hover {
   }
   
   /* Ensure content doesn't get hidden behind fixed button */
-  .container {
-    margin-bottom: 100px !important;
-  }
+  
   
   /* Improve mobile button appearance */
   .billMobile i {
@@ -4622,6 +4663,29 @@ html {
     .hero-section {
         padding: 20px 15px !important;
         margin-bottom: 20px !important;
+        /* Fix text rendering issues */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+    
+    .hero-section h1 {
+        font-size: 2.2rem !important;
+        line-height: 1.3 !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        hyphens: auto !important;
+        margin-bottom: 1rem !important;
+        text-align: center !important;
+    }
+    
+    .hero-section .lead {
+        font-size: 1.1rem !important;
+        line-height: 1.4 !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        text-align: center !important;
+        margin-bottom: 1.5rem !important;
     }
     
     .hero-content h1 {
@@ -4716,6 +4780,29 @@ html {
     .hero-section {
         padding: 15px 10px !important;
         margin-bottom: 15px !important;
+        /* Enhanced text rendering for small screens */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+    
+    .hero-section h1 {
+        font-size: 1.8rem !important;
+        line-height: 1.2 !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        hyphens: auto !important;
+        text-align: center !important;
+        margin-bottom: 0.8rem !important;
+    }
+    
+    .hero-section .lead {
+        font-size: 1rem !important;
+        line-height: 1.3 !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        text-align: center !important;
+        margin-bottom: 1.2rem !important;
     }
     
     .hero-content h1 {

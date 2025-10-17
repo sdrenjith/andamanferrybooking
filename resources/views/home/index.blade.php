@@ -16,12 +16,12 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-12 col-lg-6">
-                        <h1 class="display-4 fw-bold mb-4">Discover Andaman's Islands with Ease</h1>
-                        <p class="lead mb-4">Book your ferry tickets in minutes and explore the pristine beaches and crystal clear waters of Andaman Islands.</p>
+                        <h1 class="display-4 fw-bold mb-4" style="word-wrap: break-word; overflow-wrap: break-word; hyphens: auto;">Discover Andaman's Islands with Ease</h1>
+                        <p class="lead mb-4" style="word-wrap: break-word; overflow-wrap: break-word; hyphens: auto;">Book your ferry tickets in minutes and explore the pristine beaches and crystal clear waters of Andaman Islands.</p>
                         <div class="d-flex align-items-center mb-4">
                            <div class="rated me-4" style="min-width: fit-content; width: auto;">
     <img src="{{ url('assets/images/Stars-2.png') }}" alt="rating" class="me-2" style="height:28px;">
-    <span class="rating-text">
+    <span class="rating-text" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
          4.9/5 - Trusted by 10,000+  travelers
     </span>
 </div>
