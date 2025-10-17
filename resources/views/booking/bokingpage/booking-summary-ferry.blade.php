@@ -382,7 +382,7 @@
         <div class="col-4">
             <div class="position-sticky top-0" id="payment">
                 <div class="booking-summary-main-bg">
-                    <button onclick="closePageView()" class="popup-close mb-visible"><img src="{{url('assets/images/cancel.png')}}" alt="close"></button>
+                    <button onclick="closePageView()" class="popup-close mb-visible mobile-close-btn"><i class="bi bi-x-lg"></i></button>
                     <div class="row py-2 p-0 m-0 w-100">
                         <div class="col-md-12 d-flex align-items-center justify-content-between">
                             <div class="booking-summary-heading w-auto float-none">BOOKING SUMMARY</div>
@@ -839,15 +839,17 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Mobile Payment Button inside popup -->
+                    <div class="text-center p-3 d-block d-md-none">
+                        <button class="btn mobile-proceed-payment" style="background: #0076ae; color:#FFF; width:100%; padding: 15px 20px; border-radius: 8px; border: none; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 118, 174, 0.3);">
+                            <i class="bi bi-credit-card me-2"></i>Proceed to Payment
+                        </button>
+                    </div>
                 </div>
-                <div class="text-center p-4 pb-2">
-                    <input class="btn proceedBtn" style="background: ##0076ae; color:#FFF; width:100%" type="submit" value="Proceed to Payment">
-                </div>
-                <!-- Mobile Payment Button -->
-                <div class="text-center p-4 pb-2 d-md-none">
-                    <button class="btn mobile-proceed-payment" style="background: #0076ae; color:#FFF; width:100%; padding: 10px 15px; border-radius: 5px; border: none; font-size: 16px; font-weight: 500;">
-                        Proceed to Payment
-                    </button>
+                <!-- Desktop Payment Button -->
+                <div class="text-center p-4 pb-2 d-none d-md-block">
+                    <input class="btn proceedBtn" style="background: #0076ae; color:#FFF; width:100%" type="submit" value="Proceed to Payment">
                 </div>
             </div>
         </div>
@@ -865,19 +867,142 @@
 
 </form>
 
-<section class="mobile-summary-section">
-    <div class="container">
-        <div class="col-12 summery-btn">
-            <div class="bookingSumBg"></div>
-            <button class="btn btn-primary billMobile" id="billMobile">
-                <i class="bi bi-receipt me-2"></i>Show Summary
-            </button>
+<!-- SIMPLE MOBILE BUTTON -->
+<div class="d-block d-md-none" style="position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000 !important; padding: 15px; background: #008495;">
+    <button id="showSummaryBtn" class="btn btn-primary w-100" style="background: #008495; border: none; color: white; padding: 15px; font-size: 16px; font-weight: 600;">
+        <i class="bi bi-receipt me-2"></i>Show Summary
+    </button>
+</div>
+
+<!-- MOBILE POPUP -->
+<div id="mobilePopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 10px; padding: 20px; width: 90%; max-height: 80vh; overflow-y: auto;">
+        <button id="closePopup" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+        
+        <!-- SUMMARY CONTENT -->
+        <div class="booking-summary-content">
+            <div class="row py-2 p-0 m-0 w-100" style="background: #008495; color: white; margin: -20px -20px 20px -20px; padding: 15px 20px; border-radius: 10px 10px 0 0;">
+                <div class="col-12 d-flex align-items-center justify-content-between">
+                    <div style="font-weight: bold; font-size: 18px;">BOOKING SUMMARY</div>
+                    <div style="font-weight: bold; font-size: 18px;">₹ <span id="set_total_fare">{{ number_format($total_single_price ?? 0, 2) }}</span></div>
+                </div>
+            </div>
+            
+            <div class="summary-details" style="background: white; padding: 15px; border-radius: 5px;">
+                <!-- Trip Details -->
+                <div style="padding: 10px; margin-bottom: 10px; border-bottom: 1px solid #e0e0e0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495; font-weight: bold;">Onwards: {{ date('d-m-Y', strtotime($booking_data['date'])) }}</span>
+                        <span style="color: #008495; font-weight: bold;">{{ $trip1['ship_name'] }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495; font-weight: bold;">{{ $booking_data['form_location'] == 1 ? 'Port Blair' : ($booking_data['form_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                        <span style="color: #008495; font-weight: bold;">{{ $booking_data['to_location'] == 1 ? 'Port Blair' : ($booking_data['to_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #008495;">Total Duration</span>
+                        <span style="color: #008495;">
+                            @php
+                            $dTime = $booking_data['date'] . ' ' . $trip1['departure_time'];
+                            $aTime = $booking_data['date'] . ' ' . $trip1['arrival_time'];
+                            $departureTime = Carbon\Carbon::parse($dTime);
+                            $arrivalTime = Carbon\Carbon::parse($aTime);
+                            $totalDuration = $arrivalTime->diff($departureTime);
+                            $totalHours = $totalDuration->h + $totalDuration->days * 24;
+                            @endphp
+                            {{ $totalHours }} Hr {{ $totalDuration->i }} m Non-stop
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Booking Details -->
+                <div style="margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">Class Type</span>
+                        <span style="color: #008495;">
+                            @if(($trip1['class_title'] ?? '')=='bClass')
+                                Business
+                            @elseif (($trip1['class_title'] ?? '')=='pClass')
+                                Premium
+                            @else
+                                {{ $trip1['class_title'] ?? 'Standard' }}
+                            @endif
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">No of Passenger</span>
+                        <span style="color: #008495;">{{ $booking_data['no_of_passenger'] }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">
+                            @if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz' || str_contains($trip1['ship_name'], 'Green Ocean'))
+                                Advance Booking Price
+                            @else
+                                Per Passenger Price
+                            @endif
+                        </span>
+                        <span style="color: #008495;">INR 
+                            @php 
+                            if ($trip1['ship_name'] == 'Nautika' || $trip1['ship_name'] == 'Makruzz' || str_contains($trip1['ship_name'], 'Green Ocean')) {
+                                $price = 200;
+                            } else {
+                                $price = $trip1['fare'];
+                            }
+                            @endphp
+                            {{ number_format($price, 2) }}
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">PSF (Per Pax/Infant)</span>
+                        <span style="color: #008495;">INR {{ $trip1['psf'] }}</span>
+                    </div>
+                </div>
+                
+                <!-- Total Fare -->
+                <div style="background: #0f55cc; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                        <span>Total fare</span>
+                        <span>INR {{ number_format($total_single_price ?? 0, 2) }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PROCEED TO PAYMENT BUTTON -->
+            <div class="text-center mt-3">
+                <button id="proceedPayment" class="btn" type="button" style="background: #0076ae; color:#FFF; width:100%; padding: 15px 20px; border-radius: 8px; border: none; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(0, 118, 174, 0.3);">
+                    Proceed to Payment
+                </button>
+            </div>
         </div>
     </div>
-</section>
+</div>
 
 </main>
 @endsection
+
+@push('css')
+<style>
+/* Simple mobile styles */
+@media only screen and (max-width: 767px) {
+    /* Hide desktop elements on mobile */
+    .d-none.d-md-block {
+        display: none !important;
+    }
+    
+    /* Show mobile elements */
+    .d-block.d-md-none {
+        display: block !important;
+    }
+    
+    /* Hide mobile button when popup is open */
+    #mobilePopup:not([style*="display: none"]) ~ .d-block.d-md-none #showSummaryBtn,
+    #mobilePopup[style*="display: block"] ~ .d-block.d-md-none #showSummaryBtn {
+        display: none !important;
+    }
+}
+</style>
+@endpush
+
 @push('js')
 {{-- <script src="js/script.js"></script> --}}
 
@@ -894,13 +1019,50 @@
     function closePageView() {
         $(".bookingSumBg").removeClass("show");
         $("#payment").removeClass("show");
+        $("body").removeClass("mobile-popup-open");
+        
+        // Show the mobile summary section when popup is closed
+        $(".mobile-summary-section").show();
     }
     
     $(document).ready(function() {
-       
-        $("#billMobile").click(function() {
-            $(".bookingSumBg").toggleClass("show");
-            $("#payment").toggleClass("show");
+        // Simple mobile popup functionality
+        $("#showSummaryBtn").click(function() {
+            $("#mobilePopup").show();
+            $("#showSummaryBtn").hide(); // Hide the button when popup opens
+            $("body").css("overflow", "hidden");
+        });
+        
+        $("#closePopup").click(function() {
+            $("#mobilePopup").hide();
+            $("#showSummaryBtn").show(); // Show the button when popup closes
+            $("body").css("overflow", "auto");
+        });
+        
+        // Close popup when clicking outside
+        $("#mobilePopup").click(function(e) {
+            if (e.target === this) {
+                $("#mobilePopup").hide();
+                $("#showSummaryBtn").show(); // Show the button when popup closes
+                $("body").css("overflow", "auto");
+            }
+        });
+        
+        $("#proceedPayment").click(function() {
+            // Close the popup first
+            $("#mobilePopup").hide();
+            $("#showSummaryBtn").show();
+            $("body").css("overflow", "auto");
+            
+            // Submit the form
+            $("#booking_details_id").submit();
+        });
+        
+        // Close popup when clicking on background
+        $(".bookingSumBg").click(function(e) {
+            if (e.target === this) {
+                closePageView();
+            }
         });
         
         // Add mobile payment button functionality
@@ -909,14 +1071,20 @@
             e.stopPropagation();
             
             // Close mobile popup first
-            $(".bookingSumBg").removeClass("show");
-            $("#payment").removeClass("show");
+            closePageView();
             
             // Small delay to ensure popup closes before form submission
             setTimeout(function() {
                 // Trigger form submission
                 $('#booking_details_id').submit();
             }, 300);
+        });
+        
+        // Add escape key functionality to close popup
+        $(document).keyup(function(e) {
+            if (e.keyCode == 27) { // Escape key
+                closePageView();
+            }
         });
         
         // Add touch event support for mobile

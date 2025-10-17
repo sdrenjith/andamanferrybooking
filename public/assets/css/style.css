@@ -2220,14 +2220,23 @@ footer.mobile ul li a:hover {
 }
 
 .billMobile {
-  display: none;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   background: #008495 !important;
+  color: white !important;
   width: 100%;
+  position: fixed !important;
   bottom: 0px;
+  left: 0;
+  right: 0;
   z-index: 99999;
-  padding: 10px 0px;
+  padding: 15px 20px;
   border: none !important;
   font-size: 1.2em;
+  font-weight: 600;
+  border-radius: 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
   /* FIXED: Remove hardware acceleration */
   -webkit-transform: none;
   transform: none;
@@ -2568,6 +2577,29 @@ footer.mobile ul li a:hover {
 
 /* CRITICAL MOBILE FIXES */
 @media only screen and (max-width: 767px) {
+  /* CRITICAL: Ensure billMobile button is visible on mobile */
+  .billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
   header {
     position: fixed;
     top: 0;
@@ -3180,18 +3212,21 @@ footer.mobile ul li a:hover {
   }
 
   .billMobile {
-    display: block;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     background: #008495 !important;
+    color: white !important;
     width: 100%;
     bottom: 0px;
-    z-index: 99999;
+    z-index: 100000 !important;
     padding: 15px 20px;
     border: none !important;
     font-size: 1.2em;
     font-weight: 600;
     border-radius: 0;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    position: fixed;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    position: fixed !important;
     left: 0;
     right: 0;
   }
@@ -3247,6 +3282,156 @@ footer.mobile ul li a:hover {
   /* Improve mobile button appearance */
   .billMobile i {
     font-size: 1.1em;
+  }
+
+  /* CRITICAL: Force billMobile button visibility on mobile */
+  button.billMobile,
+  button#billMobile,
+  .billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* CRITICAL: Force billMobile button visibility in mobile summary section */
+  .mobile-summary-section button.billMobile,
+  .mobile-summary-section button#billMobile,
+  .mobile-summary-section .billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* CRITICAL: Force billMobile button visibility in summery-btn container */
+  .summery-btn button.billMobile,
+  .summery-btn button#billMobile,
+  .summery-btn .billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* CRITICAL: Force billMobile button visibility in col-12 summery-btn container */
+  .col-12.summery-btn button.billMobile,
+  .col-12.summery-btn button#billMobile,
+  .col-12.summery-btn .billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* CRITICAL: Force billMobile button visibility in container col-12 summery-btn */
+  .container .col-12.summery-btn button.billMobile,
+  .container .col-12.summery-btn button#billMobile,
+  .container .col-12.summery-btn .billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* CRITICAL: Force billMobile button visibility in mobile-summary-section container col-12 summery-btn */
+  .mobile-summary-section .container .col-12.summery-btn button.billMobile,
+  .mobile-summary-section .container .col-12.summery-btn button#billMobile,
+  .mobile-summary-section .container .col-12.summery-btn .billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
   }
 
   footer.mobile {
@@ -3520,21 +3705,74 @@ footer.mobile ul li a:hover {
   }
 }
 
+/* Mobile summary section - ensure visibility on all mobile devices */
+@media only screen and (max-width: 991px) {
+  .mobile-summary-section {
+    display: block !important;
+    position: relative !important;
+    z-index: 1000 !important;
+    margin-bottom: 100px !important;
+    min-height: 80px !important;
+    height: auto !important;
+  }
+  
+  .summery-btn {
+    position: relative !important;
+    z-index: 1000 !important;
+    padding: 0 10px !important;
+    margin-bottom: 20px !important;
+    display: block !important;
+    height: 60px !important;
+    min-height: 60px !important;
+  }
+  
+  .billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+}
+
 @media only screen and (max-width: 991px) {
   .bookingSumBg {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vh;
-    height: 0%;
-    background: #000000bf;
-    backdrop-filter: blur(2px);
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     transition: all 0.3s ease 0s;
-    z-index: 100000;
+    z-index: 99999;
+    pointer-events: auto;
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
   }
 
   .bookingSumBg.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     height: 100%;
+    pointer-events: auto;
   }
 
   .booking-summary-main-bg {
@@ -3556,17 +3794,364 @@ footer.mobile ul li a:hover {
 
   #payment {
     position: fixed !important;
-    z-index: 999999;
+    z-index: 100000 !important;
     width: 90%;
     left: 50%;
-    top: -1000px !important;
-    transform: translateX(-50%);
-
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: white !important;
+    border-radius: 15px !important;
+    padding: 20px !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4) !important;
+    pointer-events: auto !important;
     transition: all 0.3s ease 0s;
+    display: none;
   }
 
   #payment.show {
-    top: 100px !important;
+    display: block !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 100000 !important;
+    pointer-events: auto !important;
+  }
+
+  /* Mobile payment button fixes */
+  .mobile-proceed-payment {
+    position: relative !important;
+    z-index: 10001 !important;
+    background: #0076ae !important;
+    color: #FFF !important;
+    width: 100% !important;
+    padding: 15px 20px !important;
+    border-radius: 8px !important;
+    border: none !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin-top: 15px !important;
+    box-shadow: 0 4px 12px rgba(0, 118, 174, 0.3) !important;
+    transition: all 0.3s ease !important;
+    display: block !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    touch-action: manipulation !important;
+  }
+
+  .mobile-proceed-payment:hover {
+    background: #005a8b !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(0, 118, 174, 0.4) !important;
+  }
+
+  .mobile-proceed-payment:active {
+    transform: scale(0.98) !important;
+  }
+
+  /* Ensure mobile payment button is always visible */
+  .d-block.d-md-none {
+    display: block !important;
+    position: relative !important;
+    z-index: 10002 !important;
+  }
+
+  /* Override any conflicting z-index */
+  #payment .mobile-proceed-payment {
+    z-index: 10003 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+  }
+
+  /* Ensure popup content is fully interactive */
+  #payment.show * {
+    pointer-events: auto !important;
+  }
+
+  /* Specific fix for mobile payment button */
+  #payment.show .mobile-proceed-payment {
+    z-index: 10004 !important;
+    position: relative !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Hide mobile summary section when popup is open */
+  body.mobile-popup-open .mobile-summary-section {
+    display: none !important;
+  }
+
+  /* Ensure mobile summary section is visible when popup is closed */
+  .mobile-summary-section {
+    display: block !important;
+    position: relative;
+    z-index: 1000;
+    margin-bottom: 100px;
+  }
+
+  /* Ensure the summary button is always visible on mobile */
+  .summery-btn {
+    position: relative;
+    z-index: 1000;
+    padding: 0 10px;
+    margin-bottom: 20px;
+    display: block !important;
+    height: 60px !important;
+    min-height: 60px !important;
+  }
+
+  /* Force mobile summary section to be visible */
+  .mobile-summary-section {
+    display: block !important;
+    position: relative !important;
+    z-index: 1000 !important;
+    margin-bottom: 100px !important;
+    min-height: 80px !important;
+    height: auto !important;
+  }
+
+  /* Fix billMobile button - complete styling */
+  .billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* Mobile close button styling */
+  .mobile-close-btn {
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
+    z-index: 100001 !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+    color: #333 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .mobile-close-btn:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    transform: scale(1.1) !important;
+  }
+
+  .mobile-close-btn:active {
+    transform: scale(0.95) !important;
+  }
+
+  /* CRITICAL: Ensure billMobile button is always visible on mobile */
+  #billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* Ensure button is visible even when popup is not open */
+  .mobile-summary-section #billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* Ensure button is visible even when popup is open */
+  body.mobile-popup-open #billMobile {
+    display: none !important; /* Hide when popup is open */
+  }
+
+  /* Ensure button is visible when popup is closed */
+  body:not(.mobile-popup-open) #billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* CRITICAL: Force button visibility on page load */
+  .mobile-summary-section .summery-btn #billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* CRITICAL: Force button visibility on page load - alternative selector */
+  .col-12.summery-btn #billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* CRITICAL: Force button visibility on page load - most specific selector */
+  .mobile-summary-section .container .col-12.summery-btn #billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* CRITICAL: Force button visibility on page load - ultimate selector */
+  section.mobile-summary-section div.container div.col-12.summery-btn button#billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  /* CRITICAL: Force button visibility on page load - ultimate selector with class */
+  section.mobile-summary-section div.container div.col-12.summery-btn button.btn.btn-primary.billMobile#billMobile {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100000 !important;
+    background: #008495 !important;
+    color: white !important;
+    border: none !important;
+    padding: 15px 20px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3) !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 50px !important;
   }
 
   .overlay {
