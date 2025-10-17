@@ -121,9 +121,9 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                                 </div>
                                                 <div class="col-12 col-lg-2 mb-2">
                                                     <label for="date">Date</label>
-                                                    <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Date" id="date" name="date" min="" readonly="readonly" fdprocessedid="w8od0e">
+                                                    <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Date" id="date" name="date" min="" readonly="readonly" value="{{ date('Y-m-d') }}" fdprocessedid="w8od0e">
                                                     <!-- Mobile fallback date input -->
-                                                    <input type="date" class="mobile-date-input" id="date_mobile" name="date" style="display: none;" min="{{ date('Y-m-d') }}" placeholder="Select Date">
+                                                    <input type="date" class="mobile-date-input" id="date_mobile" name="date" style="display: none;" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d') }}" placeholder="Select Date">
                                                 </div>
                                                 <div class="col-12 col-lg-2 mb-2">
                                                     <label for="location">Passengers</label>
@@ -169,9 +169,9 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                             <div class="row mb-3">
                                                 <div class="col-12 col-lg-6 mb-2">
                                                         <label for="departure_date">Departure Date</label>
-                                                        <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Departure Date" id="departure_date" name="departure_date" min="" readonly="readonly">
+                                                        <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Departure Date" id="departure_date" name="departure_date" min="" readonly="readonly" value="{{ date('Y-m-d') }}">
                                                         <!-- Mobile fallback date input -->
-                                                        <input type="date" class="mobile-date-input" id="departure_date_mobile" name="departure_date" style="display: none;" min="{{ date('Y-m-d') }}">
+                                                        <input type="date" class="mobile-date-input" id="departure_date_mobile" name="departure_date" style="display: none;" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d') }}">
                                                 </div>
                                                 <div class="col-12 col-lg-6 mb-2">
                                                         <label for="departure_passenger">Passengers</label>
@@ -209,9 +209,9 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                                 <div class="row mb-3">
                                                     <div class="col-12 col-lg-6 mb-2">
                                                         <label for="return_date">Return Date</label>
-                                                        <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Return Date" id="return_date" name="return_date" min="" readonly="readonly">
+                                                        <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Return Date" id="return_date" name="return_date" min="" readonly="readonly" value="{{ date('Y-m-d', strtotime('+1 day')) }}">
                                                         <!-- Mobile fallback date input -->
-                                                        <input type="date" class="mobile-date-input" id="return_date_mobile" name="return_date" style="display: none;" min="{{ date('Y-m-d') }}">
+                                                        <input type="date" class="mobile-date-input" id="return_date_mobile" name="return_date" style="display: none;" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d', strtotime('+1 day')) }}">
                                                     </div>
                                                     <div class="col-12 col-lg-6 mb-2">
                                                         <label for="return_passenger">Passengers</label>
@@ -1866,6 +1866,7 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
         const dateOptions = {
             dateFormat: 'Y-m-d',
             minDate: "today",
+            defaultDate: "today", // Set today's date as default
             // Mobile-specific options
             allowInput: true,
             clickOpens: true,
@@ -1926,6 +1927,9 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                 $('.flatpickr-input').hide();
                 $('.mobile-date-input').show();
 
+                // Set default date for mobile inputs
+                $('.mobile-date-input').val(new Date().toISOString().split('T')[0]);
+                
                 // Sync values between mobile date inputs and flatpickr inputs
                 $('.mobile-date-input').on('change', function() {
                     const mobileInput = $(this);
@@ -1988,6 +1992,8 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             if (!$('#date').data('flatpickr')) {
                 $('.flatpickr-input').hide();
                 $('.mobile-date-input').show();
+                // Set default date for fallback mobile inputs
+                $('.mobile-date-input').val(new Date().toISOString().split('T')[0]);
             }
         }, 1000);
 
@@ -2000,6 +2006,8 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             if (isMobileView) {
                 $('.flatpickr-input').hide();
                 $('.mobile-date-input').show();
+                // Set default date for forced mobile inputs
+                $('.mobile-date-input').val(new Date().toISOString().split('T')[0]);
                 
                 // Add CSS to force mobile inputs
                 $('<style>')

@@ -294,13 +294,11 @@ class BookingController extends Controller
                 
                 \Log::info('Razorpay payment successful', ['booking_id' => $booking_id]);
                 
-                $data = [
-                    'booking' => $booking,
-                    'order_id' => $order_id,
-                    'booking_id' => $booking_id
-                ];
+                // Send confirmation email
+                $this->sendBookingConfirmationEmail($booking, $order_id);
                 
-                return view('razorpay.success', $data);
+                // Redirect to ferry booking success page
+                return redirect()->route('ferry-booking.success', ['order_id' => $order_id]);
             } else {
                 // Invalid signature
                 \Log::error('Razorpay signature verification failed', ['booking_id' => $booking_id]);
@@ -432,6 +430,34 @@ class BookingController extends Controller
         return redirect()->route('boat_booking_page')->with('error', 'Payment was not completed. Please try again.');
     }
 
+    public function ferryBookingSuccess($order_id, Request $request)
+    {
+        // Get booking details from database using order_id
+        $booking = DB::table('booking')->where('order_id', $order_id)->first();
+        
+        if (!$booking) {
+            return redirect()->route('home')->with('error', 'Booking not found.');
+        }
+        
+        // Get all related bookings for this order
+        $allBookings = DB::table('booking')->where('order_id', $order_id)->get();
+        
+        // Get passenger details
+        $passengerDetails = DB::table('booking_passenger_details')
+            ->whereIn('booking_id', $allBookings->pluck('id'))
+            ->get();
+        
+        $data = [
+            'booking' => $booking,
+            'allBookings' => $allBookings,
+            'passengerDetails' => $passengerDetails,
+            'order_id' => $order_id,
+            'booking_id' => $booking->id
+        ];
+        
+        return view('booking.ferry.ferry-booking-success', $data);
+    }
+
     public function boatPaymentSuccess($order_id, Request $request)
     {
         // Get booking details from session or database
@@ -467,6 +493,9 @@ class BookingController extends Controller
                 'razorpay_payment_id' => $payment_id,
                 'updated_at' => now()
             ]);
+        
+        // Send confirmation email
+        $this->sendBookingConfirmationEmail($booking, $order_id);
         
         $data = [
             'booking' => $booking,
@@ -536,6 +565,44 @@ class BookingController extends Controller
         ]);
         
         return response()->json(['success' => true]);
+    }
+
+    private function sendBookingConfirmationEmail($booking, $order_id)
+    {
+        try {
+            // Get all bookings for this order
+            $allBookings = DB::table('booking')->where('order_id', $order_id)->get();
+            
+            // Get passenger details for the main booking
+            $passengerDetails = DB::table('booking_passenger_details')
+                ->where('booking_id', $booking->id)
+                ->get();
+            
+            // Prepare email data for the booking-confirmation template
+            $emailData = [
+                'booking' => $booking,
+                'allBookings' => $allBookings,
+                'passengerDetails' => $passengerDetails,
+                'order_id' => $order_id
+            ];
+            
+            // Send email using Laravel Mail with booking-confirmation template
+            \Mail::send('emails.booking-confirmation', $emailData, function($message) use ($booking) {
+                $message->to($booking->c_email, $booking->c_name)
+                        ->subject('Ferry Booking Confirmation - Order #' . $booking->order_id);
+            });
+            
+            \Log::info('Booking confirmation email sent using booking-confirmation template', [
+                'order_id' => $order_id,
+                'email' => $booking->c_email
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to send booking confirmation email', [
+                'order_id' => $order_id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     public function ajaxBoatBooking(Request $request)

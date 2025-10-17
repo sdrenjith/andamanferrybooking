@@ -865,14 +865,14 @@
 
 </form>
 
-<section>
+<section class="mobile-summary-section">
     <div class="container">
         <div class="col-12 summery-btn">
-<div class="bookingSumBg"></div>
-<button class="btn btn-primary billMobile" id="billMobile">
-    Show Summary
-</button>
-</div>
+            <div class="bookingSumBg"></div>
+            <button class="btn btn-primary billMobile" id="billMobile">
+                <i class="bi bi-receipt me-2"></i>Show Summary
+            </button>
+        </div>
     </div>
 </section>
 
