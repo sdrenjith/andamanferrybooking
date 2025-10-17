@@ -121,9 +121,20 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                                 </div>
                                                 <div class="col-12 col-lg-2 mb-2">
                                                     <label for="date">Date</label>
-                                                    <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Date" id="date" name="date" min="" readonly="readonly" value="{{ date('Y-m-d') }}" fdprocessedid="w8od0e">
+                                                    <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Date" id="date" name="date" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" readonly="readonly" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" data-current-date="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" fdprocessedid="w8od0e">
                                                     <!-- Mobile fallback date input -->
-                                                    <input type="date" class="mobile-date-input" id="date_mobile" name="date" style="display: none;" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d') }}" placeholder="Select Date">
+                                                    <input type="date" class="mobile-date-input" id="date_mobile" name="date" style="display: none;" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" placeholder="Select Date">
+                                                    <!-- Debug info (remove in production) -->
+                                                    <script>
+                                                        console.log('PHP Date: {{ \Carbon\Carbon::now()->format('Y-m-d') }}');
+                                                        // Force set date immediately on page load
+                                                        document.addEventListener('DOMContentLoaded', function() {
+                                                            const today = '{{ \Carbon\Carbon::now()->format('Y-m-d') }}';
+                                                            console.log('DOMContentLoaded - Setting date to:', today);
+                                                            document.getElementById('date').value = today;
+                                                            document.getElementById('date_mobile').value = today;
+                                                        });
+                                                    </script>
                                                 </div>
                                                 <div class="col-12 col-lg-2 mb-2">
                                                     <label for="location">Passengers</label>
@@ -169,9 +180,16 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                             <div class="row mb-3">
                                                 <div class="col-12 col-lg-6 mb-2">
                                                         <label for="departure_date">Departure Date</label>
-                                                        <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Departure Date" id="departure_date" name="departure_date" min="" readonly="readonly" value="{{ date('Y-m-d') }}">
+                                                        <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Departure Date" id="departure_date" name="departure_date" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" readonly="readonly" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" data-current-date="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
                                                         <!-- Mobile fallback date input -->
-                                                        <input type="date" class="mobile-date-input" id="departure_date_mobile" name="departure_date" style="display: none;" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d') }}">
+                                                        <input type="date" class="mobile-date-input" id="departure_date_mobile" name="departure_date" style="display: none;" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                                        <script>
+                                                            document.addEventListener('DOMContentLoaded', function() {
+                                                                const today = '{{ \Carbon\Carbon::now()->format('Y-m-d') }}';
+                                                                document.getElementById('departure_date').value = today;
+                                                                document.getElementById('departure_date_mobile').value = today;
+                                                            });
+                                                        </script>
                                                 </div>
                                                 <div class="col-12 col-lg-6 mb-2">
                                                         <label for="departure_passenger">Passengers</label>
@@ -209,9 +227,16 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                                 <div class="row mb-3">
                                                     <div class="col-12 col-lg-6 mb-2">
                                                         <label for="return_date">Return Date</label>
-                                                        <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Return Date" id="return_date" name="return_date" min="" readonly="readonly" value="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                                                        <input type="text" class="my_date_picker flatpickr-input" placeholder="Select Return Date" id="return_date" name="return_date" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" readonly="readonly" value="{{ \Carbon\Carbon::now()->addDay()->format('Y-m-d') }}" data-current-date="{{ \Carbon\Carbon::now()->addDay()->format('Y-m-d') }}">
                                                         <!-- Mobile fallback date input -->
-                                                        <input type="date" class="mobile-date-input" id="return_date_mobile" name="return_date" style="display: none;" min="{{ date('Y-m-d') }}" value="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                                                        <input type="date" class="mobile-date-input" id="return_date_mobile" name="return_date" style="display: none;" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" value="{{ \Carbon\Carbon::now()->addDay()->format('Y-m-d') }}">
+                                                        <script>
+                                                            document.addEventListener('DOMContentLoaded', function() {
+                                                                const tomorrow = '{{ \Carbon\Carbon::now()->addDay()->format('Y-m-d') }}';
+                                                                document.getElementById('return_date').value = tomorrow;
+                                                                document.getElementById('return_date_mobile').value = tomorrow;
+                                                            });
+                                                        </script>
                                                     </div>
                                                     <div class="col-12 col-lg-6 mb-2">
                                                         <label for="return_passenger">Passengers</label>
@@ -1889,10 +1914,14 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
         }, 100);
 
         // Initialize date picker for both desktop and mobile
+        const today = new Date().toISOString().split('T')[0];
+        console.log('JavaScript Today:', today);
+        console.log('Current Date Object:', new Date());
+        
         const dateOptions = {
             dateFormat: 'Y-m-d',
-            minDate: "today",
-            defaultDate: "today", // Set today's date as default
+            minDate: today,
+            // Remove defaultDate to prevent conflicts
             // Mobile-specific options
             allowInput: true,
             clickOpens: true,
@@ -1902,6 +1931,10 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             static: true,
             // Prevent keyboard issues on mobile
             onReady: function(selectedDates, dateStr, instance) {
+                // Force set current date after flatpickr is ready
+                instance.setDate(today, false);
+                console.log('Flatpickr onReady - Set date to:', today);
+                
                 // Ensure proper mobile behavior
                 if (isMobile) {
                     instance.element.addEventListener('touchstart', function(e) {
@@ -1939,6 +1972,81 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
         $('#round2_date').flatpickr(dateOptions);
         $('#departure_date').flatpickr(dateOptions);
         $('#return_date').flatpickr(dateOptions);
+        
+        // Final check to ensure dates are set correctly after flatpickr initialization
+        setTimeout(function() {
+            const today = new Date().toISOString().split('T')[0];
+            const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            
+            console.log('Final check - Setting dates to:');
+            console.log('Today:', today);
+            console.log('Tomorrow:', tomorrow);
+            
+            // Get PHP dates from data attributes as primary source
+            const phpToday = $('#date').data('current-date') || today;
+            const phpTomorrow = $('#return_date').data('current-date') || tomorrow;
+            
+            console.log('Using PHP dates:', phpToday, phpTomorrow);
+            
+            // Force set dates one more time after flatpickr is initialized
+            $('#date, #departure_date').val(phpToday);
+            $('#date_mobile, #departure_date_mobile').val(phpToday);
+            $('#return_date').val(phpTomorrow);
+            $('#return_date_mobile').val(phpTomorrow);
+            
+            // Also set the flatpickr instances directly
+            if ($('#date').data('flatpickr')) {
+                $('#date').data('flatpickr').setDate(phpToday, false);
+            }
+            if ($('#departure_date').data('flatpickr')) {
+                $('#departure_date').data('flatpickr').setDate(phpToday, false);
+            }
+            if ($('#return_date').data('flatpickr')) {
+                $('#return_date').data('flatpickr').setDate(phpTomorrow, false);
+            }
+            
+            console.log('Final date values:');
+            console.log('date:', $('#date').val());
+            console.log('departure_date:', $('#departure_date').val());
+            console.log('return_date:', $('#return_date').val());
+        }, 500);
+        
+        // Removed ultimate fallback to prevent date flickering
+        
+        // Simplified date setting function - no conditions that could cause flickering
+        function setCurrentDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            
+            console.log('Setting current date - Today:', today);
+            
+            // Get PHP date from data attribute as primary source
+            const phpDate = $('#date').data('current-date');
+            const phpTomorrow = $('#return_date').data('current-date');
+            
+            // Use PHP date if available, otherwise use JavaScript date
+            const finalDate = phpDate || today;
+            const finalTomorrow = phpTomorrow || tomorrow;
+            
+            // Always set current date for all departure fields
+            $('#date, #departure_date').val(finalDate);
+            $('#date_mobile, #departure_date_mobile').val(finalDate);
+            
+            // Always set tomorrow's date for return fields
+            $('#return_date').val(finalTomorrow);
+            $('#return_date_mobile').val(finalTomorrow);
+            
+            console.log('Date field values set to:');
+            console.log('date:', $('#date').val());
+            console.log('departure_date:', $('#departure_date').val());
+            console.log('return_date:', $('#return_date').val());
+        }
+        
+        // Set dates immediately
+        setCurrentDate();
+        
+        // Set dates again after flatpickr initialization (only once)
+        setTimeout(setCurrentDate, 500);
 
         // Enhanced mobile detection and fallback system
         function initializeMobileDatePickers() {
@@ -1952,9 +2060,7 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                 // Show mobile date inputs and hide flatpickr inputs
                 $('.flatpickr-input').hide();
                 $('.mobile-date-input').show();
-
-                // Set default date for mobile inputs
-                $('.mobile-date-input').val(new Date().toISOString().split('T')[0]);
+                // Don't set dates here - let the main setCurrentDate function handle it
                 
                 // Sync values between mobile date inputs and flatpickr inputs
                 $('.mobile-date-input').on('change', function() {
@@ -2018,8 +2124,7 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             if (!$('#date').data('flatpickr')) {
                 $('.flatpickr-input').hide();
                 $('.mobile-date-input').show();
-                // Set default date for fallback mobile inputs
-                $('.mobile-date-input').val(new Date().toISOString().split('T')[0]);
+                // Don't set dates here - let the main setCurrentDate function handle it
             }
         }, 1000);
 
@@ -2032,8 +2137,7 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             if (isMobileView) {
                 $('.flatpickr-input').hide();
                 $('.mobile-date-input').show();
-                // Set default date for forced mobile inputs
-                $('.mobile-date-input').val(new Date().toISOString().split('T')[0]);
+                // Don't set dates here - let the main setCurrentDate function handle it
                 
                 // Add CSS to force mobile inputs
                 $('<style>')
@@ -2164,6 +2268,7 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             const departureDate = $(this).val();
             if (departureDate) {
                 const depDate = new Date(departureDate);
+                const nextDay = new Date(depDate.getTime() + 24 * 60 * 60 * 1000);
                 
                 // Update return date picker minimum date to be the same as departure date
                 const returnDatePicker = $("#return_date")[0]._flatpickr;
@@ -2171,14 +2276,20 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                     returnDatePicker.set('minDate', depDate);
                 }
                 
-                // If return date is already selected and is before the departure date, clear it
+                // If return date is already selected and is before the departure date, set it to next day
                 const currentReturnDate = $("#return_date").val();
                 if (currentReturnDate) {
                     const retDate = new Date(currentReturnDate);
                     if (retDate < depDate) {
-                        $("#return_date").val('');
-                        alert('Return date has been cleared as it must be on or after the departure date.');
+                        const nextDayStr = nextDay.toISOString().split('T')[0];
+                        $("#return_date").val(nextDayStr);
+                        $("#return_date_mobile").val(nextDayStr);
                     }
+                } else {
+                    // If no return date is set, set it to the day after departure
+                    const nextDayStr = nextDay.toISOString().split('T')[0];
+                    $("#return_date").val(nextDayStr);
+                    $("#return_date_mobile").val(nextDayStr);
                 }
             }
         });

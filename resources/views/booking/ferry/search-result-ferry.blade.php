@@ -2365,6 +2365,100 @@
                                         </div>
                                     </div>
 
+                                    {{-- Second tab for return journey --}}
+                                    @if (request('trip_type') == 2 && !empty($returnScheduleData))
+                                        <div class="tab-pane fade" id="nav-extra" role="tabpanel" aria-labelledby="nav-extra-tab">
+                                            <div class="row">
+                                                <div class="col-12 searchResults px-0">
+                                                    @foreach ($returnScheduleData as $key => $shipSchedule)
+                                                        @if ($shipSchedule['ship_name'] == 'Nautika')
+                                                            <div class="ferryCard ferrySearch mb-3">
+                                                                <div class="ferryImg" data-ferry-id="{{ $shipSchedule['id'] }}">
+                                                                    <img src="{{ env('UPLOADED_ASSETS') . $shipSchedule['ship_image'] }}" alt="" style="">
+                                                                </div>
+                                                                <div class="ferryDetails ms-3">
+                                                                    <div class="ferryName">
+                                                                        <h4 class="mb-3">{{ $shipSchedule['ship_name'] }}</h4>
+                                                                        <p class="mb-3">Departure Time {{ date('H:i', strtotime($shipSchedule['departure_time'])) }}</p>
+                                                                        <p class="mb-3">Arrival Time {{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}</p>
+                                                                        <p class="mb-3">{{ $shipSchedule['from'] ?? 'NA' }} - {{ $shipSchedule['to'] ?? 'NA' }}</p>
+                                                                    </div>
+                                                                    <div class="classBtn">
+                                                                        <a href="#" id="{{ 'ferry_p_' . $key + 1 }}" data-ferryschedule-id="{{ $shipSchedule['id'] }}" data-trip_id="{{ $shipSchedule['tripId'] }}" data-vessel_id="{{ $shipSchedule['vesselID'] }}" data-from="{{ $shipSchedule['from'] }}" data-to="{{ $shipSchedule['to'] }}" data-departure_time="{{ $shipSchedule['departure_time'] }}" data-arrival_time="{{ $shipSchedule['arrival_time'] }}" data-class-title="Premium" data-class_id="pClass" data-price="{{ $shipSchedule['fares']->pBaseFare }}" data-psf="50" data-avl_seat="{{ $shipSchedule['p_class_seat_availibility'] }}" data-ship_name="Nautika" class="btn Premium ferry-btn3 mb-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                                                            <p class="text-white mb-0">Premium</p>
+                                                                            <p class="text-white mb-0" style="text-decoration: line-through;">₹{{ $shipSchedule['fares']->pBaseFare }}</p>
+                                                                            <p class="text-white mb-0">₹{{ $shipSchedule['fares']->pBaseFare - 100 }}</p>
+                                                                            <p class="text-white mb-0">Seat: {{ $shipSchedule['p_class_seat_availibility'] }}</p>
+                                                                            <p class="bg-green-text-white mb-0">Book Now</p>
+                                                                        </a>
+                                                                        <a href="#" id="{{ 'ferry_b_' . $key + 1 }}" data-ferryschedule-id="{{ $shipSchedule['id'] }}" data-trip_id="{{ $shipSchedule['tripId'] }}" data-vessel_id="{{ $shipSchedule['vesselID'] }}" data-from="{{ $shipSchedule['from'] }}" data-to="{{ $shipSchedule['to'] }}" data-departure_time="{{ $shipSchedule['departure_time'] }}" data-arrival_time="{{ $shipSchedule['arrival_time'] }}" data-class-title="Business" data-class_id="bClass" data-price="{{ $shipSchedule['fares']->bBaseFare }}" data-psf="50" data-avl_seat="{{ $shipSchedule['b_class_seat_availibility'] }}" data-ship_name="Nautika" class="btn Business ferry-btn3 mb-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                                                            <p class="text-white mb-0">Business</p>
+                                                                            <p class="text-white mb-0" style="text-decoration: line-through;">₹{{ $shipSchedule['fares']->bBaseFare }}</p>
+                                                                            <p class="text-white mb-0">₹{{ $shipSchedule['fares']->bBaseFare - 100 }}</p>
+                                                                            <p class="text-white mb-0">Seat: {{ $shipSchedule['b_class_seat_availibility'] }}</p>
+                                                                            <p class="bg-green-text-white mb-0">Book Now</p>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @elseif($shipSchedule['ship_name'] == 'Admin')
+                                                            <div class="ferryCard ferrySearch mb-3">
+                                                                <div class="ferryImg" data-ferry-id="{{ $shipSchedule['id'] }}">
+                                                                    <img src="{{ env('UPLOADED_ASSETS') . $shipSchedule['ship']['image'] }}" alt="" style="">
+                                                                </div>
+                                                                <div class="ferryDetails ms-3">
+                                                                    <div class="ferryName">
+                                                                        <h4 class="mb-3">{{ $shipSchedule['ship']['title'] }}</h4>
+                                                                        <p class="mb-3">Departure Time {{ date('H:i', strtotime($shipSchedule['departure_time'])) }}</p>
+                                                                        <p class="mb-3">Arrival Time {{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}</p>
+                                                                        <p class="mb-3">{{ $return_route_titles['from_location'] }} - {{ $return_route_titles['to_location'] }}</p>
+                                                                    </div>
+                                                                    <div class="classBtn">
+                                                                        @if (isset($shipSchedule['ferry_prices']) && !empty($shipSchedule['ferry_prices']))
+                                                                            @foreach ($shipSchedule['ferry_prices'] as $ferryPrice)
+                                                                            <a href="#" id="{{ 'ferry_' . $ferryPrice['class']['title'] . '_' . $key + 1 }}" data-ferryschedule-id="{{ $shipSchedule['id'] }}" data-class_id="{{ $ferryPrice['class']['id'] }}" data-from="{{ $return_route_titles['from_location'] }}" data-to="{{ $return_route_titles['to_location'] }}" data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}" data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arrival_time'])) }}" data-class-title="{{ $ferryPrice['class']['title'] }}" data-price="{{ $ferryPrice['price'] }}" data-psf="{{ $ferryPrice['psf'] ?? 50 }}" data-avl_seat="{{ $ferryPrice['seat'] ?? 0 }}" data-ship_name="{{ $shipSchedule['ship']['title'] }}" data-ship_id="{{ $shipSchedule['ship_id'] }}" class="btn {{ $ferryPrice['class']['title'] }} ferry-btn3 mb-2">
+                                                                                <p class="text-white mb-0">{{ $ferryPrice['class']['title'] }}</p>
+                                                                                <p class="text-white mb-0">₹ {{ $ferryPrice['price'] }}</p>
+                                                                                <p class="text-white mb-0">Seat: {{ $ferryPrice['seat'] ?? 0 }}</p>
+                                                                                <p class="bg-green-text-white mb-0">Book Now</p>
+                                                                            </a>
+                                                                            @endforeach
+                                                                        @else
+                                                                            <p class="text-muted">No pricing information available</p>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @elseif($shipSchedule['ship_name'] == 'Green Ocean 1' || $shipSchedule['ship_name'] == 'Green Ocean 2')
+                                                            <div class="ferryCard ferrySearch mb-3">
+                                                                <div class="ferryImg" data-ferry-id="{{ $shipSchedule['id'] }}">
+                                                                    <img src="{{ env('UPLOADED_ASSETS') . $shipSchedule['ship_image'] }}" alt="" style="">
+                                                                </div>
+                                                                <div class="ferryDetails ms-3">
+                                                                    <div class="ferryName">
+                                                                        <h4 class="mb-3">{{ $shipSchedule['ship_name'] }}</h4>
+                                                                        <p class="mb-3">Departure Time {{ date('H:i', strtotime($shipSchedule['departure_time'])) }}</p>
+                                                                        <p class="mb-3">Arrival Time {{ date('H:i', strtotime($shipSchedule['arraival_time'])) }}</p>
+                                                                        <p class="mb-3">{{ $return_route_titles['from_location'] }} - {{ $return_route_titles['to_location'] }}</p>
+                                                                    </div>
+                                                                    <div class="classBtn">
+                                                                        @foreach ($shipSchedule['ship_class'] as $ferryPrice)
+                                                                            <a href="#" id="{{ 'ferry_' . $ferryPrice->class_name . '_' . $key + 1 }}" data-ferryschedule-id="{{ $ferryPrice->route_id }}" data-class_id="{{ $ferryPrice->class_id }}" data-from="{{ $return_route_titles['from_location'] }}" data-to="{{ $return_route_titles['to_location'] }}" data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}" data-arrival_time="{{ date('H:i', strtotime($shipSchedule['arraival_time'])) }}" data-class-title="{{ $ferryPrice->class_name }}" data-price="{{ $ferryPrice->adult_seat_rate }}" data-psf="{{ $ferryPrice->port_fee }}" data-avl_seat="{{ $ferryPrice->seat_available }}" data-ship_name="{{ $ferryPrice->ferry_name }}" data-ship_id="{{ $ferryPrice->ferry_id }}" class="btn {{ $ferryPrice->class_name }} ferry-btn3 mb-2">
+                                                                                <p class="text-white mb-0">{{ $ferryPrice->class_name }}</p>
+                                                                                <p class="text-white mb-0">₹ {{ $ferryPrice->adult_seat_rate }}</p>
+                                                                                <p class="text-white mb-0">Seat: {{ $ferryPrice->seat_available }}</p>
+                                                                                <p class="bg-green-text-white mb-0">Book Now</p>
+                                                                            </a>
+                                                                        @endforeach
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -2570,24 +2664,16 @@
 
                         var shipName = element.data('ship_name');
                         
-                        
-
                         @if (request('trip_type') == 1)
-
-                            
+                            // Single trip - keep existing logic for compatibility
                             if ((shipName != 'Nautika') && (shipName.indexOf(gShipName) == -1)) {
                                 var newUrl = "{{ route('booking-ferry') }}";
                                 window.location.href = newUrl;
-                                // $(document).find("#nav-contact-tab").removeClass('disabled')                                
                             }
                         @else
-                            
-                            if ((shipName != 'Nautika') && (shipName.indexOf(gShipName) == -1)) {
-                                $(document).find("#nav-extra-tab").removeClass('disabled').prop('disabled', false)
-                                    .trigger("click");
-                            }
-
-                            
+                            // Round trip - navigate to return tab after selecting departure ferry
+                            // Store departure selection and switch to return tab
+                            $("#nav-extra-tab").removeClass('disabled').prop("disabled", false).trigger("click");
                         @endif
 
                         var ferryScheduleId = element.data('ferryschedule-id');
@@ -2725,21 +2811,15 @@
 
                         var shipName = element.data('ship_name');
                         @if (request('trip_type') == 2)
-                            // if (shipName != 'Nautika') {
-                            if ((shipName != 'Nautika') && (shipName.indexOf(gShipName) == -1)) {
-                                var newUrl = "{{ route('booking-ferry') }}";
-                                window.location.href = newUrl;
-                                // $(document).find("#nav-contact-tab").removeClass('disabled')
-                                //     .trigger("click");
-                            }
+                            // Round trip - navigate to booking page after selecting return ferry
+                            var newUrl = "{{ route('booking-ferry') }}";
+                            window.location.href = newUrl;
                         @else
-                            
-                            // if (shipName != 'Nautika') {
+                            // Single trip - keep existing logic for compatibility
                             if ((shipName != 'Nautika') && (shipName.indexOf(gShipName) == -1)) {
                                 $(document).find("#nav-extra-tab").removeClass('disabled').prop("disabled", false)
                                     .trigger("click");
                             }
-                            
                         @endif
                             // var ferryScheduleId = element.data('ferryschedule-id');
                             // var classId = element.data('class_id');
@@ -2835,7 +2915,7 @@
             });
 
 
-            // when round 3 booking 
+            // when round 2 booking (return journey) and round 3 booking 
             $('.ferry-btn3').on('click', function(event) {
                 event.preventDefault();
 
@@ -2853,15 +2933,23 @@
                 var shipName = $(this).data('ship_name');
                 
 
-                // remove all selected seat an d let user select new
+                // Determine if this is return journey (trip 2) or additional journey (trip 3)
+                var isReturnJourney = $(this).closest('#nav-extra').length > 0;
+                var tripNumber = isReturnJourney ? 2 : 3;
+                
+                // remove all selected seat and let user select new
                 $('.luxury-down').find('.seat').removeClass("selected");
-                $("#trip3seatcount").val(0);
+                if (isReturnJourney) {
+                    $("#trip2seatcount").val(0);
+                } else {
+                    $("#trip3seatcount").val(0);
+                }
 
                 $.ajax({
                     url: '{{ url('booking-data-store') }}',
                     method: 'POST',
                     data: {
-                        trip: 3,
+                        trip: tripNumber,
                         ship: $(this).data('ship_name'),
                         scheduleId: $(this).data('ferryschedule-id'),
                         shipClass: $(this).data('class_id')
@@ -2891,7 +2979,7 @@
 
                                 $('.' + value.number + '.' + results.ship_class).each(
                                     function() {
-                                        $(this).attr('data-trip-no', '3');
+                                        $(this).attr('data-trip-no', tripNumber);
                                         $(this).attr('data-seat-no', value.number);
                                     });
                             });
@@ -2920,7 +3008,7 @@
                             var psf = element.data('psf');
                             var avlSeat = element.data('avl_seat');
                             
-                            var trip3Details = {
+                            var tripDetails = {
                                 'ship_name' : shipName,
                                 'ferryschedule_id' : ferryScheduleId,
                                 'class_id' : classId,
@@ -2936,8 +3024,15 @@
                                 'avl_seat' : avlSeat,
                             };
                             
-                            var trip3Detailsstr = JSON.stringify(trip3Details);
-                            $("#trip3details").val(trip3Detailsstr);
+                            var tripDetailsStr = JSON.stringify(tripDetails);
+                            if (isReturnJourney) {
+                                $("#trip2details").val(tripDetailsStr);
+                                // For return journey, navigate to booking page
+                                var newUrl = "{{ route('booking-ferry') }}";
+                                window.location.href = newUrl;
+                            } else {
+                                $("#trip3details").val(tripDetailsStr);
+                            }
 
                         } else if (shipName.indexOf(gShipName) == 0) {
                             
@@ -2986,7 +3081,7 @@
                             var psf = element.data('psf');
                             var avlSeat = element.data('avl_seat');
                             
-                            var trip3Details = {
+                            var tripDetails = {
                                 'ship_id' : shipId,
                                 'ship_name' : shipName,
                                 'ferryschedule_id' : ferryScheduleId,
@@ -3003,15 +3098,22 @@
                                 'avl_seat' : avlSeat,
                             };
                             
-                            var trip3Detailsstr = JSON.stringify(trip3Details);
-                            $("#trip3details").val(trip3Detailsstr);
+                            var tripDetailsStr = JSON.stringify(tripDetails);
+                            if (isReturnJourney) {
+                                $("#trip2details").val(tripDetailsStr);
+                                // For return journey, navigate to booking page
+                                var newUrl = "{{ route('booking-ferry') }}";
+                                window.location.href = newUrl;
+                            } else {
+                                $("#trip3details").val(tripDetailsStr);
+                            }
 
                             $.ajax({
                                 url: '{{ url('get-green-ship-layout') }}',
                                 method: 'POST',
                                 // dataType: 'JSON',
                                 data: {
-                                    trip: 3,
+                                    trip: tripNumber,
                                     class_id: classId,
                                     ship_id: shipId,
                                     // ferry_id: shipId,
@@ -3019,7 +3121,7 @@
                                 },
                                 success: function(seatRes) {
                                     $("#modalGreenOceanSeat .seat-layout").empty();
-                                    $("#modalGreenOceanSeat .seat-layout").data('trip-no', 3);
+                                    $("#modalGreenOceanSeat .seat-layout").data('trip-no', tripNumber);
                                     $("#modalGreenOceanSeat .seat-layout").append(seatRes);
                                     $('#modalGreenOceanSeat').modal('show');
                                 }

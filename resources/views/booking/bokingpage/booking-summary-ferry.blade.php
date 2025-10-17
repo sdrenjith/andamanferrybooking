@@ -884,22 +884,25 @@
             <div class="row py-2 p-0 m-0 w-100" style="background: #008495; color: white; margin: -20px -20px 20px -20px; padding: 15px 20px; border-radius: 10px 10px 0 0;">
                 <div class="col-12 d-flex align-items-center justify-content-between">
                     <div style="font-weight: bold; font-size: 18px;">BOOKING SUMMARY</div>
-                    <div style="font-weight: bold; font-size: 18px;">₹ <span id="set_total_fare">{{ number_format($total_single_price ?? 0, 2) }}</span></div>
+                    <div style="font-weight: bold; font-size: 18px;">₹ <span id="set_total_fare">{{ number_format(($total_single_price ?? 0) + ($total_trip2_price ?? 0) + ($total_trip3_price ?? 0), 2) }}</span></div>
                 </div>
             </div>
             
             <div class="summary-details" style="background: white; padding: 15px; border-radius: 5px;">
-                <!-- Trip Details -->
-                <div style="padding: 10px; margin-bottom: 10px; border-bottom: 1px solid #e0e0e0;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span style="color: #008495; font-weight: bold;">Onwards: {{ date('d-m-Y', strtotime($booking_data['date'])) }}</span>
-                        <span style="color: #008495; font-weight: bold;">{{ $trip1['ship_name'] }}</span>
+                <!-- Trip 1 (Onwards) -->
+                <div style="padding: 10px; margin-bottom: 15px; border: 1px solid #e0e0e0; border-radius: 5px;">
+                    <div style="background: #f8f9fa; padding: 8px; margin: -10px -10px 10px -10px; border-radius: 5px 5px 0 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #008495; font-weight: bold;">Onwards: {{ date('d-m-Y', strtotime($booking_data['date'])) }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $trip1['ship_name'] }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['form_location'] == 1 ? 'Port Blair' : ($booking_data['form_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['to_location'] == 1 ? 'Port Blair' : ($booking_data['to_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                        </div>
                     </div>
+                    
                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span style="color: #008495; font-weight: bold;">{{ $booking_data['form_location'] == 1 ? 'Port Blair' : ($booking_data['form_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
-                        <span style="color: #008495; font-weight: bold;">{{ $booking_data['to_location'] == 1 ? 'Port Blair' : ($booking_data['to_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
                         <span style="color: #008495;">Total Duration</span>
                         <span style="color: #008495;">
                             @php
@@ -913,10 +916,6 @@
                             {{ $totalHours }} Hr {{ $totalDuration->i }} m Non-stop
                         </span>
                     </div>
-                </div>
-                
-                <!-- Booking Details -->
-                <div style="margin-bottom: 10px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                         <span style="color: #008495;">Class Type</span>
                         <span style="color: #008495;">
@@ -956,13 +955,165 @@
                         <span style="color: #008495;">PSF (Per Pax/Infant)</span>
                         <span style="color: #008495;">INR {{ $trip1['psf'] }}</span>
                     </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid #e0e0e0; font-weight: bold;">
+                        <span style="color: #008495;">Trip 1 Total</span>
+                        <span style="color: #008495;">INR {{ number_format($total_single_price ?? 0, 2) }}</span>
+                    </div>
                 </div>
+
+                @if (isset($trip2))
+                <!-- Trip 2 (Return) -->
+                <div style="padding: 10px; margin-bottom: 15px; border: 1px solid #e0e0e0; border-radius: 5px;">
+                    <div style="background: #f8f9fa; padding: 8px; margin: -10px -10px 10px -10px; border-radius: 5px 5px 0 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #008495; font-weight: bold;">Trip 2: {{ $booking_data['departure_date'] }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $trip2['ship_name'] }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['departure_from_location'] == 1 ? 'Port Blair' : ($booking_data['departure_from_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['departure_to_location'] == 1 ? 'Port Blair' : ($booking_data['departure_to_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">Total Duration</span>
+                        <span style="color: #008495;">
+                            @php
+                            $dTime = $trip2['departure_time'];
+                            $aTime = $trip2['arrival_time'];
+                            $departureTime = Carbon\Carbon::parse($dTime);
+                            $arrivalTime = Carbon\Carbon::parse($aTime);
+                            $totalDuration = $arrivalTime->diff($departureTime);
+                            $totalHours = $totalDuration->h + $totalDuration->days * 24;
+                            @endphp
+                            {{ $totalHours }} Hr {{ $totalDuration->i }} m Non-stop
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">Class Type</span>
+                        <span style="color: #008495;">
+                            @if(($trip2['class_title'] ?? '')=='bClass')
+                                Business
+                            @elseif (($trip2['class_title'] ?? '')=='pClass')
+                                Premium
+                            @else
+                                {{ $trip2['class_title'] ?? 'Standard' }}
+                            @endif
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">No of Passenger</span>
+                        <span style="color: #008495;">{{ $booking_data['no_of_passenger'] }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">
+                            @if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz' || str_contains($trip2['ship_name'], 'Green Ocean'))
+                                Advance Booking Price
+                            @else
+                                Per Passenger Price
+                            @endif
+                        </span>
+                        <span style="color: #008495;">INR 
+                            @php 
+                            if ($trip2['ship_name'] == 'Nautika' || $trip2['ship_name'] == 'Makruzz' || str_contains($trip2['ship_name'], 'Green Ocean')) {
+                                $trip2_price = 200;
+                            } else {
+                                $trip2_price = $trip2['fare'];
+                            }
+                            @endphp
+                            {{ number_format($trip2_price, 2) }}
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">PSF (Per Pax/Infant)</span>
+                        <span style="color: #008495;">INR {{ $trip2['psf'] }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid #e0e0e0; font-weight: bold;">
+                        <span style="color: #008495;">Trip 2 Total</span>
+                        <span style="color: #008495;">INR {{ number_format($total_trip2_price ?? 0, 2) }}</span>
+                    </div>
+                </div>
+                @endif
+
+                @if (isset($trip3))
+                <!-- Trip 3 (Additional) -->
+                <div style="padding: 10px; margin-bottom: 15px; border: 1px solid #e0e0e0; border-radius: 5px;">
+                    <div style="background: #f8f9fa; padding: 8px; margin: -10px -10px 10px -10px; border-radius: 5px 5px 0 0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #008495; font-weight: bold;">Trip 3: {{ $booking_data['round2_date'] }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $trip3['ship_name'] }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['round2_from_location'] == 1 ? 'Port Blair' : ($booking_data['round2_from_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['round2_to_location'] == 1 ? 'Port Blair' : ($booking_data['round2_to_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">Total Duration</span>
+                        <span style="color: #008495;">
+                            @php
+                            $dTime = $trip3['departure_time'];
+                            $aTime = $trip3['arrival_time'];
+                            $departureTime = Carbon\Carbon::parse($dTime);
+                            $arrivalTime = Carbon\Carbon::parse($aTime);
+                            $totalDuration = $arrivalTime->diff($departureTime);
+                            $totalHours = $totalDuration->h + $totalDuration->days * 24;
+                            @endphp
+                            {{ $totalHours }} Hr {{ $totalDuration->i }} m Non-stop
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">Class Type</span>
+                        <span style="color: #008495;">
+                            @if(($trip3['class_title'] ?? '')=='bClass')
+                                Business
+                            @elseif (($trip3['class_title'] ?? '')=='pClass')
+                                Premium
+                            @else
+                                {{ $trip3['class_title'] ?? 'Standard' }}
+                            @endif
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">No of Passenger</span>
+                        <span style="color: #008495;">{{ $booking_data['no_of_passenger'] }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">
+                            @if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz' || str_contains($trip3['ship_name'], 'Green Ocean'))
+                                Advance Booking Price
+                            @else
+                                Per Passenger Price
+                            @endif
+                        </span>
+                        <span style="color: #008495;">INR 
+                            @php 
+                            if ($trip3['ship_name'] == 'Nautika' || $trip3['ship_name'] == 'Makruzz' || str_contains($trip3['ship_name'], 'Green Ocean')) {
+                                $trip3_price = 200;
+                            } else {
+                                $trip3_price = $trip3['fare'];
+                            }
+                            @endphp
+                            {{ number_format($trip3_price, 2) }}
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span style="color: #008495;">PSF (Per Pax/Infant)</span>
+                        <span style="color: #008495;">INR {{ $trip3['psf'] }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid #e0e0e0; font-weight: bold;">
+                        <span style="color: #008495;">Trip 3 Total</span>
+                        <span style="color: #008495;">INR {{ number_format($total_trip3_price ?? 0, 2) }}</span>
+                    </div>
+                </div>
+                @endif
                 
-                <!-- Total Fare -->
-                <div style="background: #0f55cc; color: white; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                <!-- Grand Total -->
+                <div style="background: #0f55cc; color: white; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px;">
                         <span>Total fare</span>
-                        <span>INR {{ number_format($total_single_price ?? 0, 2) }}</span>
+                        <span>INR {{ number_format(($total_single_price ?? 0) + ($total_trip2_price ?? 0) + ($total_trip3_price ?? 0), 2) }}</span>
                     </div>
                 </div>
             </div>

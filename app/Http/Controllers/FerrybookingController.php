@@ -266,6 +266,8 @@ class FerrybookingController extends Controller
                 \Log::info('Nautika API timeout - continuing with admin data only: ' . $e->getMessage());
             }
 
+            // COMMENTED OUT - Makruzz API call disabled (managed through admin panel)
+            /*
             try {
                 $makData = $this->getMakruzzDataFast($data3, $ship_image1, $ship1);
                 if (!empty($makData)) {
@@ -274,6 +276,7 @@ class FerrybookingController extends Controller
             } catch (\Exception $e) {
                 \Log::info('Makruzz API timeout - continuing with available data: ' . $e->getMessage());
             }
+            */
 
             try {
                 $greenOceanData = $this->getGreenOceanDataFast($fromLocation, $toLocation, $no_of_passenger, $infant, $date);
@@ -293,8 +296,8 @@ class FerrybookingController extends Controller
 
         $data['apiScheduleData'] = $sorted->values()->all();
 
-        // If no schedules found, show a message
-        if (empty($data['apiScheduleData'])) {
+        // If no schedules found, show a message (only for single trips)
+        if (empty($data['apiScheduleData']) && $trip_type == 1) {
             return redirect()->back()->with('error', 'No ferry schedules found for the selected date and route. Please try a different date or contact customer support.');
         }
 
@@ -355,6 +358,12 @@ class FerrybookingController extends Controller
                 return redirect()->back()->with('error', 'Invalid location selected. Please try again.');
             }
 
+            // For round trips, set the departure journey route titles as the main route titles
+            $data['route_titles'] = [
+                'from_location' => $round_1_from_location_title->title,
+                'to_location' => $round_1_to_location_title->title,
+            ];
+            
             $data['round1_route_titles'] = [
                 'from_location' => $round_1_from_location_title->title,
                 'to_location' => $round_1_to_location_title->title,
@@ -427,6 +436,8 @@ class FerrybookingController extends Controller
                 "to_location" => $round1_to_location,
             ));
 
+            // COMMENTED OUT - Makruzz API call disabled (managed through admin panel)
+            /*
             $makruzz_result = $this->makApiCallUltraFast('schedule_search', $data5);
 
             // $ship=DB::table('ship_master')->select('image')->where('id', 1)->first();
@@ -449,6 +460,8 @@ class FerrybookingController extends Controller
                     $makData2[$val->id]['ship_class'][] =  $val;
                 }
             }
+            */
+            $makData2 = []; // Empty array since API is disabled
 
             // ======================= GREEN OCEAN CALL ==================================
             $greenOceanData = $this->green_ocean_call_ultra_fast($round1_from_location, $round1_to_location, $no_of_passenger, $infant, $date);
@@ -465,6 +478,11 @@ class FerrybookingController extends Controller
                 $allSchedule = $makData2;
             }
 
+            // Merge admin schedules for departure journey
+            if (!empty($adminShipSchedules2)) {
+                $allSchedule = array_merge($allSchedule, $adminShipSchedules2);
+            }
+
             // $allSchedule3 = array_merge($allSchedule, $greenOceanData);
             $allSchedule3 = array_merge($allSchedule, $greenOceanData);
             // $allSchedule3 = $allSchedule;
@@ -477,7 +495,14 @@ class FerrybookingController extends Controller
 
             $sortedArray = $sorted->values()->all();
 
+            // For round trips, set the departure journey data as the main schedule data
+            $data['apiScheduleData'] = $sortedArray;
             $data['apiScheduleData2'] = $sortedArray;
+            
+            // Check if departure journey has schedules
+            if (empty($sortedArray)) {
+                return redirect()->back()->with('error', 'No ferry schedules found for the departure journey. Please try a different date or contact customer support.');
+            }
             // print_r($data['apiScheduleData2']);die;
             
             // Process return journey for round trip
@@ -602,6 +627,8 @@ class FerrybookingController extends Controller
                 "to_location" => $return_to_location,
             ));
 
+            // COMMENTED OUT - Makruzz API call disabled (managed through admin panel)
+            /*
             $makruzz_return_result = $this->makApiCallUltraFast('schedule_search', $return_mak_data);
 
             $ship = \Cache::remember('ship_1_data', 3600, function () {
@@ -621,6 +648,8 @@ class FerrybookingController extends Controller
                     $makReturnData[$val->id]['ship_class'][] =  $val;
                 }
             }
+            */
+            $makReturnData = []; // Empty array since API is disabled
 
             // Green Ocean call for return journey
             $greenOceanReturnData = $this->green_ocean_call_ultra_fast($return_from_location, $return_to_location, $no_of_passenger, $infant, $return_date);
@@ -645,7 +674,9 @@ class FerrybookingController extends Controller
 
             $sortedReturnArray = $sorted->values()->all();
 
+            // For round trips, set the return journey data
             $data['apiScheduleData3'] = $sortedReturnArray;
+            $data['returnScheduleData'] = $sortedReturnArray;
         }
 
 
@@ -1297,5 +1328,7 @@ class FerrybookingController extends Controller
         
         $json = json_encode($godata);
 
+        // Return the view with all the data
+        return view('booking.ferry.search-result-ferry', $data);
     }
 }
