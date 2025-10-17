@@ -844,7 +844,7 @@ body {
   letter-spacing: 1px;
 }
 
-/* FIXED: Simplified header positioning */
+/* FIXED: Simplified header positioning with iPhone safe area support */
 header {
   position: fixed;
   top: 0;
@@ -856,6 +856,10 @@ header {
   border-radius: 0;
   padding: 0.5rem 1rem;
   min-height: 70px;
+  /* iPhone safe area support */
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
 }
 
 header .navbar {
@@ -870,12 +874,16 @@ header .navbar {
 main {
   margin-top: 0;
   padding-top: 75px;
+  /* iPhone safe area support */
+  padding-top: max(75px, calc(75px + env(safe-area-inset-top)));
 }
 
 @media only screen and (max-width: 767px) {
   main {
     margin-top: 75px;
     padding-top: 0;
+    /* iPhone safe area support */
+    margin-top: max(75px, calc(75px + env(safe-area-inset-top)));
   }
 }
 
@@ -2567,11 +2575,47 @@ footer.mobile ul li a:hover {
     background-color: #fff;
     width: 100%;
     border-bottom: 1px solid #dbdbdb;
+    /* iPhone safe area support */
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
   }
 
   main {
     margin-top: 75px;
     padding-top: 0;
+    /* iPhone safe area support */
+    margin-top: max(75px, calc(75px + env(safe-area-inset-top)));
+    /* Remove bottom white space */
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  
+  /* Fix iPhone bottom white space */
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Ensure content fills viewport properly */
+  html {
+    height: -webkit-fill-available;
+  }
+  
+  /* Fix floating buttons on iPhone */
+  .whats-app,
+  .phone-app,
+  .floating-buttons {
+    bottom: max(20px, env(safe-area-inset-bottom) + 20px) !important;
+  }
+  
+  /* Remove any unwanted bottom spacing */
+  .container,
+  .row,
+  .col-12 {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
 
   p {
