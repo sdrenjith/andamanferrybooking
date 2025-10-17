@@ -46,6 +46,9 @@ class FerrybookingController extends Controller
 
     public function ferry_booking_search(Request $request)
     {
+        // Increase execution time limit for API calls
+        set_time_limit(120);
+        
         // Validate required fields
         $fromLocation = $request->form_location;
         $toLocation = $request->to_location;
@@ -60,6 +63,11 @@ class FerrybookingController extends Controller
         // Validate date format and check if it's not empty
         if (empty($date) || $date === 'Select Date' || $date === '') {
             return redirect()->back()->with('error', 'Please select a valid date for your journey.');
+        }
+        
+        // Additional date validation to prevent malformed dates
+        if (!strtotime($date)) {
+            return redirect()->back()->with('error', 'Invalid date format. Please select a valid date.');
         }
         
         // For round trips, validate departure and return journey details
@@ -80,6 +88,11 @@ class FerrybookingController extends Controller
                 return redirect()->back()->with('error', 'Please select a departure date for your round trip.');
             }
             
+            // Validate departure date format
+            if (!strtotime($departure_date)) {
+                return redirect()->back()->with('error', 'Invalid departure date format. Please select a valid date.');
+            }
+            
             // Validate return journey
             if (empty($return_from_location) || empty($return_to_location)) {
                 return redirect()->back()->with('error', 'Please select return journey locations.');
@@ -89,18 +102,17 @@ class FerrybookingController extends Controller
                 return redirect()->back()->with('error', 'Please select a return date for your round trip.');
             }
             
-            // Validate that return date is after departure date
+            // Validate return date format
+            if (!strtotime($return_date)) {
+                return redirect()->back()->with('error', 'Invalid return date format. Please select a valid date.');
+            }
+            
+            // Validate that return date is after or equal to departure date
             $depDate = strtotime($departure_date);
             $retDate = strtotime($return_date);
             
-            if ($retDate <= $depDate) {
-                return redirect()->back()->with('error', 'Return date must be after departure date. Please select a return date that is later than your departure date.');
-            }
-            
-            // Additional validation: Check if return date is at least 1 day after departure
-            $oneDayAfter = strtotime('+1 day', $depDate);
-            if ($retDate < $oneDayAfter) {
-                return redirect()->back()->with('error', 'Return date must be at least 1 day after departure date. Please select a valid return date.');
+            if ($retDate < $depDate) {
+                return redirect()->back()->with('error', 'Return date must be on or after departure date. Please select a valid return date.');
             }
         }
 
@@ -243,32 +255,34 @@ class FerrybookingController extends Controller
         // Merge all available data immediately (admin schedules are already loaded)
         $allSchedule = $adminShipSchedules;
         
-        // Try to get API data with very short timeouts (5 seconds max)
-        try {
-            $nautikaData = $this->getNautikaDataFast($data2, $ship_image2, $ship2);
-            if (!empty($nautikaData)) {
-                $allSchedule = array_merge($allSchedule, $nautikaData);
+        // Try to get API data with timeout handling - skip if admin data is sufficient
+        if (empty($allSchedule)) {
+            try {
+                $nautikaData = $this->getNautikaDataFast($data2, $ship_image2, $ship2);
+                if (!empty($nautikaData)) {
+                    $allSchedule = array_merge($allSchedule, $nautikaData);
+                }
+            } catch (\Exception $e) {
+                \Log::info('Nautika API timeout - continuing with admin data only: ' . $e->getMessage());
             }
-        } catch (\Exception $e) {
-            \Log::info('Nautika API timeout - continuing with admin data only');
-        }
 
-        try {
-            $makData = $this->getMakruzzDataFast($data3, $ship_image1, $ship1);
-            if (!empty($makData)) {
-                $allSchedule = array_merge($allSchedule, $makData);
+            try {
+                $makData = $this->getMakruzzDataFast($data3, $ship_image1, $ship1);
+                if (!empty($makData)) {
+                    $allSchedule = array_merge($allSchedule, $makData);
+                }
+            } catch (\Exception $e) {
+                \Log::info('Makruzz API timeout - continuing with available data: ' . $e->getMessage());
             }
-        } catch (\Exception $e) {
-            \Log::info('Makruzz API timeout - continuing with available data');
-        }
 
-        try {
-            $greenOceanData = $this->getGreenOceanDataFast($fromLocation, $toLocation, $no_of_passenger, $infant, $date);
-            if (!empty($greenOceanData)) {
-                $allSchedule = array_merge($allSchedule, $greenOceanData);
+            try {
+                $greenOceanData = $this->getGreenOceanDataFast($fromLocation, $toLocation, $no_of_passenger, $infant, $date);
+                if (!empty($greenOceanData)) {
+                    $allSchedule = array_merge($allSchedule, $greenOceanData);
+                }
+            } catch (\Exception $e) {
+                \Log::info('Green Ocean API timeout - continuing with available data: ' . $e->getMessage());
             }
-        } catch (\Exception $e) {
-            \Log::info('Green Ocean API timeout - continuing with available data');
         }
 
         // Sort the final schedule
@@ -278,6 +292,11 @@ class FerrybookingController extends Controller
         });
 
         $data['apiScheduleData'] = $sorted->values()->all();
+
+        // If no schedules found, show a message
+        if (empty($data['apiScheduleData'])) {
+            return redirect()->back()->with('error', 'No ferry schedules found for the selected date and route. Please try a different date or contact customer support.');
+        }
 
         // print_r($data['apiScheduleData']);die('test');
 

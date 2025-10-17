@@ -98,7 +98,7 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
                                         <p class="mb-0">Available Schedule</p>
                                     </div>
                                 </div>
-                                <form action="{{ url('search-result-ferry') }}" method="GET">
+                                <form action="{{ url('search-result-ferry') }}" method="GET" id="ferry-search-form">
                                     <input type="hidden" name="trip_type" id="trip_type" value="1">
                                     <div class="position-relative tabContainer">
                                         <div class="tabs tabs1 tab-round-trip mx-0 ferry-search-bar" style="opacity: 1; height: auto;">
@@ -1701,6 +1701,23 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
         height: auto !important;
         overflow: visible !important;
     }
+    
+    .tabBtn.active {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .tabBtn.active .icon-inactive {
+        display: none;
+    }
+    
+    .tabBtn.active .icon-active {
+        display: block;
+    }
+    
+    .tabBtn .icon-active {
+        display: none;
+    }
 </style>
 @endpush
 
@@ -1823,7 +1840,16 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
     }
 
     $(document).ready(function() {
+        // Initialize with one-way tab active
         $("#one-way").trigger("click");
+        
+        // Make sure the correct fields are enabled on page load
+        $(".tabs1").find("input, select, button").prop("disabled", false);
+        $(".tabs2").find("input, select, button").prop("disabled", true);
+        
+        // Ensure round trip form is hidden by default
+        $(".tabs2").css({'opacity': '0', 'height': '0', 'overflow': 'hidden'});
+        $(".tabs1").css({'opacity': '1', 'height': 'auto', 'overflow': 'visible'});
 
         $(".tabBtn.tabBtn1").on("click", function() {
             enableDiv1();
@@ -2026,80 +2052,102 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
 
         $("#round-trip").on("click", function() {
             $("#trip_type").val('2');
+            
+            // Show round trip form and hide one-way form
+            $(".tabs1").css({'opacity': '0', 'height': '0', 'overflow': 'hidden'});
+            $(".tabs2").css({'opacity': '1', 'height': 'auto', 'overflow': 'visible'});
+            
+            // IMPORTANT: Enable round trip form fields
+            $(".tabs2").find("input, select, button").prop("disabled", false);
+            
+            // Disable one-way form fields to prevent them from being submitted
+            $(".tabs1").find("input, select, button").prop("disabled", true);
+            
+            // Add active class to round trip tab
+            $(".tabBtn1").removeClass('active');
+            $(".tabBtn2").addClass('active');
         });
 
         $("#one-way").on("click", function() {
             $("#trip_type").val('1');
+            
+            // Show one-way form and hide round trip form
+            $(".tabs1").css({'opacity': '1', 'height': 'auto', 'overflow': 'visible'});
+            $(".tabs2").css({'opacity': '0', 'height': '0', 'overflow': 'hidden'});
+            
+            // IMPORTANT: Enable one-way form fields
+            $(".tabs1").find("input, select, button").prop("disabled", false);
+            
+            // Disable round trip form fields to prevent them from being submitted
+            $(".tabs2").find("input, select, button").prop("disabled", true);
+            
+            // Add active class to one-way tab
+            $(".tabBtn1").addClass('active');
+            $(".tabBtn2").removeClass('active');
         });
 
         // Round trip form validation
         $("#round_search").on("click", function(e) {
+            console.log('Round trip search clicked');
+            
+            // Prevent default first
             e.preventDefault();
             
             // Get form values
             const departureFrom = $("#departure_from_location").val();
             const departureTo = $("#departure_to_location").val();
             const departureDate = $("#departure_date").val();
+            const departurePassenger = $("#departure_passenger").val();
             const returnFrom = $("#return_from_location").val();
             const returnTo = $("#return_to_location").val();
             const returnDate = $("#return_date").val();
-            const departurePassenger = $("#departure_passenger").val();
             const returnPassenger = $("#return_passenger").val();
+            const infant = $("#round_infant").val();
             
-            // Validate departure journey
+            console.log('Form values:', {
+                departureFrom, departureTo, departureDate,
+                returnFrom, returnTo, returnDate
+            });
+            
+            // Validation
             if (!departureFrom || !departureTo || !departureDate) {
                 alert('Please fill in all departure journey details (From, To, and Date).');
                 return false;
             }
             
-            // Validate return journey
             if (!returnFrom || !returnTo || !returnDate) {
                 alert('Please fill in all return journey details (From, To, and Date).');
                 return false;
             }
             
-            // Validate dates
-            if (departureDate === 'Select Departure Date' || departureDate === '') {
-                alert('Please select a valid departure date.');
-                return false;
-            }
-            
-            if (returnDate === 'Select Return Date' || returnDate === '') {
-                alert('Please select a valid return date.');
-                return false;
-            }
-            
-            // Check if return date is after departure date
+            // Check if return date is after or equal to departure date
             const depDate = new Date(departureDate);
             const retDate = new Date(returnDate);
             
-            if (retDate <= depDate) {
-                alert('Return date must be after departure date. Please select a return date that is later than your departure date.');
+            if (retDate < depDate) {
+                alert('Return date must be on or after departure date. Please select a valid return date.');
                 return false;
             }
             
-            // Additional validation: Check if return date is at least 1 day after departure
-            const oneDayAfter = new Date(depDate);
-            oneDayAfter.setDate(oneDayAfter.getDate() + 1);
+            console.log('Validation passed, submitting form');
             
-            if (retDate < oneDayAfter) {
-                alert('Return date must be at least 1 day after departure date. Please select a valid return date.');
-                return false;
-            }
+            // Ensure trip_type is set to 2 for round trip
+            $("#trip_type").val('2');
             
-            // Validate passenger counts
-            if (!departurePassenger || departurePassenger < 1 || departurePassenger > 20) {
-                alert('Please enter a valid number of passengers for departure (1-20).');
-                return false;
-            }
+            // Make sure round trip fields are enabled before submission
+            $(".tabs2").find("input, select").prop("disabled", false);
             
-            if (!returnPassenger || returnPassenger < 1 || returnPassenger > 20) {
-                alert('Please enter a valid number of passengers for return (1-20).');
-                return false;
-            }
+            // Submit the form programmatically
+            $("#ferry-search-form").submit();
+        });
+        
+        // Add form submission handler for debugging
+        $("#ferry-search-form").on("submit", function(e) {
+            console.log('Form submission triggered');
+            console.log('Form data:', $(this).serialize());
             
-            // If all validations pass, submit the form
-            $("form").submit();
+            // Ensure all form fields are enabled before submission
+            $(this).find("input, select").prop("disabled", false);
         });
 
         // Sync passenger counts between departure and return journeys
@@ -2116,22 +2164,20 @@ Reserve your ferry tickets to Havelock, Neil, and other islands with instant con
             const departureDate = $(this).val();
             if (departureDate) {
                 const depDate = new Date(departureDate);
-                const minReturnDate = new Date(depDate);
-                minReturnDate.setDate(minReturnDate.getDate() + 1);
                 
-                // Update return date picker minimum date
+                // Update return date picker minimum date to be the same as departure date
                 const returnDatePicker = $("#return_date")[0]._flatpickr;
                 if (returnDatePicker) {
-                    returnDatePicker.set('minDate', minReturnDate);
+                    returnDatePicker.set('minDate', depDate);
                 }
                 
-                // If return date is already selected and is before the new minimum, clear it
+                // If return date is already selected and is before the departure date, clear it
                 const currentReturnDate = $("#return_date").val();
                 if (currentReturnDate) {
                     const retDate = new Date(currentReturnDate);
-                    if (retDate <= depDate) {
+                    if (retDate < depDate) {
                         $("#return_date").val('');
-                        alert('Return date has been cleared as it must be after the departure date.');
+                        alert('Return date has been cleared as it must be on or after the departure date.');
                     }
                 }
             }

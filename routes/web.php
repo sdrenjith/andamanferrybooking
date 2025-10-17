@@ -234,6 +234,29 @@ Route::get('/test-simple-email', function() {
     ];
 });
 
+// Test ferry search with minimal data
+Route::get('/test-ferry-search', function() {
+    try {
+        $controller = new \App\Http\Controllers\FerrybookingController();
+        $request = new \Illuminate\Http\Request();
+        $request->merge([
+            'trip_type' => 1,
+            'form_location' => 1,
+            'to_location' => 2,
+            'date' => date('Y-m-d'),
+            'passenger' => 1,
+            'infant' => 0
+        ]);
+        
+        return $controller->ferry_booking_search($request);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
+
 // Test server detection
 Route::get('/test-server-detection', function() {
     $serverName = $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'localhost';
