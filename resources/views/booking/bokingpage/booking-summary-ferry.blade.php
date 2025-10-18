@@ -403,9 +403,9 @@
                                         <span class="departing-txt-date"></span>
                                     </div>
                                     <div class="row w-100 p-0 m-0 departing-destination">
-                                        <div class="col-sm-6 destination-time px-0">{{ $booking_data['form_location'] == 1 ? 'Port Blair' : ($booking_data['form_location'] == 2 ? 'Havelock' : 'Neil'  ) }}
+                                        <div class="col-sm-6 destination-time px-0">{{ $from_location_title ?? 'Unknown' }}
                                         </div>
-                                        <div class="col-sm-6 destination-time px-0">{{ $booking_data['to_location'] == 1 ? 'Port Blair' : ($booking_data['to_location'] == 2 ? 'Havelock' : 'Neil'  ) }}
+                                        <div class="col-sm-6 destination-time px-0">{{ $to_location_title ?? 'Unknown' }}
                                         </div>
                                     </div>
 
@@ -546,9 +546,9 @@
                                         <div class="row w-100 p-0 m-0 departing-destination">
                                             <?php $form_location = $booking_data['departure_from_location']; ?>
                                             <?php $to_location = $booking_data['departure_to_location']; ?>
-                                            <div class="col-sm-6 destination-time px-0">{{ $booking_data['departure_from_location'] == 1 ? 'Port Blair' : ($booking_data['departure_from_location'] == 2 ? 'Havelock' : 'Neil'  ) }}
+                                            <div class="col-sm-6 destination-time px-0">{{ $return_from_location_title ?? 'Unknown' }}
                                             </div>
-                                            <div class="col-sm-6 destination-time px-0">{{ $booking_data['departure_to_location'] == 1 ? 'Port Blair' : ($booking_data['departure_to_location'] == 2 ? 'Havelock' : 'Neil'  ) }}
+                                            <div class="col-sm-6 destination-time px-0">{{ $return_to_location_title ?? 'Unknown' }}
                                             </div>
                                         </div>
 
@@ -692,9 +692,9 @@
                                         <div class="row w-100 p-0 m-0 departing-destination">
                                             <?php $form_location = $booking_data['round2_from_location']; ?>
                                             <?php $to_location = $booking_data['round2_to_location']; ?>
-                                            <div class="col-sm-6 destination-time px-0">{{ $booking_data['round2_from_location'] == 1 ? 'Port Blair' : ($booking_data['round2_from_location'] == 2 ? 'Havelock' : 'Neil'  ) }}
+                                            <div class="col-sm-6 destination-time px-0">{{ $round2_from_location_title ?? 'Unknown' }}
                                             </div>
-                                            <div class="col-sm-6 destination-time px-0">{{ $booking_data['round2_to_location'] == 1 ? 'Port Blair' : ($booking_data['round2_to_location'] == 2 ? 'Havelock' : 'Neil'  ) }}
+                                            <div class="col-sm-6 destination-time px-0">{{ $round2_to_location_title ?? 'Unknown' }}
                                             </div>
                                         </div>
 
@@ -897,8 +897,8 @@
                             <span style="color: #008495; font-weight: bold;">{{ $trip1['ship_name'] }}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['form_location'] == 1 ? 'Port Blair' : ($booking_data['form_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
-                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['to_location'] == 1 ? 'Port Blair' : ($booking_data['to_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $from_location_title ?? 'Unknown' }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $to_location_title ?? 'Unknown' }}</span>
                         </div>
                     </div>
                     
@@ -970,8 +970,8 @@
                             <span style="color: #008495; font-weight: bold;">{{ $trip2['ship_name'] }}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['departure_from_location'] == 1 ? 'Port Blair' : ($booking_data['departure_from_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
-                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['departure_to_location'] == 1 ? 'Port Blair' : ($booking_data['departure_to_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $return_from_location_title ?? 'Unknown' }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $return_to_location_title ?? 'Unknown' }}</span>
                         </div>
                     </div>
                     
@@ -1044,8 +1044,8 @@
                             <span style="color: #008495; font-weight: bold;">{{ $trip3['ship_name'] }}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['round2_from_location'] == 1 ? 'Port Blair' : ($booking_data['round2_from_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
-                            <span style="color: #008495; font-weight: bold;">{{ $booking_data['round2_to_location'] == 1 ? 'Port Blair' : ($booking_data['round2_to_location'] == 2 ? 'Havelock' : 'Neil') }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $round2_from_location_title ?? 'Unknown' }}</span>
+                            <span style="color: #008495; font-weight: bold;">{{ $round2_to_location_title ?? 'Unknown' }}</span>
                         </div>
                     </div>
                     

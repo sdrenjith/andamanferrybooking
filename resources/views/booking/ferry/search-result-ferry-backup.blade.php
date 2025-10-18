@@ -1184,6 +1184,22 @@
                                         aria-labelledby="nav-profile-tab">
                                         <div class="row">
                                             <div class="col-12 searchResults px-0">
+                                                {{-- Debug information for departure journey --}}
+                                                <div class="alert alert-success mb-3">
+                                                    <strong>🔍 Departure Journey Debug:</strong><br>
+                                                    Total Departure Ferries: {{ count($apiScheduleData ?? []) }}<br>
+                                                    Departure Route: {{ $route_titles['from_location'] ?? 'N/A' }} → {{ $route_titles['to_location'] ?? 'N/A' }}<br>
+                                                    Departure Date: {{ request('departure_date') ?? 'N/A' }}<br>
+                                                    <hr>
+                                                    <strong>Ferry Details:</strong>
+                                                    @if(isset($apiScheduleData))
+                                                        @foreach($apiScheduleData as $idx => $ferry)
+                                                            <br>{{ $idx + 1 }}. {{ $ferry['ship_name'] ?? 'Unknown' }} - 
+                                                            {{ $ferry['ship']['title'] ?? 'Unknown Ship' }} 
+                                                            ({{ $ferry['fromLocation']['title'] ?? 'N/A' }} → {{ $ferry['toLocation']['title'] ?? 'N/A' }})
+                                                        @endforeach
+                                                    @endif
+                                                </div>
                                                 @if (isset($apiScheduleData))
                                                     @foreach ($apiScheduleData as $key => $shipSchedule)
                                                         @if ($shipSchedule['ship_name'] == 'Nautika')
@@ -1331,7 +1347,6 @@
                                                                                 data-class_id="{{ $adminFerry['class']['id'] }}"
                                                                                 data-price="{{ $adminFerry['price'] }}"
                                                                                 data-psf="{{ 50 }}"
-                                                                                data-avl_seat="50"
                                                                                 data-ship_name="Admin"
                                                                                 class="btn {{ $adminFerry['class']['title'] }} ferry-btn  mb-2">
                                                                                 <p class="text-white mb-0">
@@ -1565,7 +1580,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="tab-pane societyList fade next_return_tab " id="nav-extra-duplicate1"
+                                    <div class="tab-pane societyList fade next_return_tab " id="nav-extra"
                                         role="tabpanel" aria-labelledby="nav-extra-tab">
 
                                         <div class="row">
@@ -1718,7 +1733,6 @@
                                                                                     data-class_id="{{ $adminFerry['class']['id'] }}"
                                                                                     data-price="{{ $adminFerry['price'] }}"
                                                                                     data-psf="{{ 50 }}"
-                                                                                    data-avl_seat="50"
                                                                                     data-ship_name="Admin"
                                                                                     class="btn {{ $adminFerry['class']['title'] }} ferry-btn2 mb-2">
                                                                                     <p class="text-white mb-0">
@@ -1969,9 +1983,8 @@
                                         </div>
                                     </div>
 
-                                    {{-- DUPLICATE SECTION REMOVED --}}
-                                    <div class="tab-pane fade" id="nav-extra-removed" role="tabpanel"
-                                        aria-labelledby="nav-extra-tab" style="display: none;">
+                                    <div class="tab-pane fade" id="nav-extra" role="tabpanel"
+                                        aria-labelledby="nav-extra-tab">
                                         <div class="row">
                                             <div class="col-12 searchResults px-0">
                                                 @if (isset($apiScheduleData3))
@@ -2121,7 +2134,6 @@
                                                                                 data-class_id="{{ $adminFerry['class']['id'] }}"
                                                                                 data-price="{{ $adminFerry['price'] }}"
                                                                                 data-psf="{{ 50 }}"
-                                                                                data-avl_seat="50"
                                                                                 data-ship_name="Admin"
                                                                                 class="btn {{ $adminFerry['class']['title'] }} ferry-btn3 mb-2">
                                                                                 <p class="text-white mb-0">
@@ -2369,13 +2381,72 @@
                                         </div>
                                     </div>
 
+                                    {{-- Debug: Check return tab conditions --}}
+                                    <div class="alert alert-warning mb-3">
+                                        <strong>🔍 Return Tab Debug:</strong><br>
+                                        Trip Type: {{ request('trip_type') }}<br>
+                                        Return Schedule Data Exists: {{ isset($apiScheduleData3) ? 'Yes' : 'No' }}<br>
+                                        Return Schedule Data Count: {{ isset($apiScheduleData3) ? count($apiScheduleData3) : 'N/A' }}<br>
+                                        Return Schedule Data Empty: {{ isset($apiScheduleData3) ? (empty($apiScheduleData3) ? 'Yes' : 'No') : 'N/A' }}<br>
+                                        Condition Met: {{ (request('trip_type') == 2 && !empty($apiScheduleData3)) ? 'Yes' : 'No' }}
+                                    </div>
 
                                     {{-- Second tab for return journey --}}
                                     @if (request('trip_type') == 2 && !empty($apiScheduleData3))
                                         <div class="tab-pane fade" id="nav-extra" role="tabpanel" aria-labelledby="nav-extra-tab">
                                             <div class="row">
                                                 <div class="col-12 searchResults px-0">
+                                                    <div class="alert alert-danger mb-3">
+                                                        <strong>🚨 RETURN TAB IS RENDERING!</strong><br>
+                                                        This means the return tab content is being loaded.<br>
+                                                        <strong>If you can see this message, the return tab is working!</strong>
+                                                    </div>
+                                                    {{-- Debug information --}}
+                                                    <div class="alert alert-info mb-3">
+                                                        <strong>🔍 Return Journey Debug:</strong><br>
+                                                        Total Return Ferries: {{ count($apiScheduleData3) }}<br>
+                                                        Return Route: {{ $return_route_titles['from_location'] ?? 'N/A' }} → {{ $return_route_titles['to_location'] ?? 'N/A' }}<br>
+                                                        Return Date: {{ request('return_date') ?? 'N/A' }}
+                                                    </div>
+                                                    <div class="alert alert-danger mb-3">
+                                                        <strong>🚨 TESTING LOOP ENTRY:</strong><br>
+                                                        About to enter foreach loop with {{ count($apiScheduleData3) }} items<br>
+                                                        Data exists: {{ isset($apiScheduleData3) ? 'YES' : 'NO' }}<br>
+                                                        First item: {{ isset($apiScheduleData3[0]) ? 'EXISTS' : 'NOT EXISTS' }}
+                                                    </div>
                                                     @foreach ($apiScheduleData3 as $key => $shipSchedule)
+                                                        <div class="alert alert-success mb-3">
+                                                            <strong>✅ LOOP ENTERED!</strong><br>
+                                                            Processing ferry {{ $key + 1 }} of {{ count($apiScheduleData3) }}
+                                                        </div>
+                                                        {{-- DIRECT FERRY RENDERING - BYPASS ALL CONDITIONS --}}
+                                                        <div class="ferryCard ferrySearch mb-3">
+                                                            <div class="ferryImg" data-ferry-id="{{ $shipSchedule['id'] }}">
+                                                                <img src="{{ env('UPLOADED_ASSETS') . $shipSchedule['ship']['image'] }}" alt="" style="">
+                                                            </div>
+                                                            <div class="ferryDetails ms-3">
+                                                                <div class="ferryName">
+                                                                    <h4 class="mb-3">{{ $shipSchedule['ship']['title'] }}</h4>
+                                                                    <p class="mb-3">Departure Time {{ date('H:i', strtotime($shipSchedule['departure_time'])) }}</p>
+                                                                    <p class="mb-3">Arrival Time {{ isset($shipSchedule['arrival_time']) ? date('H:i', strtotime($shipSchedule['arrival_time'])) : 'N/A' }}</p>
+                                                                    <p class="mb-3">{{ $return_route_titles['from_location'] }} - {{ $return_route_titles['to_location'] }}</p>
+                                                                </div>
+                                                                <div class="classBtn">
+                                                                    @if (isset($shipSchedule['ferry_prices']) && !empty($shipSchedule['ferry_prices']))
+                                                                        @foreach ($shipSchedule['ferry_prices'] as $ferryPrice)
+                                                                            <a href="#" id="{{ 'ferry_' . $ferryPrice['class']['title'] . '_' . $key + 1 }}" data-ferryschedule-id="{{ $shipSchedule['id'] }}" data-class_id="{{ $ferryPrice['class']['id'] }}" data-from="{{ $return_route_titles['from_location'] }}" data-to="{{ $return_route_titles['to_location'] }}" data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}" data-arrival_time="{{ isset($shipSchedule['arrival_time']) ? date('H:i', strtotime($shipSchedule['arrival_time'])) : 'N/A' }}" data-class-title="{{ $ferryPrice['class']['title'] }}" data-price="{{ $ferryPrice['price'] }}" data-psf="{{ $ferryPrice['psf'] ?? 50 }}" data-avl_seat="{{ $ferryPrice['seat'] ?? 0 }}" data-ship_name="{{ $shipSchedule['ship']['title'] }}" data-ship_id="{{ $shipSchedule['ship_id'] }}" class="btn {{ $ferryPrice['class']['title'] }} ferry-btn3 mb-2">
+                                                                                <p class="text-white mb-0">{{ $ferryPrice['class']['title'] }}</p>
+                                                                                <p class="text-white mb-0">₹ {{ $ferryPrice['price'] }}</p>
+                                                                                <p class="text-white mb-0">Seat: {{ $ferryPrice['seat'] ?? 0 }}</p>
+                                                                                <p class="bg-green-text-white mb-0">Book Now</p>
+                                                                            </a>
+                                                                        @endforeach
+                                                                    @else
+                                                                        <p class="text-muted">No pricing information available</p>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                         @if ($shipSchedule['ship_name'] == 'Nautika')
                                                             <div class="ferryCard ferrySearch mb-3">
                                                                 <div class="ferryImg" data-ferry-id="{{ $shipSchedule['id'] }}">
@@ -2407,6 +2478,10 @@
                                                                 </div>
                                                             </div>
                                                         @elseif($shipSchedule['ship_name'] == 'Admin')
+                                                            <div class="alert alert-success mb-3">
+                                                                <strong>✅ ADMIN FERRY FOUND!</strong><br>
+                                                                This means the Admin condition is being met!
+                                                            </div>
                                                             <div class="ferryCard ferrySearch mb-3">
                                                                 <div class="ferryImg" data-ferry-id="{{ $shipSchedule['id'] }}">
                                                                     <img src="{{ env('UPLOADED_ASSETS') . $shipSchedule['ship']['image'] }}" alt="" style="">
@@ -2421,9 +2496,10 @@
                                                                     <div class="classBtn">
                                                                         @if (isset($shipSchedule['ferry_prices']) && !empty($shipSchedule['ferry_prices']))
                                                                             @foreach ($shipSchedule['ferry_prices'] as $ferryPrice)
-                                                                            <a href="#" id="{{ 'ferry_' . $ferryPrice['class']['title'] . '_' . $key + 1 }}" data-ferryschedule-id="{{ $shipSchedule['id'] }}" data-class_id="{{ $ferryPrice['class']['id'] }}" data-from="{{ $return_route_titles['from_location'] }}" data-to="{{ $return_route_titles['to_location'] }}" data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}" data-arrival_time="{{ isset($shipSchedule['arrival_time']) ? date('H:i', strtotime($shipSchedule['arrival_time'])) : 'N/A' }}" data-class-title="{{ $ferryPrice['class']['title'] }}" data-price="{{ $ferryPrice['price'] }}" data-psf="{{ $ferryPrice['psf'] ?? 50 }}" data-avl_seat="50" data-ship_name="{{ $shipSchedule['ship']['title'] }}" data-ship_id="{{ $shipSchedule['ship_id'] }}" class="btn {{ $ferryPrice['class']['title'] }} ferry-btn3 mb-2">
+                                                                            <a href="#" id="{{ 'ferry_' . $ferryPrice['class']['title'] . '_' . $key + 1 }}" data-ferryschedule-id="{{ $shipSchedule['id'] }}" data-class_id="{{ $ferryPrice['class']['id'] }}" data-from="{{ $return_route_titles['from_location'] }}" data-to="{{ $return_route_titles['to_location'] }}" data-departure_time="{{ date('H:i', strtotime($shipSchedule['departure_time'])) }}" data-arrival_time="{{ isset($shipSchedule['arrival_time']) ? date('H:i', strtotime($shipSchedule['arrival_time'])) : 'N/A' }}" data-class-title="{{ $ferryPrice['class']['title'] }}" data-price="{{ $ferryPrice['price'] }}" data-psf="{{ $ferryPrice['psf'] ?? 50 }}" data-avl_seat="{{ $ferryPrice['seat'] ?? 0 }}" data-ship_name="{{ $shipSchedule['ship']['title'] }}" data-ship_id="{{ $shipSchedule['ship_id'] }}" class="btn {{ $ferryPrice['class']['title'] }} ferry-btn3 mb-2">
                                                                                 <p class="text-white mb-0">{{ $ferryPrice['class']['title'] }}</p>
                                                                                 <p class="text-white mb-0">₹ {{ $ferryPrice['price'] }}</p>
+                                                                                <p class="text-white mb-0">Seat: {{ $ferryPrice['seat'] ?? 0 }}</p>
                                                                                 <p class="bg-green-text-white mb-0">Book Now</p>
                                                                             </a>
                                                                             @endforeach
@@ -2965,14 +3041,6 @@
                         var results = JSON.parse(response);
 
                         // return false;
-
-                        // Handle Admin ferries (no seat selection needed)
-                        if (results.status === 'success' && !results.seats) {
-                            // For Admin ferries, redirect directly to booking page
-                            var newUrl = "{{ route('booking-ferry') }}";
-                            window.location.href = newUrl;
-                            return;
-                        }
 
                         if (results.seats) {
                             var seats = results.seats;

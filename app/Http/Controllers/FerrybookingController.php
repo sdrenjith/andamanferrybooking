@@ -266,17 +266,15 @@ class FerrybookingController extends Controller
                 \Log::info('Nautika API timeout - continuing with admin data only: ' . $e->getMessage());
             }
 
-            // COMMENTED OUT - Makruzz API call disabled (managed through admin panel)
-            /*
-            try {
-                $makData = $this->getMakruzzDataFast($data3, $ship_image1, $ship1);
-                if (!empty($makData)) {
-                    $allSchedule = array_merge($allSchedule, $makData);
-                }
-            } catch (\Exception $e) {
-                \Log::info('Makruzz API timeout - continuing with available data: ' . $e->getMessage());
-            }
-            */
+            // Makruzz API disabled - using admin panel ferries only
+            // try {
+            //     $makData = $this->getMakruzzDataFast($data3, $ship_image1, $ship1);
+            //     if (!empty($makData)) {
+            //         $allSchedule = array_merge($allSchedule, $makData);
+            //     }
+            // } catch (\Exception $e) {
+            //     \Log::info('Makruzz API timeout - continuing with available data: ' . $e->getMessage());
+            // }
 
             try {
                 $greenOceanData = $this->getGreenOceanDataFast($fromLocation, $toLocation, $no_of_passenger, $infant, $date);
@@ -296,8 +294,8 @@ class FerrybookingController extends Controller
 
         $data['apiScheduleData'] = $sorted->values()->all();
 
-        // If no schedules found, show a message (only for single trips)
-        if (empty($data['apiScheduleData']) && $trip_type == 1) {
+        // If no schedules found, show a message
+        if (empty($data['apiScheduleData'])) {
             return redirect()->back()->with('error', 'No ferry schedules found for the selected date and route. Please try a different date or contact customer support.');
         }
 
@@ -358,12 +356,6 @@ class FerrybookingController extends Controller
                 return redirect()->back()->with('error', 'Invalid location selected. Please try again.');
             }
 
-            // For round trips, set the departure journey route titles as the main route titles
-            $data['route_titles'] = [
-                'from_location' => $round_1_from_location_title->title,
-                'to_location' => $round_1_to_location_title->title,
-            ];
-            
             $data['round1_route_titles'] = [
                 'from_location' => $round_1_from_location_title->title,
                 'to_location' => $round_1_to_location_title->title,
@@ -436,9 +428,8 @@ class FerrybookingController extends Controller
                 "to_location" => $round1_to_location,
             ));
 
-            // COMMENTED OUT - Makruzz API call disabled (managed through admin panel)
-            /*
-            $makruzz_result = $this->makApiCallUltraFast('schedule_search', $data5);
+            // Makruzz API disabled - using admin panel ferries only
+            // $makruzz_result = $this->makApiCallUltraFast('schedule_search', $data5);
 
             // $ship=DB::table('ship_master')->select('image')->where('id', 1)->first();
             // $ship_image= $ship->image;
@@ -448,20 +439,19 @@ class FerrybookingController extends Controller
             });
             $ship_image = $ship ? $ship->image : '';
 
+            // Makruzz data processing disabled - using admin panel ferries only
             $makData2 = [];
-            if (!empty($makruzz_result) && !empty($makruzz_result->data)) {
-                $makFerry = $makruzz_result->data;
-                foreach ($makFerry as $key => $val) {
-                    $makData2[$val->id]['id'] =  $val->id;
-                    $makData2[$val->id]['departure_time'] =  $val->departure_time;
-                    $makData2[$val->id]['ship_name'] =  'Makruzz';
-                    $makData2[$val->id]['ship_image'] = $ship_image;
-                    $makData2[$val->id]['ship'] = $ship;
-                    $makData2[$val->id]['ship_class'][] =  $val;
-                }
-            }
-            */
-            $makData2 = []; // Empty array since API is disabled
+            // if (!empty($makruzz_result) && !empty($makruzz_result->data)) {
+            //     $makFerry = $makruzz_result->data;
+            //     foreach ($makFerry as $key => $val) {
+            //         $makData2[$val->id]['id'] =  $val->id;
+            //         $makData2[$val->id]['departure_time'] =  $val->departure_time;
+            //         $makData2[$val->id]['ship_name'] =  'Makruzz';
+            //         $makData2[$val->id]['ship_image'] = $ship_image;
+            //         $makData2[$val->id]['ship'] = $ship;
+            //         $makData2[$val->id]['ship_class'][] =  $val;
+            //     }
+            // }
 
             // ======================= GREEN OCEAN CALL ==================================
             $greenOceanData = $this->green_ocean_call_ultra_fast($round1_from_location, $round1_to_location, $no_of_passenger, $infant, $date);
@@ -478,11 +468,6 @@ class FerrybookingController extends Controller
                 $allSchedule = $makData2;
             }
 
-            // Merge admin schedules for departure journey
-            if (!empty($adminShipSchedules2)) {
-                $allSchedule = array_merge($allSchedule, $adminShipSchedules2);
-            }
-
             // $allSchedule3 = array_merge($allSchedule, $greenOceanData);
             $allSchedule3 = array_merge($allSchedule, $greenOceanData);
             // $allSchedule3 = $allSchedule;
@@ -495,14 +480,7 @@ class FerrybookingController extends Controller
 
             $sortedArray = $sorted->values()->all();
 
-            // For round trips, set the departure journey data as the main schedule data
-            $data['apiScheduleData'] = $sortedArray;
             $data['apiScheduleData2'] = $sortedArray;
-            
-            // Check if departure journey has schedules
-            if (empty($sortedArray)) {
-                return redirect()->back()->with('error', 'No ferry schedules found for the departure journey. Please try a different date or contact customer support.');
-            }
             // print_r($data['apiScheduleData2']);die;
             
             // Process return journey for round trip
@@ -535,6 +513,7 @@ class FerrybookingController extends Controller
                     ->orderBy('departure_time')
                     ->get()->toArray();
             });
+
 
             if ($adminShipSchedules3) {
                 foreach ($adminShipSchedules3 as $key => $val) {
@@ -627,29 +606,27 @@ class FerrybookingController extends Controller
                 "to_location" => $return_to_location,
             ));
 
-            // COMMENTED OUT - Makruzz API call disabled (managed through admin panel)
-            /*
-            $makruzz_return_result = $this->makApiCallUltraFast('schedule_search', $return_mak_data);
+            // Makruzz API disabled - using admin panel ferries only
+            // $makruzz_return_result = $this->makApiCallUltraFast('schedule_search', $return_mak_data);
 
             $ship = \Cache::remember('ship_1_data', 3600, function () {
                 return ShipMaster::with('images')->where('id', 1)->first();
             });
             $ship_image = $ship ? $ship->image : '';
 
+            // Makruzz data processing disabled - using admin panel ferries only
             $makReturnData = [];
-            if (!empty($makruzz_return_result) && !empty($makruzz_return_result->data)) {
-                $makFerry = $makruzz_return_result->data;
-                foreach ($makFerry as $key => $val) {
-                    $makReturnData[$val->id]['id'] =  $val->id;
-                    $makReturnData[$val->id]['departure_time'] =  $val->departure_time;
-                    $makReturnData[$val->id]['ship_name'] =  'Makruzz';
-                    $makReturnData[$val->id]['ship_image'] = $ship_image;
-                    $makReturnData[$val->id]['ship'] = $ship;
-                    $makReturnData[$val->id]['ship_class'][] =  $val;
-                }
-            }
-            */
-            $makReturnData = []; // Empty array since API is disabled
+            // if (!empty($makruzz_return_result) && !empty($makruzz_return_result->data)) {
+            //     $makFerry = $makruzz_return_result->data;
+            //     foreach ($makFerry as $key => $val) {
+            //         $makReturnData[$val->id]['id'] =  $val->id;
+            //         $makReturnData[$val->id]['departure_time'] =  $val->departure_time;
+            //         $makReturnData[$val->id]['ship_name'] =  'Makruzz';
+            //         $makReturnData[$val->id]['ship_image'] = $ship_image;
+            //         $makReturnData[$val->id]['ship'] = $ship;
+            //         $makReturnData[$val->id]['ship_class'][] =  $val;
+            //     }
+            // }
 
             // Green Ocean call for return journey
             $greenOceanReturnData = $this->green_ocean_call_ultra_fast($return_from_location, $return_to_location, $no_of_passenger, $infant, $return_date);
@@ -674,9 +651,7 @@ class FerrybookingController extends Controller
 
             $sortedReturnArray = $sorted->values()->all();
 
-            // For round trips, set the return journey data
             $data['apiScheduleData3'] = $sortedReturnArray;
-            $data['returnScheduleData'] = $sortedReturnArray;
         }
 
 
@@ -808,7 +783,8 @@ class FerrybookingController extends Controller
                 "to_location" => $round2_to_location,
             ));
 
-            $makruzz_result2 = $this->makApiCall('schedule_search', $data7);
+            // Makruzz API disabled - using admin panel ferries only
+            // $makruzz_result2 = $this->makApiCall('schedule_search', $data7);
 
             // $ship=DB::table('ship_master')->select('image')->where('id', 1)->first();
             // $ship_image= $ship->image;
@@ -818,18 +794,19 @@ class FerrybookingController extends Controller
             });
             $ship_image = $ship ? $ship->image : '';
 
+            // Makruzz data processing disabled - using admin panel ferries only
             $makData3 = [];
-            if (!empty($makruzz_result2) && !empty($makruzz_result2->data)) {
-                $makFerry = $makruzz_result2->data;
-                foreach ($makFerry as $key => $val) {
-                    $makData3[$val->id]['id'] =  $val->id;
-                    $makData3[$val->id]['departure_time'] =  $val->departure_time;
-                    $makData3[$val->id]['ship_name'] =  'Makruzz';
-                    $makData3[$val->id]['ship_image'] = $ship_image;
-                    $makData3[$val->id]['ship'] = $ship;
-                    $makData3[$val->id]['ship_class'][] =  $val;
-                }
-            }
+            // if (!empty($makruzz_result2) && !empty($makruzz_result2->data)) {
+            //     $makFerry = $makruzz_result2->data;
+            //     foreach ($makFerry as $key => $val) {
+            //         $makData3[$val->id]['id'] =  $val->id;
+            //         $makData3[$val->id]['departure_time'] =  $val->departure_time;
+            //         $makData3[$val->id]['ship_name'] =  'Makruzz';
+            //         $makData3[$val->id]['ship_image'] = $ship_image;
+            //         $makData3[$val->id]['ship'] = $ship;
+            //         $makData3[$val->id]['ship_class'][] =  $val;
+            //     }
+            // }
 
             if (!empty($nautikaData3)) {
                 $allSchedule2 = array_merge($makData3, $nautikaData3);
@@ -1328,7 +1305,5 @@ class FerrybookingController extends Controller
         
         $json = json_encode($godata);
 
-        // Return the view with all the data
-        return view('booking.ferry.search-result-ferry', $data);
     }
 }

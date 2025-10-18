@@ -683,6 +683,32 @@ class BookingController extends Controller
 
         if (!empty($booking_data) && !empty($ferry_list)) {
 
+            // ===================== FETCH LOCATION TITLES ==================================
+            // Get location titles for proper display
+            $fromLocationTitle = \App\Models\FerryLocation::where('id', $booking_data['form_location'])->first();
+            $toLocationTitle = \App\Models\FerryLocation::where('id', $booking_data['to_location'])->first();
+            
+            $data['from_location_title'] = $fromLocationTitle ? $fromLocationTitle->title : 'Unknown';
+            $data['to_location_title'] = $toLocationTitle ? $toLocationTitle->title : 'Unknown';
+            
+            // For round trips, get return location titles
+            if ($booking_data['trip_type'] >= 2) {
+                $returnFromLocationTitle = \App\Models\FerryLocation::where('id', $booking_data['return_from_location'])->first();
+                $returnToLocationTitle = \App\Models\FerryLocation::where('id', $booking_data['return_to_location'])->first();
+                
+                $data['return_from_location_title'] = $returnFromLocationTitle ? $returnFromLocationTitle->title : 'Unknown';
+                $data['return_to_location_title'] = $returnToLocationTitle ? $returnToLocationTitle->title : 'Unknown';
+            }
+            
+            // For triple trips, get additional location titles
+            if ($booking_data['trip_type'] == 3) {
+                $round2FromLocationTitle = \App\Models\FerryLocation::where('id', $booking_data['round2_from_location'])->first();
+                $round2ToLocationTitle = \App\Models\FerryLocation::where('id', $booking_data['round2_to_location'])->first();
+                
+                $data['round2_from_location_title'] = $round2FromLocationTitle ? $round2FromLocationTitle->title : 'Unknown';
+                $data['round2_to_location_title'] = $round2ToLocationTitle ? $round2ToLocationTitle->title : 'Unknown';
+            }
+
             // ===================== TRIP 1 ==================================
             $trip1FerryList = $ferry_list['apiScheduleData'];
             $ferryScheduleId = $booking_data['schedule'][1]['scheduleId'];
@@ -691,19 +717,24 @@ class BookingController extends Controller
             $passenger = $booking_data['no_of_passenger'];
             $infants = $booking_data['no_of_infant'];
 
+            $scheduleDet1 = null;
             foreach ($trip1FerryList as $row) {
                 if ($row['id'] == $ferryScheduleId && $row['ship_name'] == $ferryScheduleType) {
                     $scheduleDet1 = $row;
+                    break;
                 }
             }
 
             $selectedSche1 = [];
 
-            if ($scheduleDet1['ship_name'] == 'Admin') {
+            if ($scheduleDet1 && $scheduleDet1['ship_name'] == 'Admin') {
+                $selectedSche1['fare'] = 0; // Default fare
+                $selectedSche1['class_title'] = 'Standard'; // Default class
                 foreach ($scheduleDet1['ferry_prices'] as $row) {
                     if ($row['class_id'] == $booking_data['schedule'][1]['shipClass']) {
                         $selectedSche1['fare'] = $row['price'];
                         $selectedSche1['class_title'] = $row['class']['title'];
+                        break; // Exit loop once found
                     }
                 }
 
@@ -715,7 +746,7 @@ class BookingController extends Controller
                 $selectedSche1['arrival_time'] = $scheduleDet1['arrival_time'];
                 $selectedSche1['psf'] = 0;
                 $selectedSche1['route_id'] = NULL;
-            } else if ($scheduleDet1['ship_name'] == 'Nautika' || $scheduleDet1['ship_name'] == 'Makruzz' || str_contains($scheduleDet1['ship_name'], 'Green Ocean')) {
+            } else if ($scheduleDet1 && ($scheduleDet1['ship_name'] == 'Nautika' || $scheduleDet1['ship_name'] == 'Makruzz' || str_contains($scheduleDet1['ship_name'], 'Green Ocean'))) {
                 if ($booking_data['schedule'][1]['shipClass'] == 'bClass') {
                     $selectedSche1['fare'] = 200;
                     $selectedSche1['class_title'] = 'Business';
@@ -736,27 +767,55 @@ class BookingController extends Controller
                 $selectedSche1['tripSeatNo'] = $booking_data['schedule'][1]['tripSeatNo'] ?? null;
             }
 
+            // Ensure trip1 has required keys even if no ferry found
+            if (empty($selectedSche1)) {
+                $selectedSche1 = [
+                    'ship_name' => 'Unknown',
+                    'fare' => 0,
+                    'class_title' => 'Standard',
+                    'departure_time' => '00:00:00',
+                    'arrival_time' => '00:00:00',
+                    'psf' => 0
+                ];
+            }
             $data['trip1'] = $selectedSche1;
 
             // ============================ TRIP 2 =====================================================
             if ($booking_data['trip_type'] >= 2) {
-                $trip2FerryList = $ferry_list['apiScheduleData2'];
+                // For round trips, return journey data is in apiScheduleData3, not apiScheduleData2
+                $trip2FerryList = $ferry_list['apiScheduleData3'];
                 $ferryScheduleId = $booking_data['schedule'][2]['scheduleId'];
                 $ferryScheduleType = $booking_data['schedule'][2]['ship'];
 
+                $scheduleDet2 = null;
+                // Try to find the ferry by ID and ship name
                 foreach ($trip2FerryList as $row) {
                     if ($row['id'] == $ferryScheduleId && $row['ship_name'] == $ferryScheduleType) {
                         $scheduleDet2 = $row;
+                        break;
+                    }
+                }
+                
+                // If not found, try to find by ID only (for Admin ferries)
+                if (!$scheduleDet2) {
+                    foreach ($trip2FerryList as $row) {
+                        if ($row['id'] == $ferryScheduleId) {
+                            $scheduleDet2 = $row;
+                            break;
+                        }
                     }
                 }
 
                 $selectedSche2 = [];
 
-                if ($scheduleDet2['ship_name'] == 'Admin') {
+                if ($scheduleDet2 && $scheduleDet2['ship_name'] == 'Admin') {
+                    $selectedSche2['fare'] = 0; // Default fare
+                    $selectedSche2['class_title'] = 'Standard'; // Default class
                     foreach ($scheduleDet2['ferry_prices'] as $row) {
                         if ($row['class_id'] == $booking_data['schedule'][2]['shipClass']) {
                             $selectedSche2['fare'] = $row['price'];
                             $selectedSche2['class_title'] = $row['class']['title'];
+                            break; // Exit loop once found
                         }
                     }
 
@@ -769,7 +828,7 @@ class BookingController extends Controller
                     $selectedSche2['psf'] = 0;
                     $selectedSche2['route_id'] = NULL;
 
-                } else if ($scheduleDet2['ship_name'] == 'Nautika' || $scheduleDet2['ship_name'] == 'Makruzz' || str_contains($scheduleDet2['ship_name'], 'Green Ocean')) {
+                } else if ($scheduleDet2 && ($scheduleDet2['ship_name'] == 'Nautika' || $scheduleDet2['ship_name'] == 'Makruzz' || str_contains($scheduleDet2['ship_name'], 'Green Ocean'))) {
                     if ($booking_data['schedule'][2]['shipClass'] == 'bClass') {
                         $selectedSche2['fare'] = 200;
                         $selectedSche2['class_title'] = 'Business';
@@ -788,7 +847,7 @@ class BookingController extends Controller
                     $selectedSche2['route_id'] = NULL;
                     $selectedSche2['psf'] = 0;
                     $selectedSche2['tripSeatNo'] = $booking_data['schedule'][2]['tripSeatNo'] ?? null;
-                } else if ($scheduleDet2['ship_name'] == 'Makruzz') {
+                } else if ($scheduleDet2 && $scheduleDet2['ship_name'] == 'Makruzz') {
                     $selectedSche2['class_id'] = $booking_data['schedule'][2]['shipClass'];
                     $selectedSche2['schedule_id'] = $booking_data['schedule'][2]['scheduleId'];
                     $selectedSche2['trip_id'] = NULL;
@@ -804,7 +863,7 @@ class BookingController extends Controller
                             $selectedSche2['class_title'] = $sch->ship_class_title;
                         }
                     }
-                } else if (str_contains($scheduleDet2['ship_name'], 'Green Ocean')) {
+                } else if ($scheduleDet2 && str_contains($scheduleDet2['ship_name'], 'Green Ocean')) {
                     $selectedSche2['class_id'] = $booking_data['schedule'][2]['shipClass'];
                     $selectedSche2['schedule_id'] = $booking_data['schedule'][2]['scheduleId'];
                     $selectedSche2['trip_id'] = NULL;
@@ -824,6 +883,17 @@ class BookingController extends Controller
                     }
                 }
 
+                // Ensure trip2 has required keys even if no ferry found
+                if (empty($selectedSche2)) {
+                    $selectedSche2 = [
+                        'ship_name' => 'Unknown',
+                        'fare' => 0,
+                        'class_title' => 'Standard',
+                        'departure_time' => '00:00:00',
+                        'arrival_time' => '00:00:00',
+                        'psf' => 0
+                    ];
+                }
                 $data['trip2'] = $selectedSche2;
             }
 
@@ -833,18 +903,23 @@ class BookingController extends Controller
                 $ferryScheduleId = $booking_data['schedule'][3]['scheduleId'];
                 $ferryScheduleType = $booking_data['schedule'][3]['ship'];
 
+                $scheduleDet3 = null;
                 foreach ($trip3FerryList as $row) {
                     if ($row['id'] == $ferryScheduleId && $row['ship_name'] == $ferryScheduleType) {
                         $scheduleDet3 = $row;
+                        break;
                     }
                 }
                 $selectedSche3 = [];
 
-                if ($scheduleDet3['ship_name'] == 'Admin') {
+                if ($scheduleDet3 && $scheduleDet3['ship_name'] == 'Admin') {
+                    $selectedSche3['fare'] = 0; // Default fare
+                    $selectedSche3['class_title'] = 'Standard'; // Default class
                     foreach ($scheduleDet3['ferry_prices'] as $row) {
                         if ($row['class_id'] == $booking_data['schedule'][3]['shipClass']) {
                             $selectedSche3['fare'] = $row['price'];
                             $selectedSche3['class_title'] = $row['class']['title'];
+                            break; // Exit loop once found
                         }
                     }
 
@@ -857,7 +932,7 @@ class BookingController extends Controller
                     $selectedSche3['psf'] = 0;
                     $selectedSche3['route_id'] = NULL;
 
-                } else if ($scheduleDet3['ship_name'] == 'Nautika' || $scheduleDet3['ship_name'] == 'Makruzz' || str_contains($scheduleDet3['ship_name'], 'Green Ocean')) {
+                } else if ($scheduleDet3 && ($scheduleDet3['ship_name'] == 'Nautika' || $scheduleDet3['ship_name'] == 'Makruzz' || str_contains($scheduleDet3['ship_name'], 'Green Ocean'))) {
                     if ($booking_data['schedule'][3]['shipClass'] == 'bClass') {
                         $selectedSche3['fare'] = 200;
                         $selectedSche3['class_title'] = 'Business';
@@ -876,7 +951,7 @@ class BookingController extends Controller
                     $selectedSche3['psf'] = 0;
                     $selectedSche3['tripSeatNo'] = $booking_data['schedule'][3]['tripSeatNo'] ?? null;
                     $selectedSche3['route_id'] = NULL;
-                } else if ($scheduleDet3['ship_name'] == 'Makruzz') {
+                } else if ($scheduleDet3 && $scheduleDet3['ship_name'] == 'Makruzz') {
                     $selectedSche3['class_id'] = $booking_data['schedule'][3]['shipClass'];
                     $selectedSche3['schedule_id'] = $booking_data['schedule'][3]['scheduleId'];
                     $selectedSche3['trip_id'] = NULL;
@@ -891,7 +966,7 @@ class BookingController extends Controller
                             $selectedSche3['class_title'] = $sch->ship_class_title;
                         }
                     }
-                } else if (str_contains($scheduleDet3['ship_name'], 'Green Ocean')) {
+                } else if ($scheduleDet3 && str_contains($scheduleDet3['ship_name'], 'Green Ocean')) {
                     $selectedSche3['class_id'] = $booking_data['schedule'][3]['shipClass'];
                     $selectedSche3['schedule_id'] = $booking_data['schedule'][3]['scheduleId'];
                     $selectedSche3['trip_id'] = NULL;
@@ -910,6 +985,17 @@ class BookingController extends Controller
                     }
                 }
 
+                // Ensure trip3 has required keys even if no ferry found
+                if (empty($selectedSche3)) {
+                    $selectedSche3 = [
+                        'ship_name' => 'Unknown',
+                        'fare' => 0,
+                        'class_title' => 'Standard',
+                        'departure_time' => '00:00:00',
+                        'arrival_time' => '00:00:00',
+                        'psf' => 0
+                    ];
+                }
                 $data['trip3'] = $selectedSche3;
             }
 
